@@ -1,0 +1,1389 @@
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 1; @symbol_importdef<0> = [Toybox,1,7,13]; @symbol_importdef<1> = [ActivityMonitor,1,14,29]; ]
+import Toybox.ActivityMonitor;
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 2; @symbol_importdef<0> = [Toybox,2,7,13]; @symbol_importdef<1> = [Graphics,2,14,22]; ]
+import Toybox.Graphics;
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 3; @symbol_importdef<0> = [Toybox,3,7,13]; @symbol_importdef<1> = [Lang,3,14,18]; ]
+import Toybox.Lang;
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 4; @symbol_importdef<0> = [Toybox,4,7,13]; @symbol_importdef<1> = [System,4,14,20]; ]
+import Toybox.System;
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 5; @symbol_importdef<0> = [Toybox,5,7,13]; @symbol_importdef<1> = [Time,5,14,18]; ]
+import Toybox.Time;
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 6; @symbol_importdef<0> = [Toybox,6,7,13]; @symbol_importdef<1> = [Time,6,14,18]; @symbol_importdef<2> = [Gregorian,6,19,28]; ]
+import Toybox.Time.Gregorian;
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 7; @symbol_importdef<0> = [Toybox,7,7,13]; @symbol_importdef<1> = [Timer,7,14,19]; ]
+import Toybox.Timer;
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 8; @symbol_importdef<0> = [Toybox,8,7,13]; @symbol_importdef<1> = [WatchUi,8,14,21]; ]
+import Toybox.WatchUi;
+//! Two-page data view. Page 0 shows activity stats, page 1 shows device state.
+//! A 1 Hz timer drives redraws while the view is on screen.
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 12; @symbol_classdef = [GarminSampleView,12,6,22]; @symbol_extends<0> = [WatchUi,12,31,38]; @symbol_extends<1> = [View,12,39,43]; ]
+class GarminSampleView extends WatchUi.View {
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 12; ]
+    <init> {
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 12; ]
+    static
+    <init> {
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 14; @position = 18; @symbol_constdef = [PAGE_STATS,14,18,28]; ]
+    private
+    const PAGE_STATS = 0;
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 15; @position = 18; @symbol_constdef = [PAGE_SYSTEM,15,18,29]; ]
+    private
+    const PAGE_SYSTEM = 1;
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 16; @position = 18; @symbol_constdef = [PAGE_COUNT,16,18,28]; ]
+    private
+    const PAGE_COUNT = 2;
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 18; @position = 16; @symbol_vardef = [_page,18,16,21]; @symbol_type<0> = [Number,18,25,31]; ]
+    private
+    var _page as Number;
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 19; @position = 16; @symbol_vardef = [_timer,19,16,22]; @symbol_type<0> = [Timer,19,26,31]; @symbol_type<1> = [Timer,19,32,37]; ]
+    private
+    var _timer as Timer.Timer or Null;
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 21; @symbol_functiondef = [initialize,21,13,23]; ]
+    function initialize() as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_21_26_25_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 22 8 ]
+        symbol [ View %tmp.2 22 8 12 ];
+        %tmp.2 = getv ? :View;
+        symbol [ initialize %tmp.3 22 13 23 ];
+        %tmp.3 = getv function %tmp.2 :initialize;
+        invoke %tmp.2 %tmp.3();
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 23 8 ]
+        symbol [ PAGE_STATS %tmp.5 23 16 26 ];
+        %tmp.5 = getv ? :PAGE_STATS;
+        symbol [ _page ? 23 8 13 ];
+        putv self :_page %tmp.5;
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 24 8 ]
+        %tmp.6 = null;
+        symbol [ _timer ? 24 8 14 ];
+        putv self :_timer %tmp.6;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_21_26_25_4_stop:
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 27; @symbol_functiondef = [onLayout,27,13,21]; @symbol_param<0> = [dc,27,22,24]; @symbol_param<0>_type<0> = [Dc,27,28,30]; ]
+    function onLayout(dc as Dc) as Void {
+    }
+    //! Start the refresh timer only while the view is visible, to save battery.
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 31; @symbol_functiondef = [onShow,31,13,19]; ]
+    function onShow() as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_31_30_34_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 32 8 ]
+        symbol [ Timer %tmp.3 32 21 26 ];
+        %tmp.3 = getm $.Toybox.Timer;
+        symbol [ Timer %tmp.4 32 27 32 ];
+        %tmp.4 = getv function ? %tmp.3 :Timer;
+        %tmp.1 = newc %tmp.4 ();
+        symbol [ _timer ? 32 8 14 ];
+        putv self :_timer %tmp.1;
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 33 8 ]
+        symbol [ _timer %tmp.6 33 8 14 ];
+        %tmp.6 = getv ? :_timer;
+        symbol [ start %tmp.7 33 15 20 ];
+        %tmp.7 = getv function %tmp.6 :start;
+        %tmp.8 = self;
+        symbol [ method %tmp.9 33 21 27 ];
+        %tmp.9 = getv function %tmp.8 :method;
+        %tmp.11 = const :onTick;
+        symbol [ onTick %tmp.11 33 29 35 const ];
+        %tmp.12 = invoke %tmp.8 %tmp.9(%tmp.11);
+        %tmp.13 = 1000;
+        %tmp.14 = true;
+        invoke %tmp.6 %tmp.7(%tmp.12, %tmp.13, %tmp.14);
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_31_30_34_4_stop:
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 36; @symbol_functiondef = [onHide,36,13,19]; ]
+    function onHide() as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_36_30_41_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 37 8 ]
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_37_8_40_8_if_stmt:
+        symbol [ _timer %tmp.2 37 12 18 ];
+        %tmp.2 = getv ? :_timer;
+        %tmp.3 = null;
+        %tmp.4 = ne %tmp.2 %tmp.3;
+        bf %tmp.4 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_37_8_40_8_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_37_8_40_8_if_true:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_37_28_40_8_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 38 12 ]
+        symbol [ _timer %tmp.6 38 12 18 ];
+        %tmp.6 = getv ? :_timer;
+        %tmp.7 = as %tmp.6 { (!Null) };
+        symbol [ stop %tmp.8 38 19 23 ];
+        %tmp.8 = getv function %tmp.7 :stop;
+        invoke %tmp.7 %tmp.8();
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 39 12 ]
+        %tmp.9 = null;
+        symbol [ _timer ? 39 12 18 ];
+        putv self :_timer %tmp.9;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_37_28_40_8_stop:
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_37_8_40_8_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_37_8_40_8_if_end:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_36_30_41_4_stop:
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 43; @symbol_functiondef = [onTick,43,13,19]; ]
+    function onTick() as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_43_30_45_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 44 8 ]
+        symbol [ WatchUi %tmp.1 44 8 15 ];
+        %tmp.1 = getm $.Toybox.WatchUi;
+        symbol [ requestUpdate %tmp.2 44 16 29 ];
+        %tmp.2 = getv function %tmp.1 :requestUpdate;
+        invoke %tmp.1 %tmp.2();
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_43_30_45_4_stop:
+    }
+    //! Advance to the next page and redraw immediately.
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 48; @symbol_functiondef = [nextPage,48,13,21]; ]
+    function nextPage() as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_48_32_51_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 49 8 ]
+        symbol [ _page %tmp.2 49 17 22 ];
+        %tmp.2 = getv ? :_page;
+        %tmp.3 = 1;
+        %tmp.4 = add %tmp.2 %tmp.3;
+        symbol [ PAGE_COUNT %tmp.6 49 30 40 ];
+        %tmp.6 = getv ? :PAGE_COUNT;
+        %tmp.7 = mod %tmp.4 %tmp.6;
+        symbol [ _page ? 49 8 13 ];
+        putv self :_page %tmp.7;
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 50 8 ]
+        symbol [ WatchUi %tmp.8 50 8 15 ];
+        %tmp.8 = getm $.Toybox.WatchUi;
+        symbol [ requestUpdate %tmp.9 50 16 29 ];
+        %tmp.9 = getv function %tmp.8 :requestUpdate;
+        invoke %tmp.8 %tmp.9();
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_48_32_51_4_stop:
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 53; @symbol_functiondef = [previousPage,53,13,25]; ]
+    function previousPage() as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_53_36_56_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 54 8 ]
+        symbol [ _page %tmp.2 54 17 22 ];
+        %tmp.2 = getv ? :_page;
+        symbol [ PAGE_COUNT %tmp.4 54 25 35 ];
+        %tmp.4 = getv ? :PAGE_COUNT;
+        %tmp.5 = add %tmp.2 %tmp.4;
+        %tmp.6 = 1;
+        %tmp.7 = sub %tmp.5 %tmp.6;
+        symbol [ PAGE_COUNT %tmp.9 54 43 53 ];
+        %tmp.9 = getv ? :PAGE_COUNT;
+        %tmp.10 = mod %tmp.7 %tmp.9;
+        symbol [ _page ? 54 8 13 ];
+        putv self :_page %tmp.10;
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 55 8 ]
+        symbol [ WatchUi %tmp.11 55 8 15 ];
+        %tmp.11 = getm $.Toybox.WatchUi;
+        symbol [ requestUpdate %tmp.12 55 16 29 ];
+        %tmp.12 = getv function %tmp.11 :requestUpdate;
+        invoke %tmp.11 %tmp.12();
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_53_36_56_4_stop:
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 58; @symbol_functiondef = [onUpdate,58,13,21]; @symbol_param<0> = [dc,58,22,24]; @symbol_param<0>_type<0> = [Dc,58,28,30]; ]
+    function onUpdate(dc as Dc) as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_58_40_75_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 59 8 ]
+        %tmp.1 = lgetv %dc;
+        symbol [ dc %tmp.1 59 8 10 ];
+        symbol [ setColor %tmp.2 59 11 19 ];
+        %tmp.2 = getv function %tmp.1 :setColor;
+        symbol [ Graphics %tmp.3 59 20 28 ];
+        %tmp.3 = getm $.Toybox.Graphics;
+        symbol [ COLOR_WHITE %tmp.4 59 29 40 ];
+        %tmp.4 = getv %tmp.3 :COLOR_WHITE;
+        symbol [ Graphics %tmp.5 59 42 50 ];
+        %tmp.5 = getm $.Toybox.Graphics;
+        symbol [ COLOR_BLACK %tmp.6 59 51 62 ];
+        %tmp.6 = getv %tmp.5 :COLOR_BLACK;
+        invoke %tmp.1 %tmp.2(%tmp.4, %tmp.6);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 60 8 ]
+        %tmp.7 = lgetv %dc;
+        symbol [ dc %tmp.7 60 8 10 ];
+        symbol [ clear %tmp.8 60 11 16 ];
+        %tmp.8 = getv function %tmp.7 :clear;
+        invoke %tmp.7 %tmp.8();
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 62 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_58_40_75_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_58_40_75_4_stop" ]
+        %width.1 = local;
+        symbol [ width %width.1 62 12 17 ];
+        %tmp.9 = lgetv %dc;
+        symbol [ dc %tmp.9 62 20 22 ];
+        symbol [ getWidth %tmp.10 62 23 31 ];
+        %tmp.10 = getv function %tmp.9 :getWidth;
+        %tmp.11 = invoke %tmp.9 %tmp.10();
+        lputv %width.1 %tmp.11;
+        symbol [ width %width.1 62 12 17 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 63 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_58_40_75_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_58_40_75_4_stop" ]
+        %height.2 = local;
+        symbol [ height %height.2 63 12 18 ];
+        %tmp.12 = lgetv %dc;
+        symbol [ dc %tmp.12 63 21 23 ];
+        symbol [ getHeight %tmp.13 63 24 33 ];
+        %tmp.13 = getv function %tmp.12 :getHeight;
+        %tmp.14 = invoke %tmp.12 %tmp.13();
+        lputv %height.2 %tmp.14;
+        symbol [ height %height.2 63 12 18 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 64 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_58_40_75_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_58_40_75_4_stop" ]
+        %centerX.3 = local;
+        symbol [ centerX %centerX.3 64 12 19 ];
+        %tmp.15 = lgetv %width.1;
+        symbol [ width %tmp.15 64 22 27 ];
+        %tmp.16 = 2;
+        %tmp.17 = div %tmp.15 %tmp.16;
+        lputv %centerX.3 %tmp.17;
+        symbol [ centerX %centerX.3 64 12 19 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 66 8 ]
+        %tmp.18 = self;
+        symbol [ drawHeader %tmp.19 66 8 18 ];
+        %tmp.19 = getv function %tmp.18 :drawHeader;
+        %tmp.20 = lgetv %dc;
+        symbol [ dc %tmp.20 66 19 21 ];
+        %tmp.21 = lgetv %centerX.3;
+        symbol [ centerX %tmp.21 66 23 30 ];
+        %tmp.22 = lgetv %height.2;
+        symbol [ height %tmp.22 66 32 38 ];
+        invoke %tmp.18 %tmp.19(%tmp.20, %tmp.21, %tmp.22);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 68 8 ]
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_68_8_72_8_if_stmt:
+        symbol [ _page %tmp.24 68 12 17 ];
+        %tmp.24 = getv ? :_page;
+        symbol [ PAGE_STATS %tmp.26 68 21 31 ];
+        %tmp.26 = getv ? :PAGE_STATS;
+        %tmp.27 = eq %tmp.24 %tmp.26;
+        bf %tmp.27 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_68_8_72_8_if_else_false;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_68_8_72_8_if_true:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_68_33_70_8_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 69 12 ]
+        %tmp.28 = self;
+        symbol [ drawStatsPage %tmp.29 69 12 25 ];
+        %tmp.29 = getv function %tmp.28 :drawStatsPage;
+        %tmp.30 = lgetv %dc;
+        symbol [ dc %tmp.30 69 26 28 ];
+        %tmp.31 = lgetv %centerX.3;
+        symbol [ centerX %tmp.31 69 30 37 ];
+        %tmp.32 = lgetv %height.2;
+        symbol [ height %tmp.32 69 39 45 ];
+        invoke %tmp.28 %tmp.29(%tmp.30, %tmp.31, %tmp.32);
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_68_33_70_8_stop:
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_68_8_72_8_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_68_8_72_8_if_else_false:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_70_15_72_8_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 71 12 ]
+        %tmp.33 = self;
+        symbol [ drawSystemPage %tmp.34 71 12 26 ];
+        %tmp.34 = getv function %tmp.33 :drawSystemPage;
+        %tmp.35 = lgetv %dc;
+        symbol [ dc %tmp.35 71 27 29 ];
+        %tmp.36 = lgetv %centerX.3;
+        symbol [ centerX %tmp.36 71 31 38 ];
+        %tmp.37 = lgetv %height.2;
+        symbol [ height %tmp.37 71 40 46 ];
+        invoke %tmp.33 %tmp.34(%tmp.35, %tmp.36, %tmp.37);
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_70_15_72_8_stop:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_68_8_72_8_if_end:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 74 8 ]
+        %tmp.38 = self;
+        symbol [ drawPageDots %tmp.39 74 8 20 ];
+        %tmp.39 = getv function %tmp.38 :drawPageDots;
+        %tmp.40 = lgetv %dc;
+        symbol [ dc %tmp.40 74 21 23 ];
+        %tmp.41 = lgetv %centerX.3;
+        symbol [ centerX %tmp.41 74 25 32 ];
+        %tmp.42 = lgetv %height.2;
+        symbol [ height %tmp.42 74 34 40 ];
+        invoke %tmp.38 %tmp.39(%tmp.40, %tmp.41, %tmp.42);
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_58_40_75_4_stop:
+    }
+    //! Title plus current clock time.
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 78; @symbol_functiondef = [drawHeader,78,21,31]; @symbol_param<0> = [dc,78,32,34]; @symbol_param<0>_type<0> = [Dc,78,38,40]; @symbol_param<1> = [centerX,78,42,49]; @symbol_param<1>_type<0> = [Number,78,53,59]; @symbol_param<2> = [height,78,61,67]; @symbol_param<2>_type<0> = [Number,78,71,77]; ]
+    private
+    function drawHeader(dc as Dc, centerX as Number, height as Number) as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_78_87_93_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 79 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_78_87_93_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_78_87_93_4_stop" ]
+        %title.1 = local;
+        symbol [ title %title.1 79 12 17 ];
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_79_20_81_62_begin:
+        symbol [ _page %tmp.2 79 21 26 ];
+        %tmp.2 = getv ? :_page;
+        symbol [ PAGE_STATS %tmp.4 79 30 40 ];
+        %tmp.4 = getv ? :PAGE_STATS;
+        %tmp.5 = eq %tmp.2 %tmp.4;
+        bf %tmp.5 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_79_20_81_62_else_false;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_79_20_81_62_true:
+        symbol [ WatchUi %tmp.6 80 14 21 ];
+        %tmp.6 = getm $.Toybox.WatchUi;
+        symbol [ loadResource %tmp.7 80 22 34 ];
+        %tmp.7 = getv function %tmp.6 :loadResource;
+        symbol [ Rez %tmp.9 80 35 38 ];
+        %tmp.9 = getv ? :Rez;
+        symbol [ Strings %tmp.10 80 39 46 ];
+        %tmp.10 = getv %tmp.9 :Strings;
+        symbol [ PageStats %tmp.11 80 47 56 ];
+        %tmp.11 = getv %tmp.10 :PageStats;
+        %tmp.12 = invoke %tmp.6 %tmp.7(%tmp.11);
+        %tmp.13 = as %tmp.12 String;
+        symbol [ String %tmp.13 80 61 67 ];
+        push %tmp.13;
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_79_20_81_62_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_79_20_81_62_else_false:
+        symbol [ WatchUi %tmp.14 81 14 21 ];
+        %tmp.14 = getm $.Toybox.WatchUi;
+        symbol [ loadResource %tmp.15 81 22 34 ];
+        %tmp.15 = getv function %tmp.14 :loadResource;
+        symbol [ Rez %tmp.17 81 35 38 ];
+        %tmp.17 = getv ? :Rez;
+        symbol [ Strings %tmp.18 81 39 46 ];
+        %tmp.18 = getv %tmp.17 :Strings;
+        symbol [ PageSystem %tmp.19 81 47 57 ];
+        %tmp.19 = getv %tmp.18 :PageSystem;
+        %tmp.20 = invoke %tmp.14 %tmp.15(%tmp.19);
+        %tmp.21 = as %tmp.20 String;
+        symbol [ String %tmp.21 81 62 68 ];
+        push %tmp.21;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_79_20_81_62_end:
+        %tmp.22 = phi [%tmp.5 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_79_20_81_62_begin] [%tmp.13 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_79_20_81_62_true] [%tmp.21 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_79_20_81_62_else_false] [%tmp.22 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_79_20_81_62_end];
+        lputv %title.1 %tmp.22;
+        symbol [ title %title.1 79 12 17 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 83 8 ]
+        %tmp.23 = lgetv %dc;
+        symbol [ dc %tmp.23 83 8 10 ];
+        symbol [ setColor %tmp.24 83 11 19 ];
+        %tmp.24 = getv function %tmp.23 :setColor;
+        symbol [ Graphics %tmp.25 83 20 28 ];
+        %tmp.25 = getm $.Toybox.Graphics;
+        symbol [ COLOR_LT_GRAY %tmp.26 83 29 42 ];
+        %tmp.26 = getv %tmp.25 :COLOR_LT_GRAY;
+        symbol [ Graphics %tmp.27 83 44 52 ];
+        %tmp.27 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.28 83 53 70 ];
+        %tmp.28 = getv %tmp.27 :COLOR_TRANSPARENT;
+        invoke %tmp.23 %tmp.24(%tmp.26, %tmp.28);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 84 8 ]
+        %tmp.29 = lgetv %dc;
+        symbol [ dc %tmp.29 84 8 10 ];
+        symbol [ drawText %tmp.30 84 11 19 ];
+        %tmp.30 = getv function %tmp.29 :drawText;
+        %tmp.31 = lgetv %centerX;
+        symbol [ centerX %tmp.31 84 20 27 ];
+        %tmp.32 = lgetv %height;
+        symbol [ height %tmp.32 84 29 35 ];
+        %tmp.33 = 0.16;
+        %tmp.34 = mul %tmp.32 %tmp.33;
+        symbol [ Graphics %tmp.35 84 44 52 ];
+        %tmp.35 = getm $.Toybox.Graphics;
+        symbol [ FONT_XTINY %tmp.36 84 53 63 ];
+        %tmp.36 = getv %tmp.35 :FONT_XTINY;
+        %tmp.37 = lgetv %title.1;
+        symbol [ title %tmp.37 84 65 70 ];
+        symbol [ Graphics %tmp.38 85 20 28 ];
+        %tmp.38 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_CENTER %tmp.39 85 29 48 ];
+        %tmp.39 = getv %tmp.38 :TEXT_JUSTIFY_CENTER;
+        symbol [ Graphics %tmp.40 85 51 59 ];
+        %tmp.40 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_VCENTER %tmp.41 85 60 80 ];
+        %tmp.41 = getv %tmp.40 :TEXT_JUSTIFY_VCENTER;
+        %tmp.42 = bitor %tmp.39 %tmp.41;
+        invoke %tmp.29 %tmp.30(%tmp.31, %tmp.34, %tmp.36, %tmp.37, %tmp.42);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 87 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_78_87_93_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_78_87_93_4_stop" ]
+        %now.2 = local;
+        symbol [ now %now.2 87 12 15 ];
+        symbol [ Gregorian %tmp.43 87 18 27 ];
+        %tmp.43 = getm $.Toybox.Time.Gregorian;
+        symbol [ info %tmp.44 87 28 32 ];
+        %tmp.44 = getv function %tmp.43 :info;
+        symbol [ Time %tmp.45 87 33 37 ];
+        %tmp.45 = getm $.Toybox.Time;
+        symbol [ now %tmp.46 87 38 41 ];
+        %tmp.46 = getv function %tmp.45 :now;
+        %tmp.47 = invoke %tmp.45 %tmp.46();
+        symbol [ Time %tmp.48 87 45 49 ];
+        %tmp.48 = getm $.Toybox.Time;
+        symbol [ FORMAT_SHORT %tmp.49 87 50 62 ];
+        %tmp.49 = getv %tmp.48 :FORMAT_SHORT;
+        %tmp.50 = invoke %tmp.43 %tmp.44(%tmp.47, %tmp.49);
+        lputv %now.2 %tmp.50;
+        symbol [ now %now.2 87 12 15 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 88 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_78_87_93_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_78_87_93_4_stop" ]
+        %clock.3 = local;
+        symbol [ clock %clock.3 88 12 17 ];
+        symbol [ Lang %tmp.51 88 20 24 ];
+        %tmp.51 = getm $.Toybox.Lang;
+        symbol [ format %tmp.52 88 25 31 ];
+        %tmp.52 = getv function %tmp.51 :format;
+        %tmp.53 = "$1$:$2$";
+        %tmp.54 = newa 2;
+        %tmp.55 = lgetv %now.2;
+        symbol [ now %tmp.55 88 44 47 ];
+        symbol [ hour %tmp.56 88 48 52 ];
+        %tmp.56 = getv %tmp.55 :hour;
+        symbol [ format %tmp.57 88 53 59 ];
+        %tmp.57 = getv function %tmp.56 :format;
+        %tmp.58 = "%02d";
+        %tmp.59 = invoke %tmp.56 %tmp.57(%tmp.58);
+        %tmp.60 = dup %tmp.54;
+        %tmp.61 = aputv %tmp.60 0 %tmp.59;
+        %tmp.62 = lgetv %now.2;
+        symbol [ now %tmp.62 88 69 72 ];
+        symbol [ min %tmp.63 88 73 76 ];
+        %tmp.63 = getv %tmp.62 :min;
+        symbol [ format %tmp.64 88 77 83 ];
+        %tmp.64 = getv function %tmp.63 :format;
+        %tmp.65 = "%02d";
+        %tmp.66 = invoke %tmp.63 %tmp.64(%tmp.65);
+        %tmp.67 = dup %tmp.61;
+        %tmp.68 = aputv %tmp.67 1 %tmp.66;
+        %tmp.69 = invoke %tmp.51 %tmp.52(%tmp.53, %tmp.68);
+        lputv %clock.3 %tmp.69;
+        symbol [ clock %clock.3 88 12 17 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 90 8 ]
+        %tmp.70 = lgetv %dc;
+        symbol [ dc %tmp.70 90 8 10 ];
+        symbol [ setColor %tmp.71 90 11 19 ];
+        %tmp.71 = getv function %tmp.70 :setColor;
+        symbol [ Graphics %tmp.72 90 20 28 ];
+        %tmp.72 = getm $.Toybox.Graphics;
+        symbol [ COLOR_WHITE %tmp.73 90 29 40 ];
+        %tmp.73 = getv %tmp.72 :COLOR_WHITE;
+        symbol [ Graphics %tmp.74 90 42 50 ];
+        %tmp.74 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.75 90 51 68 ];
+        %tmp.75 = getv %tmp.74 :COLOR_TRANSPARENT;
+        invoke %tmp.70 %tmp.71(%tmp.73, %tmp.75);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 91 8 ]
+        %tmp.76 = lgetv %dc;
+        symbol [ dc %tmp.76 91 8 10 ];
+        symbol [ drawText %tmp.77 91 11 19 ];
+        %tmp.77 = getv function %tmp.76 :drawText;
+        %tmp.78 = lgetv %centerX;
+        symbol [ centerX %tmp.78 91 20 27 ];
+        %tmp.79 = lgetv %height;
+        symbol [ height %tmp.79 91 29 35 ];
+        %tmp.80 = 0.30;
+        %tmp.81 = mul %tmp.79 %tmp.80;
+        symbol [ Graphics %tmp.82 91 44 52 ];
+        %tmp.82 = getm $.Toybox.Graphics;
+        symbol [ FONT_NUMBER_MEDIUM %tmp.83 91 53 71 ];
+        %tmp.83 = getv %tmp.82 :FONT_NUMBER_MEDIUM;
+        %tmp.84 = lgetv %clock.3;
+        symbol [ clock %tmp.84 91 73 78 ];
+        symbol [ Graphics %tmp.85 92 20 28 ];
+        %tmp.85 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_CENTER %tmp.86 92 29 48 ];
+        %tmp.86 = getv %tmp.85 :TEXT_JUSTIFY_CENTER;
+        symbol [ Graphics %tmp.87 92 51 59 ];
+        %tmp.87 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_VCENTER %tmp.88 92 60 80 ];
+        %tmp.88 = getv %tmp.87 :TEXT_JUSTIFY_VCENTER;
+        %tmp.89 = bitor %tmp.86 %tmp.88;
+        invoke %tmp.76 %tmp.77(%tmp.78, %tmp.81, %tmp.83, %tmp.84, %tmp.89);
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_78_87_93_4_stop:
+    }
+    //! Steps / distance / calories / heart rate from ActivityMonitor.
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 96; @symbol_functiondef = [drawStatsPage,96,21,34]; @symbol_param<0> = [dc,96,35,37]; @symbol_param<0>_type<0> = [Dc,96,41,43]; @symbol_param<1> = [centerX,96,45,52]; @symbol_param<1>_type<0> = [Number,96,56,62]; @symbol_param<2> = [height,96,64,70]; @symbol_param<2>_type<0> = [Number,96,74,80]; ]
+    private
+    function drawStatsPage(dc as Dc, centerX as Number, height as Number) as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 97 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_stop" ]
+        %info.1 = local;
+        symbol [ info %info.1 97 12 16 ];
+        symbol [ ActivityMonitor %tmp.1 97 19 34 ];
+        %tmp.1 = getm $.Toybox.ActivityMonitor;
+        symbol [ getInfo %tmp.2 97 35 42 ];
+        %tmp.2 = getv function %tmp.1 :getInfo;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        lputv %info.1 %tmp.3;
+        symbol [ info %info.1 97 12 16 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 98 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_stop" ]
+        %noValue.2 = local;
+        symbol [ noValue %noValue.2 98 12 19 ];
+        symbol [ WatchUi %tmp.4 98 22 29 ];
+        %tmp.4 = getm $.Toybox.WatchUi;
+        symbol [ loadResource %tmp.5 98 30 42 ];
+        %tmp.5 = getv function %tmp.4 :loadResource;
+        symbol [ Rez %tmp.7 98 43 46 ];
+        %tmp.7 = getv ? :Rez;
+        symbol [ Strings %tmp.8 98 47 54 ];
+        %tmp.8 = getv %tmp.7 :Strings;
+        symbol [ NoValue %tmp.9 98 55 62 ];
+        %tmp.9 = getv %tmp.8 :NoValue;
+        %tmp.10 = invoke %tmp.4 %tmp.5(%tmp.9);
+        %tmp.11 = as %tmp.10 String;
+        symbol [ String %tmp.11 98 67 73 ];
+        lputv %noValue.2 %tmp.11;
+        symbol [ noValue %noValue.2 98 12 19 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 100 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_stop" ]
+        %rawSteps.3 = local;
+        symbol [ rawSteps %rawSteps.3 100 12 20 ];
+        %tmp.12 = lgetv %info.1;
+        symbol [ info %tmp.12 100 23 27 ];
+        symbol [ steps %tmp.13 100 28 33 ];
+        %tmp.13 = getv %tmp.12 :steps;
+        lputv %rawSteps.3 %tmp.13;
+        symbol [ rawSteps %rawSteps.3 100 12 20 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 101 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_stop" ]
+        %rawGoal.4 = local;
+        symbol [ rawGoal %rawGoal.4 101 12 19 ];
+        %tmp.14 = lgetv %info.1;
+        symbol [ info %tmp.14 101 22 26 ];
+        symbol [ stepGoal %tmp.15 101 27 35 ];
+        %tmp.15 = getv %tmp.14 :stepGoal;
+        lputv %rawGoal.4 %tmp.15;
+        symbol [ rawGoal %rawGoal.4 101 12 19 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 102 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_stop" ]
+        %rawDistance.5 = local;
+        symbol [ rawDistance %rawDistance.5 102 12 23 ];
+        %tmp.16 = lgetv %info.1;
+        symbol [ info %tmp.16 102 26 30 ];
+        symbol [ distance %tmp.17 102 31 39 ];
+        %tmp.17 = getv %tmp.16 :distance;
+        lputv %rawDistance.5 %tmp.17;
+        symbol [ rawDistance %rawDistance.5 102 12 23 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 103 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_stop" ]
+        %rawCalories.6 = local;
+        symbol [ rawCalories %rawCalories.6 103 12 23 ];
+        %tmp.18 = lgetv %info.1;
+        symbol [ info %tmp.18 103 26 30 ];
+        symbol [ calories %tmp.19 103 31 39 ];
+        %tmp.19 = getv %tmp.18 :calories;
+        lputv %rawCalories.6 %tmp.19;
+        symbol [ rawCalories %rawCalories.6 103 12 23 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 105 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_stop" ]
+        %steps.7 = local;
+        symbol [ steps %steps.7 105 12 17 ];
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_105_20_105_63_begin:
+        %tmp.20 = lgetv %rawSteps.3;
+        symbol [ rawSteps %tmp.20 105 21 29 ];
+        %tmp.21 = null;
+        %tmp.22 = ne %tmp.20 %tmp.21;
+        bf %tmp.22 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_105_20_105_63_else_false;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_105_20_105_63_true:
+        %tmp.23 = lgetv %rawSteps.3;
+        symbol [ rawSteps %tmp.23 105 41 49 ];
+        %tmp.24 = as %tmp.23 { (!Null) };
+        symbol [ toString %tmp.25 105 50 58 ];
+        %tmp.25 = getv function %tmp.24 :toString;
+        %tmp.26 = invoke %tmp.24 %tmp.25();
+        push %tmp.26;
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_105_20_105_63_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_105_20_105_63_else_false:
+        %tmp.27 = lgetv %noValue.2;
+        symbol [ noValue %tmp.27 105 63 70 ];
+        push %tmp.27;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_105_20_105_63_end:
+        %tmp.28 = phi [%tmp.22 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_105_20_105_63_begin] [%tmp.26 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_105_20_105_63_true] [%tmp.27 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_105_20_105_63_else_false] [%tmp.28 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_105_20_105_63_end];
+        lputv %steps.7 %tmp.28;
+        symbol [ steps %steps.7 105 12 17 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 106 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_stop" ]
+        %goal.8 = local;
+        symbol [ goal %goal.8 106 12 16 ];
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_106_19_106_49_begin:
+        %tmp.29 = lgetv %rawGoal.4;
+        symbol [ rawGoal %tmp.29 106 20 27 ];
+        %tmp.30 = null;
+        %tmp.31 = ne %tmp.29 %tmp.30;
+        bf %tmp.31 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_106_19_106_49_else_false;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_106_19_106_49_true:
+        %tmp.32 = lgetv %rawGoal.4;
+        symbol [ rawGoal %tmp.32 106 39 46 ];
+        %tmp.33 = as %tmp.32 { (!Null) };
+        push %tmp.33;
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_106_19_106_49_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_106_19_106_49_else_false:
+        %tmp.34 = 0;
+        push %tmp.34;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_106_19_106_49_end:
+        %tmp.35 = phi [%tmp.31 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_106_19_106_49_begin] [%tmp.33 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_106_19_106_49_true] [%tmp.34 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_106_19_106_49_else_false] [%tmp.35 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_106_19_106_49_end];
+        lputv %goal.8 %tmp.35;
+        symbol [ goal %goal.8 106 12 16 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 108 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_stop" ]
+        %distance.9 = local;
+        symbol [ distance %distance.9 108 12 20 ];
+        %tmp.36 = lgetv %noValue.2;
+        symbol [ noValue %tmp.36 108 23 30 ];
+        lputv %distance.9 %tmp.36;
+        symbol [ distance %distance.9 108 12 20 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 109 8 ]
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_109_8_112_8_if_stmt:
+        %tmp.37 = lgetv %rawDistance.5;
+        symbol [ rawDistance %tmp.37 109 12 23 ];
+        %tmp.38 = null;
+        %tmp.39 = ne %tmp.37 %tmp.38;
+        bf %tmp.39 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_109_8_112_8_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_109_8_112_8_if_true:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_109_33_112_8_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 111 12 ]
+        %tmp.40 = lgetv %rawDistance.5;
+        symbol [ rawDistance %tmp.40 111 24 35 ];
+        %tmp.41 = as %tmp.40 { (!Null) };
+        %tmp.42 = 100000.0;
+        %tmp.43 = div %tmp.41 %tmp.42;
+        symbol [ format %tmp.44 111 48 54 ];
+        %tmp.44 = getv function %tmp.43 :format;
+        %tmp.45 = "%.2f";
+        %tmp.46 = invoke %tmp.43 %tmp.44(%tmp.45);
+        %tmp.47 = " km";
+        %tmp.48 = add %tmp.46 %tmp.47;
+        lputv %distance.9 %tmp.48;
+        symbol [ distance %distance.9 111 12 20 ];
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_109_33_112_8_stop:
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_109_8_112_8_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_109_8_112_8_if_end:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 114 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_stop" ]
+        %calories.10 = local;
+        symbol [ calories %calories.10 114 12 20 ];
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_114_23_114_72_begin:
+        %tmp.49 = lgetv %rawCalories.6;
+        symbol [ rawCalories %tmp.49 114 24 35 ];
+        %tmp.50 = null;
+        %tmp.51 = ne %tmp.49 %tmp.50;
+        bf %tmp.51 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_114_23_114_72_else_false;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_114_23_114_72_true:
+        %tmp.52 = lgetv %rawCalories.6;
+        symbol [ rawCalories %tmp.52 114 47 58 ];
+        %tmp.53 = as %tmp.52 { (!Null) };
+        symbol [ toString %tmp.54 114 59 67 ];
+        %tmp.54 = getv function %tmp.53 :toString;
+        %tmp.55 = invoke %tmp.53 %tmp.54();
+        push %tmp.55;
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_114_23_114_72_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_114_23_114_72_else_false:
+        %tmp.56 = lgetv %noValue.2;
+        symbol [ noValue %tmp.56 114 72 79 ];
+        push %tmp.56;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_114_23_114_72_end:
+        %tmp.57 = phi [%tmp.51 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_114_23_114_72_begin] [%tmp.55 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_114_23_114_72_true] [%tmp.56 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_114_23_114_72_else_false] [%tmp.57 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_114_23_114_72_end];
+        lputv %calories.10 %tmp.57;
+        symbol [ calories %calories.10 114 12 20 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 116 8 ]
+        %tmp.58 = self;
+        symbol [ drawRow %tmp.59 116 8 15 ];
+        %tmp.59 = getv function %tmp.58 :drawRow;
+        %tmp.60 = lgetv %dc;
+        symbol [ dc %tmp.60 116 16 18 ];
+        %tmp.61 = lgetv %centerX;
+        symbol [ centerX %tmp.61 116 20 27 ];
+        %tmp.62 = lgetv %height;
+        symbol [ height %tmp.62 116 29 35 ];
+        %tmp.63 = 0.48;
+        %tmp.64 = mul %tmp.62 %tmp.63;
+        symbol [ Rez %tmp.66 116 44 47 ];
+        %tmp.66 = getv ? :Rez;
+        symbol [ Strings %tmp.67 116 48 55 ];
+        %tmp.67 = getv %tmp.66 :Strings;
+        symbol [ LabelSteps %tmp.68 116 56 66 ];
+        %tmp.68 = getv %tmp.67 :LabelSteps;
+        %tmp.69 = lgetv %steps.7;
+        symbol [ steps %tmp.69 116 68 73 ];
+        invoke %tmp.58 %tmp.59(%tmp.60, %tmp.61, %tmp.64, %tmp.68, %tmp.69);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 117 8 ]
+        %tmp.70 = self;
+        symbol [ drawRow %tmp.71 117 8 15 ];
+        %tmp.71 = getv function %tmp.70 :drawRow;
+        %tmp.72 = lgetv %dc;
+        symbol [ dc %tmp.72 117 16 18 ];
+        %tmp.73 = lgetv %centerX;
+        symbol [ centerX %tmp.73 117 20 27 ];
+        %tmp.74 = lgetv %height;
+        symbol [ height %tmp.74 117 29 35 ];
+        %tmp.75 = 0.60;
+        %tmp.76 = mul %tmp.74 %tmp.75;
+        symbol [ Rez %tmp.78 117 44 47 ];
+        %tmp.78 = getv ? :Rez;
+        symbol [ Strings %tmp.79 117 48 55 ];
+        %tmp.79 = getv %tmp.78 :Strings;
+        symbol [ LabelDistance %tmp.80 117 56 69 ];
+        %tmp.80 = getv %tmp.79 :LabelDistance;
+        %tmp.81 = lgetv %distance.9;
+        symbol [ distance %tmp.81 117 71 79 ];
+        invoke %tmp.70 %tmp.71(%tmp.72, %tmp.73, %tmp.76, %tmp.80, %tmp.81);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 118 8 ]
+        %tmp.82 = self;
+        symbol [ drawRow %tmp.83 118 8 15 ];
+        %tmp.83 = getv function %tmp.82 :drawRow;
+        %tmp.84 = lgetv %dc;
+        symbol [ dc %tmp.84 118 16 18 ];
+        %tmp.85 = lgetv %centerX;
+        symbol [ centerX %tmp.85 118 20 27 ];
+        %tmp.86 = lgetv %height;
+        symbol [ height %tmp.86 118 29 35 ];
+        %tmp.87 = 0.72;
+        %tmp.88 = mul %tmp.86 %tmp.87;
+        symbol [ Rez %tmp.90 118 44 47 ];
+        %tmp.90 = getv ? :Rez;
+        symbol [ Strings %tmp.91 118 48 55 ];
+        %tmp.91 = getv %tmp.90 :Strings;
+        symbol [ LabelCalories %tmp.92 118 56 69 ];
+        %tmp.92 = getv %tmp.91 :LabelCalories;
+        %tmp.93 = lgetv %calories.10;
+        symbol [ calories %tmp.93 118 71 79 ];
+        invoke %tmp.82 %tmp.83(%tmp.84, %tmp.85, %tmp.88, %tmp.92, %tmp.93);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 120 8 ]
+        %tmp.94 = self;
+        symbol [ drawGoalBar %tmp.95 120 8 19 ];
+        %tmp.95 = getv function %tmp.94 :drawGoalBar;
+        %tmp.96 = lgetv %dc;
+        symbol [ dc %tmp.96 120 20 22 ];
+        %tmp.97 = lgetv %centerX;
+        symbol [ centerX %tmp.97 120 24 31 ];
+        %tmp.98 = lgetv %height;
+        symbol [ height %tmp.98 120 33 39 ];
+        %tmp.99 = 0.83;
+        %tmp.100 = mul %tmp.98 %tmp.99;
+        %tmp.101 = lgetv %rawSteps.3;
+        symbol [ rawSteps %tmp.101 120 48 56 ];
+        %tmp.102 = lgetv %goal.8;
+        symbol [ goal %tmp.102 120 58 62 ];
+        invoke %tmp.94 %tmp.95(%tmp.96, %tmp.97, %tmp.100, %tmp.101, %tmp.102);
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_96_90_121_4_stop:
+    }
+    //! Heart rate, battery and memory — the "is the watch OK" page.
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 124; @symbol_functiondef = [drawSystemPage,124,21,35]; @symbol_param<0> = [dc,124,36,38]; @symbol_param<0>_type<0> = [Dc,124,42,44]; @symbol_param<1> = [centerX,124,46,53]; @symbol_param<1>_type<0> = [Number,124,57,63]; @symbol_param<2> = [height,124,65,71]; @symbol_param<2>_type<0> = [Number,124,75,81]; ]
+    private
+    function drawSystemPage(dc as Dc, centerX as Number, height as Number) as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 125 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_stop" ]
+        %noValue.1 = local;
+        symbol [ noValue %noValue.1 125 12 19 ];
+        symbol [ WatchUi %tmp.1 125 22 29 ];
+        %tmp.1 = getm $.Toybox.WatchUi;
+        symbol [ loadResource %tmp.2 125 30 42 ];
+        %tmp.2 = getv function %tmp.1 :loadResource;
+        symbol [ Rez %tmp.4 125 43 46 ];
+        %tmp.4 = getv ? :Rez;
+        symbol [ Strings %tmp.5 125 47 54 ];
+        %tmp.5 = getv %tmp.4 :Strings;
+        symbol [ NoValue %tmp.6 125 55 62 ];
+        %tmp.6 = getv %tmp.5 :NoValue;
+        %tmp.7 = invoke %tmp.1 %tmp.2(%tmp.6);
+        %tmp.8 = as %tmp.7 String;
+        symbol [ String %tmp.8 125 67 73 ];
+        lputv %noValue.1 %tmp.8;
+        symbol [ noValue %noValue.1 125 12 19 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 126 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_stop" ]
+        %stats.2 = local;
+        symbol [ stats %stats.2 126 12 17 ];
+        symbol [ System %tmp.9 126 20 26 ];
+        %tmp.9 = getm $.Toybox.System;
+        symbol [ getSystemStats %tmp.10 126 27 41 ];
+        %tmp.10 = getv function %tmp.9 :getSystemStats;
+        %tmp.11 = invoke %tmp.9 %tmp.10();
+        lputv %stats.2 %tmp.11;
+        symbol [ stats %stats.2 126 12 17 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 128 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_stop" ]
+        %heartRate.3 = local;
+        symbol [ heartRate %heartRate.3 128 12 21 ];
+        %tmp.12 = lgetv %noValue.1;
+        symbol [ noValue %tmp.12 128 24 31 ];
+        lputv %heartRate.3 %tmp.12;
+        symbol [ heartRate %heartRate.3 128 12 21 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 129 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_stop" ]
+        %iterator.4 = local;
+        symbol [ iterator %iterator.4 129 12 20 ];
+        symbol [ ActivityMonitor %tmp.13 129 23 38 ];
+        %tmp.13 = getm $.Toybox.ActivityMonitor;
+        symbol [ getHeartRateHistory %tmp.14 129 39 58 ];
+        %tmp.14 = getv function %tmp.13 :getHeartRateHistory;
+        %tmp.15 = 1;
+        %tmp.16 = true;
+        %tmp.17 = invoke %tmp.13 %tmp.14(%tmp.15, %tmp.16);
+        lputv %iterator.4 %tmp.17;
+        symbol [ iterator %iterator.4 129 12 20 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 130 8 ]
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_130_8_138_8_if_stmt:
+        %tmp.18 = lgetv %iterator.4;
+        symbol [ iterator %tmp.18 130 12 20 ];
+        %tmp.19 = null;
+        %tmp.20 = ne %tmp.18 %tmp.19;
+        bf %tmp.20 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_130_8_138_8_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_130_8_138_8_if_true:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_130_30_138_8_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 131 12 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_130_30_138_8_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_130_30_138_8_stop" ]
+        %sample.5 = local;
+        symbol [ sample %sample.5 131 16 22 ];
+        %tmp.21 = lgetv %iterator.4;
+        symbol [ iterator %tmp.21 131 25 33 ];
+        %tmp.22 = as %tmp.21 { (!Null) };
+        symbol [ next %tmp.23 131 34 38 ];
+        %tmp.23 = getv function %tmp.22 :next;
+        %tmp.24 = invoke %tmp.22 %tmp.23();
+        lputv %sample.5 %tmp.24;
+        symbol [ sample %sample.5 131 16 22 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 132 12 ]
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_132_12_137_12_if_stmt:
+        %tmp.25 = lgetv %sample.5;
+        symbol [ sample %tmp.25 132 16 22 ];
+        %tmp.26 = null;
+        %tmp.27 = ne %tmp.25 %tmp.26;
+        bf %tmp.27 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_132_12_137_12_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_132_12_137_12_if_true:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_132_32_137_12_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 133 16 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_132_32_137_12_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_132_32_137_12_stop" ]
+        %bpm.6 = local;
+        symbol [ bpm %bpm.6 133 20 23 ];
+        %tmp.28 = lgetv %sample.5;
+        symbol [ sample %tmp.28 133 26 32 ];
+        %tmp.29 = as %tmp.28 { (!Null) };
+        symbol [ heartRate %tmp.30 133 33 42 ];
+        %tmp.30 = getv %tmp.29 :heartRate;
+        lputv %bpm.6 %tmp.30;
+        symbol [ bpm %bpm.6 133 20 23 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 134 16 ]
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_16_136_16_if_stmt:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_20_134_58_begin:
+        %tmp.31 = lgetv %bpm.6;
+        symbol [ bpm %tmp.31 134 20 23 ];
+        %tmp.32 = null;
+        %tmp.33 = ne %tmp.31 %tmp.32;
+        bf %tmp.33 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_16_136_16_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_35_134_58_true:
+        %tmp.34 = lgetv %bpm.6;
+        symbol [ bpm %tmp.34 134 35 38 ];
+        %tmp.35 = as %tmp.34 { (!Null) };
+        symbol [ ActivityMonitor %tmp.36 134 42 57 ];
+        %tmp.36 = getm $.Toybox.ActivityMonitor;
+        symbol [ INVALID_HR_SAMPLE %tmp.37 134 58 75 ];
+        %tmp.37 = getv %tmp.36 :INVALID_HR_SAMPLE;
+        %tmp.38 = ne %tmp.35 %tmp.37;
+        push %tmp.38;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_35_134_58_end:
+        %tmp.39 = phi [%tmp.33 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_20_134_58_begin] [%tmp.38 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_35_134_58_true] [%tmp.39 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_35_134_58_end];
+        bf %tmp.39 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_16_136_16_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_16_136_16_if_true:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_77_136_16_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 135 20 ]
+        %tmp.40 = lgetv %bpm.6;
+        symbol [ bpm %tmp.40 135 32 35 ];
+        %tmp.41 = as %tmp.40 { (!Null) };
+        symbol [ toString %tmp.42 135 36 44 ];
+        %tmp.42 = getv function %tmp.41 :toString;
+        %tmp.43 = invoke %tmp.41 %tmp.42();
+        %tmp.44 = " bpm";
+        %tmp.45 = add %tmp.43 %tmp.44;
+        lputv %heartRate.3 %tmp.45;
+        symbol [ heartRate %heartRate.3 135 20 29 ];
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_77_136_16_stop:
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_16_136_16_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_134_16_136_16_if_end:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_132_32_137_12_stop:
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_132_12_137_12_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_132_12_137_12_if_end:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_130_30_138_8_stop:
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_130_8_138_8_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_130_8_138_8_if_end:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 140 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_stop" ]
+        %battery.7 = local;
+        symbol [ battery %battery.7 140 12 19 ];
+        %tmp.46 = lgetv %stats.2;
+        symbol [ stats %tmp.46 140 22 27 ];
+        symbol [ battery %tmp.47 140 28 35 ];
+        %tmp.47 = getv %tmp.46 :battery;
+        symbol [ format %tmp.48 140 36 42 ];
+        %tmp.48 = getv function %tmp.47 :format;
+        %tmp.49 = "%.0f";
+        %tmp.50 = invoke %tmp.47 %tmp.48(%tmp.49);
+        %tmp.51 = "%";
+        %tmp.52 = add %tmp.50 %tmp.51;
+        lputv %battery.7 %tmp.52;
+        symbol [ battery %battery.7 140 12 19 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 141 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_stop" ]
+        %memory.8 = local;
+        symbol [ memory %memory.8 141 12 18 ];
+        %tmp.53 = lgetv %stats.2;
+        symbol [ stats %tmp.53 141 23 28 ];
+        symbol [ usedMemory %tmp.54 141 29 39 ];
+        %tmp.54 = getv %tmp.53 :usedMemory;
+        %tmp.55 = 100;
+        %tmp.56 = mul %tmp.54 %tmp.55;
+        %tmp.57 = lgetv %stats.2;
+        symbol [ stats %tmp.57 141 49 54 ];
+        symbol [ totalMemory %tmp.58 141 55 66 ];
+        %tmp.58 = getv %tmp.57 :totalMemory;
+        %tmp.59 = div %tmp.56 %tmp.58;
+        symbol [ toString %tmp.60 141 68 76 ];
+        %tmp.60 = getv function %tmp.59 :toString;
+        %tmp.61 = invoke %tmp.59 %tmp.60();
+        %tmp.62 = "%";
+        %tmp.63 = add %tmp.61 %tmp.62;
+        lputv %memory.8 %tmp.63;
+        symbol [ memory %memory.8 141 12 18 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 143 8 ]
+        %tmp.64 = self;
+        symbol [ drawRow %tmp.65 143 8 15 ];
+        %tmp.65 = getv function %tmp.64 :drawRow;
+        %tmp.66 = lgetv %dc;
+        symbol [ dc %tmp.66 143 16 18 ];
+        %tmp.67 = lgetv %centerX;
+        symbol [ centerX %tmp.67 143 20 27 ];
+        %tmp.68 = lgetv %height;
+        symbol [ height %tmp.68 143 29 35 ];
+        %tmp.69 = 0.48;
+        %tmp.70 = mul %tmp.68 %tmp.69;
+        symbol [ Rez %tmp.72 143 44 47 ];
+        %tmp.72 = getv ? :Rez;
+        symbol [ Strings %tmp.73 143 48 55 ];
+        %tmp.73 = getv %tmp.72 :Strings;
+        symbol [ LabelHeartRate %tmp.74 143 56 70 ];
+        %tmp.74 = getv %tmp.73 :LabelHeartRate;
+        %tmp.75 = lgetv %heartRate.3;
+        symbol [ heartRate %tmp.75 143 72 81 ];
+        invoke %tmp.64 %tmp.65(%tmp.66, %tmp.67, %tmp.70, %tmp.74, %tmp.75);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 144 8 ]
+        %tmp.76 = self;
+        symbol [ drawRow %tmp.77 144 8 15 ];
+        %tmp.77 = getv function %tmp.76 :drawRow;
+        %tmp.78 = lgetv %dc;
+        symbol [ dc %tmp.78 144 16 18 ];
+        %tmp.79 = lgetv %centerX;
+        symbol [ centerX %tmp.79 144 20 27 ];
+        %tmp.80 = lgetv %height;
+        symbol [ height %tmp.80 144 29 35 ];
+        %tmp.81 = 0.60;
+        %tmp.82 = mul %tmp.80 %tmp.81;
+        symbol [ Rez %tmp.84 144 44 47 ];
+        %tmp.84 = getv ? :Rez;
+        symbol [ Strings %tmp.85 144 48 55 ];
+        %tmp.85 = getv %tmp.84 :Strings;
+        symbol [ LabelBattery %tmp.86 144 56 68 ];
+        %tmp.86 = getv %tmp.85 :LabelBattery;
+        %tmp.87 = lgetv %battery.7;
+        symbol [ battery %tmp.87 144 70 77 ];
+        invoke %tmp.76 %tmp.77(%tmp.78, %tmp.79, %tmp.82, %tmp.86, %tmp.87);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 145 8 ]
+        %tmp.88 = self;
+        symbol [ drawRow %tmp.89 145 8 15 ];
+        %tmp.89 = getv function %tmp.88 :drawRow;
+        %tmp.90 = lgetv %dc;
+        symbol [ dc %tmp.90 145 16 18 ];
+        %tmp.91 = lgetv %centerX;
+        symbol [ centerX %tmp.91 145 20 27 ];
+        %tmp.92 = lgetv %height;
+        symbol [ height %tmp.92 145 29 35 ];
+        %tmp.93 = 0.72;
+        %tmp.94 = mul %tmp.92 %tmp.93;
+        symbol [ Rez %tmp.96 145 44 47 ];
+        %tmp.96 = getv ? :Rez;
+        symbol [ Strings %tmp.97 145 48 55 ];
+        %tmp.97 = getv %tmp.96 :Strings;
+        symbol [ LabelMemory %tmp.98 145 56 67 ];
+        %tmp.98 = getv %tmp.97 :LabelMemory;
+        %tmp.99 = lgetv %memory.8;
+        symbol [ memory %tmp.99 145 69 75 ];
+        invoke %tmp.88 %tmp.89(%tmp.90, %tmp.91, %tmp.94, %tmp.98, %tmp.99);
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_124_91_146_4_stop:
+    }
+    //! Label left of center, value right of center, on one baseline.
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 149; @symbol_functiondef = [drawRow,149,21,28]; @symbol_param<0> = [dc,149,29,31]; @symbol_param<0>_type<0> = [Dc,149,35,37]; @symbol_param<1> = [centerX,149,39,46]; @symbol_param<1>_type<0> = [Number,149,50,56]; @symbol_param<2> = [y,149,58,59]; @symbol_param<2>_type<0> = [Numeric,149,63,70]; @symbol_param<3> = [labelId,150,29,36]; @symbol_param<3>_type<0> = [ResourceId,150,40,50]; @symbol_param<4> = [value,150,52,57]; @symbol_param<4>_type<0> = [String,150,61,67]; ]
+    private
+    function drawRow(dc as Dc, centerX as Number, y as Numeric, labelId as ResourceId, value as String) as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_150_77_160_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 151 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_150_77_160_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_150_77_160_4_stop" ]
+        %label.1 = local;
+        symbol [ label %label.1 151 12 17 ];
+        symbol [ WatchUi %tmp.1 151 20 27 ];
+        %tmp.1 = getm $.Toybox.WatchUi;
+        symbol [ loadResource %tmp.2 151 28 40 ];
+        %tmp.2 = getv function %tmp.1 :loadResource;
+        %tmp.3 = lgetv %labelId;
+        symbol [ labelId %tmp.3 151 41 48 ];
+        %tmp.4 = invoke %tmp.1 %tmp.2(%tmp.3);
+        %tmp.5 = as %tmp.4 String;
+        symbol [ String %tmp.5 151 53 59 ];
+        lputv %label.1 %tmp.5;
+        symbol [ label %label.1 151 12 17 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 153 8 ]
+        %tmp.6 = lgetv %dc;
+        symbol [ dc %tmp.6 153 8 10 ];
+        symbol [ setColor %tmp.7 153 11 19 ];
+        %tmp.7 = getv function %tmp.6 :setColor;
+        symbol [ Graphics %tmp.8 153 20 28 ];
+        %tmp.8 = getm $.Toybox.Graphics;
+        symbol [ COLOR_LT_GRAY %tmp.9 153 29 42 ];
+        %tmp.9 = getv %tmp.8 :COLOR_LT_GRAY;
+        symbol [ Graphics %tmp.10 153 44 52 ];
+        %tmp.10 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.11 153 53 70 ];
+        %tmp.11 = getv %tmp.10 :COLOR_TRANSPARENT;
+        invoke %tmp.6 %tmp.7(%tmp.9, %tmp.11);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 154 8 ]
+        %tmp.12 = lgetv %dc;
+        symbol [ dc %tmp.12 154 8 10 ];
+        symbol [ drawText %tmp.13 154 11 19 ];
+        %tmp.13 = getv function %tmp.12 :drawText;
+        %tmp.14 = lgetv %centerX;
+        symbol [ centerX %tmp.14 154 20 27 ];
+        %tmp.15 = 6;
+        %tmp.16 = sub %tmp.14 %tmp.15;
+        %tmp.17 = lgetv %y;
+        symbol [ y %tmp.17 154 33 34 ];
+        symbol [ Graphics %tmp.18 154 36 44 ];
+        %tmp.18 = getm $.Toybox.Graphics;
+        symbol [ FONT_TINY %tmp.19 154 45 54 ];
+        %tmp.19 = getv %tmp.18 :FONT_TINY;
+        %tmp.20 = lgetv %label.1;
+        symbol [ label %tmp.20 154 56 61 ];
+        symbol [ Graphics %tmp.21 155 20 28 ];
+        %tmp.21 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_RIGHT %tmp.22 155 29 47 ];
+        %tmp.22 = getv %tmp.21 :TEXT_JUSTIFY_RIGHT;
+        symbol [ Graphics %tmp.23 155 50 58 ];
+        %tmp.23 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_VCENTER %tmp.24 155 59 79 ];
+        %tmp.24 = getv %tmp.23 :TEXT_JUSTIFY_VCENTER;
+        %tmp.25 = bitor %tmp.22 %tmp.24;
+        invoke %tmp.12 %tmp.13(%tmp.16, %tmp.17, %tmp.19, %tmp.20, %tmp.25);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 157 8 ]
+        %tmp.26 = lgetv %dc;
+        symbol [ dc %tmp.26 157 8 10 ];
+        symbol [ setColor %tmp.27 157 11 19 ];
+        %tmp.27 = getv function %tmp.26 :setColor;
+        symbol [ Graphics %tmp.28 157 20 28 ];
+        %tmp.28 = getm $.Toybox.Graphics;
+        symbol [ COLOR_WHITE %tmp.29 157 29 40 ];
+        %tmp.29 = getv %tmp.28 :COLOR_WHITE;
+        symbol [ Graphics %tmp.30 157 42 50 ];
+        %tmp.30 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.31 157 51 68 ];
+        %tmp.31 = getv %tmp.30 :COLOR_TRANSPARENT;
+        invoke %tmp.26 %tmp.27(%tmp.29, %tmp.31);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 158 8 ]
+        %tmp.32 = lgetv %dc;
+        symbol [ dc %tmp.32 158 8 10 ];
+        symbol [ drawText %tmp.33 158 11 19 ];
+        %tmp.33 = getv function %tmp.32 :drawText;
+        %tmp.34 = lgetv %centerX;
+        symbol [ centerX %tmp.34 158 20 27 ];
+        %tmp.35 = 6;
+        %tmp.36 = add %tmp.34 %tmp.35;
+        %tmp.37 = lgetv %y;
+        symbol [ y %tmp.37 158 33 34 ];
+        symbol [ Graphics %tmp.38 158 36 44 ];
+        %tmp.38 = getm $.Toybox.Graphics;
+        symbol [ FONT_TINY %tmp.39 158 45 54 ];
+        %tmp.39 = getv %tmp.38 :FONT_TINY;
+        %tmp.40 = lgetv %value;
+        symbol [ value %tmp.40 158 56 61 ];
+        symbol [ Graphics %tmp.41 159 20 28 ];
+        %tmp.41 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_LEFT %tmp.42 159 29 46 ];
+        %tmp.42 = getv %tmp.41 :TEXT_JUSTIFY_LEFT;
+        symbol [ Graphics %tmp.43 159 49 57 ];
+        %tmp.43 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_VCENTER %tmp.44 159 58 78 ];
+        %tmp.44 = getv %tmp.43 :TEXT_JUSTIFY_VCENTER;
+        %tmp.45 = bitor %tmp.42 %tmp.44;
+        invoke %tmp.32 %tmp.33(%tmp.36, %tmp.37, %tmp.39, %tmp.40, %tmp.45);
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_150_77_160_4_stop:
+    }
+    //! Horizontal progress bar for steps against the daily goal.
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 163; @symbol_functiondef = [drawGoalBar,163,21,32]; @symbol_param<0> = [dc,163,33,35]; @symbol_param<0>_type<0> = [Dc,163,39,41]; @symbol_param<1> = [centerX,163,43,50]; @symbol_param<1>_type<0> = [Number,163,54,60]; @symbol_param<2> = [y,163,62,63]; @symbol_param<2>_type<0> = [Numeric,163,67,74]; @symbol_param<3> = [steps,164,33,38]; @symbol_param<3>_type<0> = [Number,164,42,48]; @symbol_param<4> = [goal,164,51,55]; @symbol_param<4>_type<0> = [Number,164,59,65]; ]
+    private
+    function drawGoalBar(dc as Dc, centerX as Number, y as Numeric, steps as Number or Null, goal as Number) as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_164_75_183_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 165 8 ]
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_8_167_8_if_stmt:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_12_165_37_begin:
+        %tmp.1 = lgetv %steps;
+        symbol [ steps %tmp.1 165 12 17 ];
+        %tmp.2 = null;
+        %tmp.3 = eq %tmp.1 %tmp.2;
+        bt %tmp.3 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_8_167_8_if_true;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_29_165_37_false:
+        %tmp.4 = lgetv %goal;
+        symbol [ goal %tmp.4 165 29 33 ];
+        %tmp.5 = 0;
+        %tmp.6 = lte %tmp.4 %tmp.5;
+        push %tmp.6;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_29_165_37_end:
+        %tmp.7 = phi [%tmp.3 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_12_165_37_begin] [%tmp.6 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_29_165_37_false] [%tmp.7 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_29_165_37_end];
+        bf %tmp.7 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_8_167_8_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_8_167_8_if_true:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_40_167_8_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 166 12 ]
+        ret ?;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_40_167_8_stop:
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_8_167_8_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_165_8_167_8_if_end:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 169 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_164_75_183_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_164_75_183_4_stop" ]
+        %barWidth.1 = local;
+        symbol [ barWidth %barWidth.1 169 12 20 ];
+        %tmp.8 = lgetv %dc;
+        symbol [ dc %tmp.8 169 23 25 ];
+        symbol [ getWidth %tmp.9 169 26 34 ];
+        %tmp.9 = getv function %tmp.8 :getWidth;
+        %tmp.10 = invoke %tmp.8 %tmp.9();
+        %tmp.11 = 2;
+        %tmp.12 = div %tmp.10 %tmp.11;
+        lputv %barWidth.1 %tmp.12;
+        symbol [ barWidth %barWidth.1 169 12 20 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 170 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_164_75_183_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_164_75_183_4_stop" ]
+        %barHeight.2 = local;
+        symbol [ barHeight %barHeight.2 170 12 21 ];
+        %tmp.13 = 6;
+        lputv %barHeight.2 %tmp.13;
+        symbol [ barHeight %barHeight.2 170 12 21 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 171 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_164_75_183_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_164_75_183_4_stop" ]
+        %x.3 = local;
+        symbol [ x %x.3 171 12 13 ];
+        %tmp.14 = lgetv %centerX;
+        symbol [ centerX %tmp.14 171 16 23 ];
+        %tmp.15 = lgetv %barWidth.1;
+        symbol [ barWidth %tmp.15 171 26 34 ];
+        %tmp.16 = 2;
+        %tmp.17 = div %tmp.15 %tmp.16;
+        %tmp.18 = sub %tmp.14 %tmp.17;
+        lputv %x.3 %tmp.18;
+        symbol [ x %x.3 171 12 13 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 173 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_164_75_183_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_164_75_183_4_stop" ]
+        %ratio.4 = local;
+        symbol [ ratio %ratio.4 173 12 17 ];
+        %tmp.19 = lgetv %steps;
+        symbol [ steps %tmp.19 173 20 25 ];
+        symbol [ toFloat %tmp.20 173 26 33 ];
+        %tmp.20 = getv function %tmp.19 :toFloat;
+        %tmp.21 = invoke %tmp.19 %tmp.20();
+        %tmp.22 = lgetv %goal;
+        symbol [ goal %tmp.22 173 38 42 ];
+        symbol [ toFloat %tmp.23 173 43 50 ];
+        %tmp.23 = getv function %tmp.22 :toFloat;
+        %tmp.24 = invoke %tmp.22 %tmp.23();
+        %tmp.25 = div %tmp.21 %tmp.24;
+        lputv %ratio.4 %tmp.25;
+        symbol [ ratio %ratio.4 173 12 17 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 174 8 ]
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_174_8_176_8_if_stmt:
+        %tmp.26 = lgetv %ratio.4;
+        symbol [ ratio %tmp.26 174 12 17 ];
+        %tmp.27 = 1.0;
+        %tmp.28 = gt %tmp.26 %tmp.27;
+        bf %tmp.28 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_174_8_176_8_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_174_8_176_8_if_true:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_174_25_176_8_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 175 12 ]
+        %tmp.29 = 1.0;
+        lputv %ratio.4 %tmp.29;
+        symbol [ ratio %ratio.4 175 12 17 ];
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_174_25_176_8_stop:
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_174_8_176_8_if_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_174_8_176_8_if_end:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 178 8 ]
+        %tmp.30 = lgetv %dc;
+        symbol [ dc %tmp.30 178 8 10 ];
+        symbol [ setColor %tmp.31 178 11 19 ];
+        %tmp.31 = getv function %tmp.30 :setColor;
+        symbol [ Graphics %tmp.32 178 20 28 ];
+        %tmp.32 = getm $.Toybox.Graphics;
+        symbol [ COLOR_DK_GRAY %tmp.33 178 29 42 ];
+        %tmp.33 = getv %tmp.32 :COLOR_DK_GRAY;
+        symbol [ Graphics %tmp.34 178 44 52 ];
+        %tmp.34 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.35 178 53 70 ];
+        %tmp.35 = getv %tmp.34 :COLOR_TRANSPARENT;
+        invoke %tmp.30 %tmp.31(%tmp.33, %tmp.35);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 179 8 ]
+        %tmp.36 = lgetv %dc;
+        symbol [ dc %tmp.36 179 8 10 ];
+        symbol [ fillRectangle %tmp.37 179 11 24 ];
+        %tmp.37 = getv function %tmp.36 :fillRectangle;
+        %tmp.38 = lgetv %x.3;
+        symbol [ x %tmp.38 179 25 26 ];
+        %tmp.39 = lgetv %y;
+        symbol [ y %tmp.39 179 28 29 ];
+        %tmp.40 = lgetv %barWidth.1;
+        symbol [ barWidth %tmp.40 179 31 39 ];
+        %tmp.41 = lgetv %barHeight.2;
+        symbol [ barHeight %tmp.41 179 41 50 ];
+        invoke %tmp.36 %tmp.37(%tmp.38, %tmp.39, %tmp.40, %tmp.41);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 181 8 ]
+        %tmp.42 = lgetv %dc;
+        symbol [ dc %tmp.42 181 8 10 ];
+        symbol [ setColor %tmp.43 181 11 19 ];
+        %tmp.43 = getv function %tmp.42 :setColor;
+        symbol [ Graphics %tmp.44 181 20 28 ];
+        %tmp.44 = getm $.Toybox.Graphics;
+        symbol [ COLOR_GREEN %tmp.45 181 29 40 ];
+        %tmp.45 = getv %tmp.44 :COLOR_GREEN;
+        symbol [ Graphics %tmp.46 181 42 50 ];
+        %tmp.46 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.47 181 51 68 ];
+        %tmp.47 = getv %tmp.46 :COLOR_TRANSPARENT;
+        invoke %tmp.42 %tmp.43(%tmp.45, %tmp.47);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 182 8 ]
+        %tmp.48 = lgetv %dc;
+        symbol [ dc %tmp.48 182 8 10 ];
+        symbol [ fillRectangle %tmp.49 182 11 24 ];
+        %tmp.49 = getv function %tmp.48 :fillRectangle;
+        %tmp.50 = lgetv %x.3;
+        symbol [ x %tmp.50 182 25 26 ];
+        %tmp.51 = lgetv %y;
+        symbol [ y %tmp.51 182 28 29 ];
+        %tmp.52 = lgetv %barWidth.1;
+        symbol [ barWidth %tmp.52 182 32 40 ];
+        %tmp.53 = lgetv %ratio.4;
+        symbol [ ratio %tmp.53 182 43 48 ];
+        %tmp.54 = mul %tmp.52 %tmp.53;
+        symbol [ toNumber %tmp.55 182 50 58 ];
+        %tmp.55 = getv function %tmp.54 :toNumber;
+        %tmp.56 = invoke %tmp.54 %tmp.55();
+        %tmp.57 = lgetv %barHeight.2;
+        symbol [ barHeight %tmp.57 182 62 71 ];
+        invoke %tmp.48 %tmp.49(%tmp.50, %tmp.51, %tmp.56, %tmp.57);
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_164_75_183_4_stop:
+    }
+    //! Page indicator dots at the bottom of the screen.
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 186; @symbol_functiondef = [drawPageDots,186,21,33]; @symbol_param<0> = [dc,186,34,36]; @symbol_param<0>_type<0> = [Dc,186,40,42]; @symbol_param<1> = [centerX,186,44,51]; @symbol_param<1>_type<0> = [Number,186,55,61]; @symbol_param<2> = [height,186,63,69]; @symbol_param<2>_type<0> = [Number,186,73,79]; ]
+    private
+    function drawPageDots(dc as Dc, centerX as Number, height as Number) as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_186_89_196_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 187 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_186_89_196_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_186_89_196_4_stop" ]
+        %y.1 = local;
+        symbol [ y %y.1 187 12 13 ];
+        %tmp.1 = lgetv %height;
+        symbol [ height %tmp.1 187 16 22 ];
+        %tmp.2 = 0.92;
+        %tmp.3 = mul %tmp.1 %tmp.2;
+        lputv %y.1 %tmp.3;
+        symbol [ y %y.1 187 12 13 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 188 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_186_89_196_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_186_89_196_4_stop" ]
+        %spacing.2 = local;
+        symbol [ spacing %spacing.2 188 12 19 ];
+        %tmp.4 = 12;
+        lputv %spacing.2 %tmp.4;
+        symbol [ spacing %spacing.2 188 12 19 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 189 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_186_89_196_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_186_89_196_4_stop" ]
+        %startX.3 = local;
+        symbol [ startX %startX.3 189 12 18 ];
+        %tmp.5 = lgetv %centerX;
+        symbol [ centerX %tmp.5 189 21 28 ];
+        symbol [ PAGE_COUNT %tmp.7 189 33 43 ];
+        %tmp.7 = getv ? :PAGE_COUNT;
+        %tmp.8 = 1;
+        %tmp.9 = sub %tmp.7 %tmp.8;
+        %tmp.10 = lgetv %spacing.2;
+        symbol [ spacing %tmp.10 189 51 58 ];
+        %tmp.11 = mul %tmp.9 %tmp.10;
+        %tmp.12 = 2;
+        %tmp.13 = div %tmp.11 %tmp.12;
+        %tmp.14 = sub %tmp.5 %tmp.13;
+        lputv %startX.3 %tmp.14;
+        symbol [ startX %startX.3 189 12 18 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 191 8 ]
+        for @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_8_195_8_for_test @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_8_195_8_for_incr @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_8_195_8_for_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_8_195_8_for_init:
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_8_195_8_for_begin" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_8_195_8_for_end" ]
+        %i.4 = local;
+        symbol [ i %i.4 191 17 18 ];
+        %tmp.15 = 0;
+        lputv %i.4 %tmp.15;
+        symbol [ i %i.4 191 17 18 ];
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_8_195_8_for_test:
+        %tmp.16 = lgetv %i.4;
+        symbol [ i %tmp.16 191 24 25 ];
+        symbol [ PAGE_COUNT %tmp.18 191 28 38 ];
+        %tmp.18 = getv ? :PAGE_COUNT;
+        %tmp.19 = lt %tmp.16 %tmp.18;
+        bf %tmp.19 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_8_195_8_for_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_8_195_8_for_begin:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_48_195_8_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 192 12 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_48_195_8_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_48_195_8_stop" ]
+        %color.5 = local;
+        symbol [ color %color.5 192 16 21 ];
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_192_24_192_71_begin:
+        %tmp.20 = lgetv %i.4;
+        symbol [ i %tmp.20 192 25 26 ];
+        symbol [ _page %tmp.22 192 30 35 ];
+        %tmp.22 = getv ? :_page;
+        %tmp.23 = eq %tmp.20 %tmp.22;
+        bf %tmp.23 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_192_24_192_71_else_false;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_192_24_192_71_true:
+        symbol [ Graphics %tmp.24 192 39 47 ];
+        %tmp.24 = getm $.Toybox.Graphics;
+        symbol [ COLOR_WHITE %tmp.25 192 48 59 ];
+        %tmp.25 = getv %tmp.24 :COLOR_WHITE;
+        push %tmp.25;
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_192_24_192_71_end;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_192_24_192_71_else_false:
+        symbol [ Graphics %tmp.26 192 62 70 ];
+        %tmp.26 = getm $.Toybox.Graphics;
+        symbol [ COLOR_DK_GRAY %tmp.27 192 71 84 ];
+        %tmp.27 = getv %tmp.26 :COLOR_DK_GRAY;
+        push %tmp.27;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_192_24_192_71_end:
+        %tmp.28 = phi [%tmp.23 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_192_24_192_71_begin] [%tmp.25 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_192_24_192_71_true] [%tmp.27 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_192_24_192_71_else_false] [%tmp.28 @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_192_24_192_71_end];
+        lputv %color.5 %tmp.28;
+        symbol [ color %color.5 192 16 21 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 193 12 ]
+        %tmp.29 = lgetv %dc;
+        symbol [ dc %tmp.29 193 12 14 ];
+        symbol [ setColor %tmp.30 193 15 23 ];
+        %tmp.30 = getv function %tmp.29 :setColor;
+        %tmp.31 = lgetv %color.5;
+        symbol [ color %tmp.31 193 24 29 ];
+        symbol [ Graphics %tmp.32 193 31 39 ];
+        %tmp.32 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.33 193 40 57 ];
+        %tmp.33 = getv %tmp.32 :COLOR_TRANSPARENT;
+        invoke %tmp.29 %tmp.30(%tmp.31, %tmp.33);
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 194 12 ]
+        %tmp.34 = lgetv %dc;
+        symbol [ dc %tmp.34 194 12 14 ];
+        symbol [ fillCircle %tmp.35 194 15 25 ];
+        %tmp.35 = getv function %tmp.34 :fillCircle;
+        %tmp.36 = lgetv %startX.3;
+        symbol [ startX %tmp.36 194 26 32 ];
+        %tmp.37 = lgetv %i.4;
+        symbol [ i %tmp.37 194 35 36 ];
+        %tmp.38 = lgetv %spacing.2;
+        symbol [ spacing %tmp.38 194 39 46 ];
+        %tmp.39 = mul %tmp.37 %tmp.38;
+        %tmp.40 = add %tmp.36 %tmp.39;
+        %tmp.41 = lgetv %y.1;
+        symbol [ y %tmp.41 194 48 49 ];
+        %tmp.42 = 3;
+        invoke %tmp.34 %tmp.35(%tmp.40, %tmp.41, %tmp.42);
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_48_195_8_stop:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_8_195_8_for_incr:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc" 191 ]
+        %tmp.43 = lgetv %i.4;
+        symbol [ i %tmp.43 191 40 41 ];
+        %tmp.44 = 1;
+        %tmp.45 = add %tmp.43 %tmp.44;
+        lputv %i.4 %tmp.45;
+        symbol [ i %i.4 191 40 41 ];
+        goto @_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_8_195_8_for_test;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_191_8_195_8_for_end:
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleView_mc_186_89_196_4_stop:
+    }
+}
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleView.mc"; @line = 1; ]
+<init> {
+}

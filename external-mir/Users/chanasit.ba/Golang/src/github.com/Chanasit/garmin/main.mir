@@ -1,0 +1,36 @@
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/main.mc"; @line = 1; @symbol_usingdef<0> = [Toybox,1,6,12]; @symbol_usingdef<1> = [Application,1,13,24]; @symbol_usingAlias = [App,1,28,31]; ]
+using Toybox.Application as :App;
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/main.mc"; @line = 2; @symbol_usingdef<0> = [Toybox,2,6,12]; @symbol_usingdef<1> = [System,2,13,19]; ]
+using Toybox.System;
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/main.mc"; @line = 4; @symbol_classdef = [MyProjectApp,4,6,18]; @symbol_extends<0> = [App,4,27,30]; @symbol_extends<1> = [AppBase,4,31,38]; ]
+class MyProjectApp extends App.AppBase {
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/main.mc"; @line = 4; ]
+    <init> {
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/main.mc"; @line = 4; ]
+    static
+    <init> {
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/main.mc"; @line = 7; @symbol_functiondef = [onStart,7,13,20]; @symbol_param<0> = [state,7,21,26]; ]
+    function onStart(state) {
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/main.mc"; @line = 11; @symbol_functiondef = [onStop,11,13,19]; @symbol_param<0> = [state,11,20,25]; ]
+    function onStop(state) {
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/main.mc"; @line = 15; @symbol_functiondef = [getInitialView,15,13,27]; ]
+    function getInitialView() {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_main_mc_15_30_17_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/main.mc" 16 8 ]
+        %tmp.1 = newa 1;
+        symbol [ MyProjectView %tmp.5 16 21 34 ];
+        %tmp.5 = getv ? :MyProjectView;
+        %tmp.2 = newc %tmp.5 ();
+        %tmp.6 = dup %tmp.1;
+        %tmp.7 = aputv %tmp.6 0 %tmp.2;
+        ret %tmp.7;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_main_mc_15_30_17_4_stop:
+    }
+}
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/main.mc"; @line = 1; ]
+<init> {
+}

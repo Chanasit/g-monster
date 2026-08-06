@@ -1,0 +1,68 @@
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc"; @line = 1; @symbol_importdef<0> = [Toybox,1,7,13]; @symbol_importdef<1> = [Application,1,14,25]; ]
+import Toybox.Application;
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc"; @line = 2; @symbol_importdef<0> = [Toybox,2,7,13]; @symbol_importdef<1> = [Lang,2,14,18]; ]
+import Toybox.Lang;
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc"; @line = 3; @symbol_importdef<0> = [Toybox,3,7,13]; @symbol_importdef<1> = [WatchUi,3,14,21]; ]
+import Toybox.WatchUi;
+//! Entry point. Owns the app lifecycle and hands back the initial view/delegate pair.
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc"; @line = 6; @symbol_classdef = [GarminSampleApp,6,6,21]; @symbol_extends<0> = [Application,6,30,41]; @symbol_extends<1> = [AppBase,6,42,49]; ]
+class GarminSampleApp extends Application.AppBase {
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc"; @line = 6; ]
+    <init> {
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc"; @line = 6; ]
+    static
+    <init> {
+    }
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc"; @line = 8; @symbol_functiondef = [initialize,8,13,23]; ]
+    function initialize() as Void {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleApp_mc_8_26_10_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc" 9 8 ]
+        symbol [ AppBase %tmp.2 9 8 15 ];
+        %tmp.2 = getv ? :AppBase;
+        symbol [ initialize %tmp.3 9 16 26 ];
+        %tmp.3 = getv function %tmp.2 :initialize;
+        invoke %tmp.2 %tmp.3();
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleApp_mc_8_26_10_4_stop:
+    }
+    //! Called once when the app is launched.
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc"; @line = 13; @symbol_functiondef = [onStart,13,13,20]; @symbol_param<0> = [state,13,21,26]; @symbol_param<0>_type<0> = [Dictionary,13,30,40]; ]
+    function onStart(state as Dictionary or Null) as Void {
+    }
+    //! Called once when the app is exiting.
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc"; @line = 17; @symbol_functiondef = [onStop,17,13,19]; @symbol_param<0> = [state,17,20,25]; @symbol_param<0>_type<0> = [Dictionary,17,29,39]; ]
+    function onStop(state as Dictionary or Null) as Void {
+    }
+    //! First view shown, plus the delegate that handles button/touch input.
+    [ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc"; @line = 21; @symbol_functiondef = [getInitialView,21,13,27]; @symbol_return<0> = [WatchUi,21,34,41]; @symbol_return<1> = [Views,21,42,47]; @symbol_return<2> = [WatchUi,21,53,60]; @symbol_return<3> = [Views,21,61,66]; @symbol_return<4> = [WatchUi,21,68,75]; @symbol_return<5> = [InputDelegates,21,76,90]; ]
+    function getInitialView() as [WatchUi.Views] or [WatchUi.Views, WatchUi.InputDelegates] {
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleApp_mc_21_92_24_4_start:
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc" 22 8 ]
+        [ "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleApp_mc_21_92_24_4_start" "_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleApp_mc_21_92_24_4_stop" ]
+        %view.1 = local;
+        symbol [ view %view.1 22 12 16 ];
+        symbol [ GarminSampleView %tmp.4 22 23 39 ];
+        %tmp.4 = getv ? :GarminSampleView;
+        %tmp.1 = newc %tmp.4 ();
+        lputv %view.1 %tmp.1;
+        symbol [ view %view.1 22 12 16 ];
+[ "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc" 23 8 ]
+        %tmp.5 = newa 2;
+        %tmp.6 = lgetv %view.1;
+        symbol [ view %tmp.6 23 16 20 ];
+        %tmp.7 = dup %tmp.5;
+        %tmp.8 = aputv %tmp.7 0 %tmp.6;
+        symbol [ GarminSampleDelegate %tmp.12 23 26 46 ];
+        %tmp.12 = getv ? :GarminSampleDelegate;
+        %tmp.13 = lgetv %view.1;
+        symbol [ view %tmp.13 23 47 51 ];
+        %tmp.9 = newc %tmp.12 (%tmp.13);
+        %tmp.14 = dup %tmp.8;
+        %tmp.15 = aputv %tmp.14 1 %tmp.9;
+        ret %tmp.15;
+_Users_chanasit_ba_Golang_src_github_com_Chanasit_garmin_source_GarminSampleApp_mc_21_92_24_4_stop:
+    }
+}
+[ @file = "/Users/chanasit.ba/Golang/src/github.com/Chanasit/garmin/source/GarminSampleApp.mc"; @line = 1; ]
+<init> {
+}

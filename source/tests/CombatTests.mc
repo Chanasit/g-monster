@@ -2,7 +2,7 @@ import Toybox.Lang;
 import Toybox.Test;
 
 //! Unit tests for the combat engine. Excluded from release builds via the `test` annotation.
-//! Run: monkeyc --unit-test ... && monkeydo GarminSample.prg fenix6pro -t
+//! Run: monkeyc --unit-test ... && monkeydo GMonster.prg fenix6pro -t
 
 (:test)
 function testTypeWheel(logger as Logger) as Boolean {

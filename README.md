@@ -35,9 +35,9 @@ ground.
 ```
 manifest.xml                        app id, type, target products, min API level
 monkey.jungle                       build config
-source/GarminSampleApp.mc           AppBase entry point
-source/GarminSampleView.mc          rendering + refresh timer
-source/GarminSampleDelegate.mc      button/swipe handling
+source/GMonsterApp.mc           AppBase entry point
+source/GMonsterView.mc          rendering + refresh timer
+source/GMonsterDelegate.mc      button/swipe handling
 source/GameState.mc                 persistent player state (Storage)
 source/BackgroundService.mc         5-minute step accrual while the app is closed
 source/journey/Journey.mc           area table + Trek state machine (pure)
@@ -92,7 +92,7 @@ its target still keeps a 5% floor rather than being locked out.
 export CIQ_SDK="$HOME/Library/Application Support/Garmin/ConnectIQ/Sdks/connectiq-sdk-mac-9.2.0-2026-06-09-92a1605b2"
 
 # Compile (-l 3 = strict type check)
-"$CIQ_SDK/bin/monkeyc" -d fenix6pro -f monkey.jungle -o GarminSample.prg -y developer_key.der -l 3
+"$CIQ_SDK/bin/monkeyc" -d fenix6pro -f monkey.jungle -o GMonster.prg -y developer_key.der -l 3
 ```
 
 ## Run
@@ -102,7 +102,7 @@ export CIQ_SDK="$HOME/Library/Application Support/Garmin/ConnectIQ/Sdks/connecti
 "$CIQ_SDK/bin/connectiq"
 
 # 2. Side-load the built app into it
-"$CIQ_SDK/bin/monkeydo" GarminSample.prg fenix6pro
+"$CIQ_SDK/bin/monkeydo" GMonster.prg fenix6pro
 ```
 
 `monkeydo` stays in the foreground for as long as the app runs — that is normal, not a hang.
@@ -113,14 +113,14 @@ Tests are `(:test)`-annotated, so `monkeyc` only compiles them into `--unit-test
 The simulator must already be running.
 
 ```bash
-"$CIQ_SDK/bin/monkeyc" -d fenix6pro -f monkey.jungle -o GarminSampleTest.prg -y developer_key.der -l 3 --unit-test
-"$CIQ_SDK/bin/monkeydo" GarminSampleTest.prg fenix6pro -t
+"$CIQ_SDK/bin/monkeyc" -d fenix6pro -f monkey.jungle -o GMonsterTest.prg -y developer_key.der -l 3 --unit-test
+"$CIQ_SDK/bin/monkeydo" GMonsterTest.prg fenix6pro -t
 ```
 
 ## Package for the store
 
 ```bash
-"$CIQ_SDK/bin/monkeyc" -e -f monkey.jungle -o GarminSample.iq -y developer_key.der -l 3
+"$CIQ_SDK/bin/monkeyc" -e -f monkey.jungle -o GMonster.iq -y developer_key.der -l 3
 ```
 
 `-e` builds for every product listed in `manifest.xml`.

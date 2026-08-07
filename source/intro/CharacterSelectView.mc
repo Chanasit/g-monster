@@ -71,8 +71,8 @@ class CharacterSelectView extends WatchUi.View {
     function confirm() as Void {
         GameState.createCharacter(_choices[_selected].key);
 
-        var main = new GarminSampleView();
-        WatchUi.switchToView(main, new GarminSampleDelegate(main), WatchUi.SLIDE_LEFT);
+        var main = new GMonsterView();
+        WatchUi.switchToView(main, new GMonsterDelegate(main), WatchUi.SLIDE_LEFT);
     }
 
     function onUpdate(dc as Dc) as Void {

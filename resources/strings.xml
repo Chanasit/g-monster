@@ -1,5 +1,5 @@
 <resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
-    <string id="AppName">Garmin Sample</string>
+    <string id="AppName">GMonster</string>
     <string id="PagePet">ALLY</string>
     <string id="PageStats">STATS</string>
     <string id="PageJourney">JOURNEY</string>

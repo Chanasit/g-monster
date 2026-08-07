@@ -6,7 +6,7 @@ import Toybox.WatchUi;
 
 //! Two-page data view. Page 0 shows activity stats, page 1 shows device state.
 //! A 1 Hz timer drives redraws while the view is on screen.
-class GarminSampleView extends WatchUi.View {
+class GMonsterView extends WatchUi.View {
 
     public const PAGE_PET = 0;
     public const PAGE_STATS = 1;

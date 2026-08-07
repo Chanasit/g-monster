@@ -18,18 +18,18 @@ No package manager, no test runner. Everything goes through the SDK's `monkeyc` 
 export CIQ_SDK="$HOME/Library/Application Support/Garmin/ConnectIQ/Sdks/connectiq-sdk-mac-9.2.0-2026-06-09-92a1605b2"
 
 # Compile. -l 3 is strict type check — always build with it.
-"$CIQ_SDK/bin/monkeyc" -d fenix6pro -f monkey.jungle -o GarminSample.prg -y developer_key.der -l 3
+"$CIQ_SDK/bin/monkeyc" -d fenix6pro -f monkey.jungle -o GMonster.prg -y developer_key.der -l 3
 
 # Run: simulator must already be running in another process.
 "$CIQ_SDK/bin/connectiq"
-"$CIQ_SDK/bin/monkeydo" GarminSample.prg fenix6pro
+"$CIQ_SDK/bin/monkeydo" GMonster.prg fenix6pro
 
 # Unit tests: separate build with --unit-test, run with -t.
-"$CIQ_SDK/bin/monkeyc" -d fenix6pro -f monkey.jungle -o GarminSampleTest.prg -y developer_key.der -l 3 --unit-test
-"$CIQ_SDK/bin/monkeydo" GarminSampleTest.prg fenix6pro -t
+"$CIQ_SDK/bin/monkeyc" -d fenix6pro -f monkey.jungle -o GMonsterTest.prg -y developer_key.der -l 3 --unit-test
+"$CIQ_SDK/bin/monkeydo" GMonsterTest.prg fenix6pro -t
 
 # Store package: -e builds every product in manifest.xml.
-"$CIQ_SDK/bin/monkeyc" -e -f monkey.jungle -o GarminSample.iq -y developer_key.der -l 3
+"$CIQ_SDK/bin/monkeyc" -e -f monkey.jungle -o GMonster.iq -y developer_key.der -l 3
 ```
 
 - `monkeydo` stays in the foreground while the app runs. That is not a hang.
@@ -56,10 +56,10 @@ Layered so the game logic can be unit-tested without a device.
 
 ### Background scope
 
-`(:background)` files: `GarminSampleApp.mc`, `BackgroundService.mc`, `journey/{Journey,JourneyState,StepTracker}.mc`,
+`(:background)` files: `GMonsterApp.mc`, `BackgroundService.mc`, `journey/{Journey,JourneyState,StepTracker}.mc`,
 `combat/Rng.mc`. The background context only permits a restricted API subset, and the annotation is
 viral — pulling a new dependency into a `(:background)` file drags that file into background scope
-too, and `-l 3` will reject it. `GarminSampleApp.getInitialView()` is the one deliberate escape
+too, and `-l 3` will reject it. `GMonsterApp.getInitialView()` is the one deliberate escape
 hatch, via `(:typecheck(disableBackgroundCheck))`.
 
 Background sync runs every 300s (the platform minimum) and only calls

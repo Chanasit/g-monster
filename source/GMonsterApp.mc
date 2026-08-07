@@ -7,7 +7,7 @@ import Toybox.WatchUi;
 
 //! Entry point. Owns the app lifecycle, the background registration, and the initial view.
 (:background)
-class GarminSampleApp extends Application.AppBase {
+class GMonsterApp extends Application.AppBase {
 
     //! How often the system may wake the background service. Five minutes is the platform minimum.
     private const BACKGROUND_PERIOD_SECONDS = 300;
@@ -59,7 +59,7 @@ class GarminSampleApp extends Application.AppBase {
             return [intro, new CharacterSelectDelegate(intro)];
         }
 
-        var view = new GarminSampleView();
-        return [view, new GarminSampleDelegate(view)];
+        var view = new GMonsterView();
+        return [view, new GMonsterDelegate(view)];
     }
 }

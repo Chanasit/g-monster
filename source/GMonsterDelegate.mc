@@ -2,11 +2,11 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 //! Maps physical buttons and swipes onto view page changes.
-class GarminSampleDelegate extends WatchUi.BehaviorDelegate {
+class GMonsterDelegate extends WatchUi.BehaviorDelegate {
 
-    private var _view as GarminSampleView;
+    private var _view as GMonsterView;
 
-    function initialize(view as GarminSampleView) {
+    function initialize(view as GMonsterView) {
         BehaviorDelegate.initialize();
         _view = view;
     }

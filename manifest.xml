@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="3">
-    <iq:application entry="GarminSampleApp"
+    <iq:application entry="GMonsterApp"
                     id="da0e99aa68da4b71acd93b6b814d9c62"
                     launcherIcon="@Drawables.LauncherIcon"
                     minApiLevel="3.2.0"

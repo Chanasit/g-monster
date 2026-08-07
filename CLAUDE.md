@@ -72,6 +72,22 @@ Creature roster, rarity tiers, worlds, and starters are JSON in `resources/data/
 `jsonData` in `resources/data/data.xml` and parsed lazily by `Combat.Bestiary` / `Atlas`. Re-tuning
 or adding a species is a JSON edit, not a code edit. Strings go in `resources/strings.xml`.
 
+### Sprites
+
+`resources/drawables/*_0.png` / `*_1.png` are **generated** — do not hand-edit them. The art lives as
+24x24 ASCII in `tools/sprites/sprites.txt` (`#` ink, `.` clear), one grid per species key:
+
+```bash
+python3 tools/sprites/generate_sprites.py           # rewrite the PNGs
+python3 tools/sprites/generate_sprites.py --check    # fail if PNGs are stale
+```
+
+Only frame A is authored; frame B is derived by shifting the grid down one row, which is the idle
+breath. That is why the last row of every grid must stay blank. Adding a species means a grid in
+`sprites.txt`, a `<bitmap>` pair in `resources/drawables/drawables.xml`, and an entry in the
+`Sprites.index()` table. `Sprites.draw` still returns false for an unknown key, so the text fallback
+survives if any of the three is missed.
+
 ## Conventions
 
 - Doc comments use `//!` and explain *why*, not what. Match that — the codebase is heavily

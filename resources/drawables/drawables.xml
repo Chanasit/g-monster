@@ -1,8 +1,9 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png"/>
 
-    <!-- Two idle frames per creature. Frame 1 is the body dropped a row, which reads as a breath
-         when alternated. Only the starters are drawn so far; Sprites falls back to text otherwise. -->
+    <!-- Two idle frames per creature. Frame B is the body dropped a row, which reads as a
+         breath when alternated. Both frames are generated from tools/sprites/sprites.txt by
+         tools/sprites/generate_sprites.py. Edit the ASCII there, not these PNGs. -->
     <bitmap id="EmberlingA" filename="emberling_0.png"/>
     <bitmap id="EmberlingB" filename="emberling_1.png"/>
     <bitmap id="DrizzletA" filename="drizzlet_0.png"/>
@@ -11,4 +12,54 @@
     <bitmap id="SparkmiteB" filename="sparkmite_1.png"/>
     <bitmap id="MosscubA" filename="mosscub_0.png"/>
     <bitmap id="MosscubB" filename="mosscub_1.png"/>
+    <bitmap id="GustlingA" filename="gustling_0.png"/>
+    <bitmap id="GustlingB" filename="gustling_1.png"/>
+    <bitmap id="ShardpupA" filename="shardpup_0.png"/>
+    <bitmap id="ShardpupB" filename="shardpup_1.png"/>
+    <bitmap id="CinderpipA" filename="cinderpip_0.png"/>
+    <bitmap id="CinderpipB" filename="cinderpip_1.png"/>
+    <bitmap id="SilthatchA" filename="silthatch_0.png"/>
+    <bitmap id="SilthatchB" filename="silthatch_1.png"/>
+    <bitmap id="CinderfangA" filename="cinderfang_0.png"/>
+    <bitmap id="CinderfangB" filename="cinderfang_1.png"/>
+    <bitmap id="TidecallerA" filename="tidecaller_0.png"/>
+    <bitmap id="TidecallerB" filename="tidecaller_1.png"/>
+    <bitmap id="VoltcrestA" filename="voltcrest_0.png"/>
+    <bitmap id="VoltcrestB" filename="voltcrest_1.png"/>
+    <bitmap id="ThornmaneA" filename="thornmane_0.png"/>
+    <bitmap id="ThornmaneB" filename="thornmane_1.png"/>
+    <bitmap id="GalewingA" filename="galewing_0.png"/>
+    <bitmap id="GalewingB" filename="galewing_1.png"/>
+    <bitmap id="GlacierjawA" filename="glacierjaw_0.png"/>
+    <bitmap id="GlacierjawB" filename="glacierjaw_1.png"/>
+    <bitmap id="DuneshellA" filename="duneshell_0.png"/>
+    <bitmap id="DuneshellB" filename="duneshell_1.png"/>
+    <bitmap id="AshlynxA" filename="ashlynx_0.png"/>
+    <bitmap id="AshlynxB" filename="ashlynx_1.png"/>
+    <bitmap id="PyrewardenA" filename="pyrewarden_0.png"/>
+    <bitmap id="PyrewardenB" filename="pyrewarden_1.png"/>
+    <bitmap id="AbysswardA" filename="abyssward_0.png"/>
+    <bitmap id="AbysswardB" filename="abyssward_1.png"/>
+    <bitmap id="StormcrownA" filename="stormcrown_0.png"/>
+    <bitmap id="StormcrownB" filename="stormcrown_1.png"/>
+    <bitmap id="GrovekeeperA" filename="grovekeeper_0.png"/>
+    <bitmap id="GrovekeeperB" filename="grovekeeper_1.png"/>
+    <bitmap id="SandmonarchA" filename="sandmonarch_0.png"/>
+    <bitmap id="SandmonarchB" filename="sandmonarch_1.png"/>
+    <bitmap id="EmberdrakeA" filename="emberdrake_0.png"/>
+    <bitmap id="EmberdrakeB" filename="emberdrake_1.png"/>
+    <bitmap id="SolmonarchA" filename="solmonarch_0.png"/>
+    <bitmap id="SolmonarchB" filename="solmonarch_1.png"/>
+    <bitmap id="VoidsentinelA" filename="voidsentinel_0.png"/>
+    <bitmap id="VoidsentinelB" filename="voidsentinel_1.png"/>
+    <bitmap id="FlarewispA" filename="flarewisp_0.png"/>
+    <bitmap id="FlarewispB" filename="flarewisp_1.png"/>
+    <bitmap id="StonefangA" filename="stonefang_0.png"/>
+    <bitmap id="StonefangB" filename="stonefang_1.png"/>
+    <bitmap id="TwinflareA" filename="twinflare_0.png"/>
+    <bitmap id="TwinflareB" filename="twinflare_1.png"/>
+    <bitmap id="ElderflameA" filename="elderflame_0.png"/>
+    <bitmap id="ElderflameB" filename="elderflame_1.png"/>
+    <bitmap id="GleammoteA" filename="gleammote_0.png"/>
+    <bitmap id="GleammoteB" filename="gleammote_1.png"/>
 </drawables>

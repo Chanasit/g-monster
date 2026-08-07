@@ -1,0 +1,20 @@
+[
+  {
+    "number": 0,
+    "name": "Emberlands",
+    "areas": [
+      {"number": 0, "name": "Ember Flats",  "distance": 1500, "boss": "shardpup"},
+      {"number": 1, "name": "Rust Basin",   "distance": 2000, "boss": "cinderfang"},
+      {"number": 2, "name": "Pale Reach",   "distance": 2500, "boss": "voltcrest"}
+    ]
+  },
+  {
+    "number": 1,
+    "name": "Deepwilds",
+    "areas": [
+      {"number": 0, "name": "Storm Shelf",  "distance": 3000, "boss": "glacierjaw"},
+      {"number": 1, "name": "Hollow Wood",  "distance": 3500, "boss": "stormcrown"},
+      {"number": 2, "name": "Sunken Spire", "distance": 4000, "boss": "solmonarch"}
+    ]
+  }
+]

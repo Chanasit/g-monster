@@ -1,12 +1,40 @@
 <resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
     <string id="AppName">Garmin Sample</string>
+    <string id="PagePet">ALLY</string>
     <string id="PageStats">STATS</string>
-    <string id="PageSystem">SYSTEM</string>
+    <string id="PageJourney">JOURNEY</string>
+    <string id="PageTamer">TAMER</string>
+    <string id="LabelArea">Area</string>
+    <string id="LabelRemaining">Left</string>
+    <string id="LabelNextEvent">Next</string>
+    <string id="EventEncounter">! AMBUSH</string>
+    <string id="EventBoss">! GUARDIAN</string>
+    <string id="EventFound">! FOUND</string>
+    <string id="IntroEncounter">ENCOUNTER</string>
+    <string id="IntroBoss">GUARDIAN</string>
+    <string id="PageFound">ON THE ROAD</string>
+    <string id="HintDismiss">START = ok</string>
+    <string id="LabelLevel">Lv</string>
+    <string id="LabelPartner">Ally</string>
+    <string id="LabelRecord">W/B</string>
+    <string id="HintBattle">START = battle</string>
+    <string id="HintWalk">walk to find one</string>
+    <string id="PageEvolve">EVOLVE</string>
+    <string id="PageParty">PARTY</string>
+    <string id="PageChoose">CHOOSE ALLY</string>
+    <string id="PageSpirit">SPIRIT</string>
+    <string id="ActionCall">CALL ALLY</string>
+    <string id="ActionSpirit">SPIRIT ON</string>
+    <string id="SpiritHeld">form already held</string>
+    <string id="HintChoose">START = begin</string>
+    <string id="PageDDock">CALL</string>
+    <string id="HintPartyEdit">MENU = edit</string>
+    <string id="HintPartySwap">START = swap</string>
+    <string id="LabelFocus">Focus</string>
+    <string id="HintEvolveReady">MENU = evolve</string>
+    <string id="HintEvolveCommit">START = commit</string>
     <string id="LabelSteps">Steps</string>
     <string id="LabelDistance">Dist</string>
     <string id="LabelCalories">Cals</string>
-    <string id="LabelHeartRate">HR</string>
-    <string id="LabelBattery">Batt</string>
-    <string id="LabelMemory">Mem</string>
     <string id="NoValue">--</string>
 </resources>

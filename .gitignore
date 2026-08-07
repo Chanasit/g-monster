@@ -5,3 +5,13 @@ bin/
 developer_key
 developer_key.der
 developer_key.pem
+
+# Compiler output
+gen/
+external-mir/
+*.mir
+
+# macOS
+.DS_Store
+
+internal-mir/

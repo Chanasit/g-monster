@@ -1,0 +1,35 @@
+[
+  {"key": "emberling",   "name": "Emberling",   "stage": 0, "baseLevel": 3,  "stats": {"HP": 36,  "EN": 22,  "CR": 14,  "AB": 18},  "evolvesTo": "cinderfang"},
+  {"key": "drizzlet",    "name": "Drizzlet",    "stage": 0, "baseLevel": 3,  "stats": {"HP": 40,  "EN": 18,  "CR": 16,  "AB": 16},  "evolvesTo": "tidecaller"},
+  {"key": "sparkmite",   "name": "Sparkmite",   "stage": 0, "baseLevel": 4,  "stats": {"HP": 32,  "EN": 26,  "CR": 12,  "AB": 20},  "evolvesTo": "voltcrest"},
+  {"key": "mosscub",     "name": "Mosscub",     "stage": 0, "baseLevel": 5,  "stats": {"HP": 48,  "EN": 16,  "CR": 22,  "AB": 14},  "evolvesTo": "thornmane"},
+  {"key": "gustling",    "name": "Gustling",    "stage": 0, "baseLevel": 6,  "stats": {"HP": 38,  "EN": 24,  "CR": 18,  "AB": 24},  "evolvesTo": "galewing"},
+  {"key": "shardpup",    "name": "Shardpup",    "stage": 0, "baseLevel": 7,  "stats": {"HP": 44,  "EN": 20,  "CR": 26,  "AB": 18},  "evolvesTo": "glacierjaw"},
+  {"key": "cinderpip",   "name": "Cinderpip",   "stage": 0, "baseLevel": 8,  "stats": {"HP": 42,  "EN": 30,  "CR": 20,  "AB": 22},  "evolvesTo": "pyrewarden"},
+  {"key": "silthatch",   "name": "Silthatch",   "stage": 0, "baseLevel": 9,  "stats": {"HP": 52,  "EN": 22,  "CR": 30,  "AB": 20},  "evolvesTo": "duneshell"},
+
+  {"key": "cinderfang",  "name": "Cinderfang",  "stage": 1, "baseLevel": 12, "stats": {"HP": 72,  "EN": 44,  "CR": 32,  "AB": 38},  "evolvesTo": "pyrewarden"},
+  {"key": "tidecaller",  "name": "Tidecaller",  "stage": 1, "baseLevel": 12, "stats": {"HP": 80,  "EN": 36,  "CR": 34,  "AB": 36},  "evolvesTo": "abyssward"},
+  {"key": "voltcrest",   "name": "Voltcrest",   "stage": 1, "baseLevel": 14, "stats": {"HP": 66,  "EN": 52,  "CR": 28,  "AB": 44},  "evolvesTo": "stormcrown"},
+  {"key": "thornmane",   "name": "Thornmane",   "stage": 1, "baseLevel": 15, "stats": {"HP": 92,  "EN": 32,  "CR": 48,  "AB": 30},  "evolvesTo": "grovekeeper"},
+  {"key": "galewing",    "name": "Galewing",    "stage": 1, "baseLevel": 17, "stats": {"HP": 74,  "EN": 48,  "CR": 36,  "AB": 50},  "evolvesTo": null},
+  {"key": "glacierjaw",  "name": "Glacierjaw",  "stage": 1, "baseLevel": 19, "stats": {"HP": 88,  "EN": 40,  "CR": 56,  "AB": 34},  "evolvesTo": null},
+  {"key": "duneshell",   "name": "Duneshell",   "stage": 1, "baseLevel": 20, "stats": {"HP": 104, "EN": 34,  "CR": 52,  "AB": 32},  "evolvesTo": "sandmonarch"},
+  {"key": "ashlynx",     "name": "Ashlynx",     "stage": 1, "baseLevel": 22, "stats": {"HP": 78,  "EN": 58,  "CR": 40,  "AB": 54},  "evolvesTo": "emberdrake"},
+
+  {"key": "pyrewarden",  "name": "Pyrewarden",  "stage": 2, "baseLevel": 26, "stats": {"HP": 130, "EN": 84,  "CR": 62,  "AB": 74},  "evolvesTo": null},
+  {"key": "abyssward",   "name": "Abyssward",   "stage": 2, "baseLevel": 27, "stats": {"HP": 148, "EN": 70,  "CR": 66,  "AB": 68},  "evolvesTo": null},
+  {"key": "stormcrown",  "name": "Stormcrown",  "stage": 2, "baseLevel": 30, "stats": {"HP": 124, "EN": 98,  "CR": 58,  "AB": 86},  "evolvesTo": null},
+  {"key": "grovekeeper", "name": "Grovekeeper", "stage": 2, "baseLevel": 32, "stats": {"HP": 168, "EN": 62,  "CR": 92,  "AB": 60},  "evolvesTo": null},
+  {"key": "sandmonarch", "name": "Sandmonarch", "stage": 2, "baseLevel": 34, "stats": {"HP": 176, "EN": 66,  "CR": 96,  "AB": 58},  "evolvesTo": null},
+  {"key": "emberdrake",  "name": "Emberdrake",  "stage": 2, "baseLevel": 36, "stats": {"HP": 142, "EN": 104, "CR": 70,  "AB": 92},  "evolvesTo": "solmonarch"},
+
+  {"key": "solmonarch",  "name": "Solmonarch",  "stage": 3, "baseLevel": 44, "stats": {"HP": 210, "EN": 132, "CR": 104, "AB": 118}, "evolvesTo": null},
+  {"key": "voidsentinel","name": "Voidsentinel","stage": 3, "baseLevel": 48, "stats": {"HP": 236, "EN": 118, "CR": 128, "AB": 110}, "evolvesTo": null},
+
+  {"key": "flarewisp",   "name": "Flarewisp",   "stage": 3, "baseLevel": 20, "stats": {"HP": 120, "EN": 88,  "CR": 52,  "AB": 76},  "evolvesTo": null, "spirit": "warrior"},
+  {"key": "stonefang",   "name": "Stonefang",   "stage": 3, "baseLevel": 24, "stats": {"HP": 190, "EN": 58,  "CR": 112, "AB": 54},  "evolvesTo": null, "spirit": "beast"},
+  {"key": "twinflare",   "name": "Twinflare",   "stage": 3, "baseLevel": 30, "stats": {"HP": 205, "EN": 116, "CR": 96,  "AB": 108}, "evolvesTo": null, "spirit": "fused"},
+  {"key": "elderflame",  "name": "Elderflame",  "stage": 3, "baseLevel": 40, "stats": {"HP": 260, "EN": 148, "CR": 130, "AB": 140}, "evolvesTo": null, "spirit": "ancient"},
+  {"key": "gleammote",   "name": "Gleammote",   "stage": 3, "baseLevel": 10, "stats": {"HP": 84,  "EN": 54,  "CR": 38,  "AB": 46},  "evolvesTo": null, "spirit": "minor"}
+]

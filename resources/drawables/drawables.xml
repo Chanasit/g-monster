@@ -1,3 +1,14 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png"/>
+
+    <!-- Two idle frames per creature. Frame 1 is the body dropped a row, which reads as a breath
+         when alternated. Only the starters are drawn so far; Sprites falls back to text otherwise. -->
+    <bitmap id="EmberlingA" filename="emberling_0.png"/>
+    <bitmap id="EmberlingB" filename="emberling_1.png"/>
+    <bitmap id="DrizzletA" filename="drizzlet_0.png"/>
+    <bitmap id="DrizzletB" filename="drizzlet_1.png"/>
+    <bitmap id="SparkmiteA" filename="sparkmite_0.png"/>
+    <bitmap id="SparkmiteB" filename="sparkmite_1.png"/>
+    <bitmap id="MosscubA" filename="mosscub_0.png"/>
+    <bitmap id="MosscubB" filename="mosscub_1.png"/>
 </drawables>

@@ -21,9 +21,34 @@ class GarminSampleDelegate extends WatchUi.BehaviorDelegate {
         return true;
     }
 
-    //! Select (START) also advances, so touch-only devices can page through.
+    //! START fights whatever the trek is waiting on. With nothing pending there is no fight to be
+    //! had — battles are earned by walking, not by pressing the button again.
     function onSelect() as Boolean {
-        _view.nextPage();
+        Encounter.begin();
+        return true;
+    }
+
+    //! MENU acts on whatever page is showing: the roster editor on PARTY, evolution on TAMER.
+    function onMenu() as Boolean {
+        if (_view.currentPage() == _view.PAGE_PARTY) {
+            var party = new PartyView();
+            WatchUi.pushView(party, new PartyDelegate(party), WatchUi.SLIDE_LEFT);
+            return true;
+        }
+
+        // Evolution is only offered once the lead has actually earned the chance.
+        if (!GameState.partnerCanEvolve()) {
+            return true;
+        }
+
+        var partner = GameState.partner();
+        var target = Evolution.target(partner);
+        if (target == null) {
+            return true;
+        }
+
+        var view = new EvolveView(partner, target, GameState.focus());
+        WatchUi.pushView(view, new EvolveDelegate(view), WatchUi.SLIDE_LEFT);
         return true;
     }
 }

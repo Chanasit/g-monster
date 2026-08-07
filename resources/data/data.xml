@@ -1,0 +1,6 @@
+<resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <jsonData id="Creatures" filename="creatures.json"/>
+    <jsonData id="Rarities" filename="rarities.json"/>
+    <jsonData id="Worlds" filename="worlds.json"/>
+    <jsonData id="Starters" filename="starters.json"/>
+</resources>

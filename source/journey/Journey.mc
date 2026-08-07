@@ -32,7 +32,7 @@ module Journey {
     //! encounter loop can be exercised in the simulator without walking several hundred steps per
     //! event. Set back to 0 to restore the real 300..500 pacing — this is a tuning cheat, not a
     //! feature, and shipping it would trivialise the game.
-    const DEBUG_EVENT_GAP = 50;
+    const DEBUG_EVENT_GAP = 0;
 
     //! Bounds `rollEventGap` can actually return, override included. Tests assert against these
     //! rather than against 300/500 literals, so flipping the override does not fake a passing suite.

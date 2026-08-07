@@ -13,17 +13,44 @@ class BattleView extends WatchUi.View {
     private const STATE_RESOLVE = 2;  // showing what happened this turn
     private const STATE_OVER = 3;     // battle finished, showing the payout
 
-    //! Ticks the encounter flash runs for. Long enough to register as an event, short enough that
-    //! it never feels like something to sit through.
-    private const INTRO_TICKS = 4;
+    //! The view ticks at 100ms rather than the 500ms the rest of the app uses. A lunge that only
+    //! gets two frames does not read as movement, and 500ms is already past the point where a hit
+    //! feels connected to the button that caused it. Battles are short and the player is watching
+    //! the whole time, so the extra redraws are worth it here and nowhere else.
+    private const TICK_MS = 100;
 
-    private const RESOLVE_TICKS = 2;  // ~1s at the 500ms tick rate
+    //! The encounter flash. Long enough to register as an event, short enough that it never feels
+    //! like something to sit through.
+    private const INTRO_MS = 2000;
+
+    //! How long a resolved turn stays on screen. Longer than the old 1s because the animation now
+    //! has to play inside it.
+    private const RESOLVE_MS = 1200;
+
+    private const SUMMON_MS = 1000;
+
+    //! The attacker travels out and back within this window, then the defender takes the blow.
+    private const LUNGE_MS = 400;
+
+    //! How far the attacker travels, as a share of the clear space between the two sprites. Derived
+    //! rather than a fixed fraction of the screen: at 208px the two 72px sprites leave only 23px
+    //! between them, and any fixed reach large enough to read on a 280px panel makes them collide
+    //! on the small one.
+    private const LUNGE_SHARE = 3;
+
+    //! The struck creature blinks for this long once the lunge lands. Blinking the sprite is the
+    //! only damage cue a two-tone panel has — there is no red to flash.
+    private const FLASH_MS = 600;
+    private const FLASH_BLINK_MS = 100;
+
+    //! A creature that ignored its tamer jitters in place instead of attacking.
+    private const SHAKE_PX = 3;
 
     private var _engine as Combat.BattleEngine;
     private var _state as Number;
     private var _selected as Number;
     private var _lastResult as Combat.TurnResult?;
-    private var _ticksLeft as Number;
+    private var _resolveMs as Number;
     private var _timer as Timer.Timer?;
     private var _experienceDelta as Number;
     private var _levelChanged as Boolean;
@@ -33,8 +60,8 @@ class BattleView extends WatchUi.View {
     private var _partnerLevelDelta as Number;
     private var _recruited as String?;
     private var _summonedName as String?;
-    private var _summonTicks as Number;
-    private var _introTicks as Number;
+    private var _summonMs as Number;
+    private var _introMs as Number;
 
     //! Every battle comes from a trek event — there is no free sparring — so the trek is always
     //! blocked on this fight and always has to be unblocked when it ends.
@@ -54,7 +81,7 @@ class BattleView extends WatchUi.View {
         _partnerLevelDelta = 0;
         _recruited = null;
         _summonedName = null;
-        _summonTicks = 0;
+        _summonMs = 0;
 
         _engine = new Combat.BattleEngine(
             GameState.partner(),
@@ -68,10 +95,10 @@ class BattleView extends WatchUi.View {
         _engine.setSpiritPower(GameState.spiritPower());
 
         _state = STATE_INTRO;
-        _introTicks = INTRO_TICKS;
+        _introMs = INTRO_MS;
         _selected = Combat.ATTACK_ENERGY;
         _lastResult = null;
-        _ticksLeft = 0;
+        _resolveMs = 0;
         _timer = null;
         _experienceDelta = 0;
         _levelChanged = false;
@@ -80,7 +107,7 @@ class BattleView extends WatchUi.View {
 
     function onShow() as Void {
         var timer = new Timer.Timer();
-        timer.start(method(:onTick), 500, true);
+        timer.start(method(:onTick), TICK_MS, true);
         _timer = timer;
     }
 
@@ -94,24 +121,24 @@ class BattleView extends WatchUi.View {
 
     function onTick() as Void {
         if (_state == STATE_INTRO) {
-            _introTicks -= 1;
-            if (_introTicks <= 0) {
+            _introMs -= TICK_MS;
+            if (_introMs <= 0) {
                 _state = STATE_SELECT;
             }
             WatchUi.requestUpdate();
             return;
         }
 
-        if (_summonTicks > 0) {
-            _summonTicks -= 1;
-            if (_summonTicks <= 0) {
+        if (_summonMs > 0) {
+            _summonMs -= TICK_MS;
+            if (_summonMs <= 0) {
                 _summonedName = null;
             }
         }
 
         if (_state == STATE_RESOLVE) {
-            _ticksLeft -= 1;
-            if (_ticksLeft <= 0) {
+            _resolveMs -= TICK_MS;
+            if (_resolveMs <= 0) {
                 _state = _engine.isOver() ? STATE_OVER : STATE_SELECT;
                 if (_state == STATE_OVER) {
                     settleBattle();
@@ -133,7 +160,7 @@ class BattleView extends WatchUi.View {
     //! Commit the highlighted attack, or dismiss the result of the previous one.
     function confirm() as Void {
         if (_state == STATE_INTRO) {
-            _introTicks = 0;
+            _introMs = 0;
             _state = STATE_SELECT;
             WatchUi.requestUpdate();
             return;
@@ -142,10 +169,10 @@ class BattleView extends WatchUi.View {
         if (_state == STATE_SELECT) {
             _lastResult = _engine.takeTurn(_selected);
             _state = STATE_RESOLVE;
-            _ticksLeft = RESOLVE_TICKS;
+            _resolveMs = RESOLVE_MS;
         } else if (_state == STATE_RESOLVE) {
             // Skip the result animation.
-            _ticksLeft = 0;
+            _resolveMs = 0;
             _state = _engine.isOver() ? STATE_OVER : STATE_SELECT;
             if (_state == STATE_OVER) {
                 settleBattle();
@@ -173,7 +200,9 @@ class BattleView extends WatchUi.View {
     //! This is the moment the fight announces itself — on a two-tone screen, inverting everything
     //! is the loudest thing available.
     private function drawIntro(dc as Dc, centerX as Number, height as Numeric) as Void {
-        var flash = (_introTicks % 2) == 0;
+        // Two flashes per second, independent of the 100ms tick so the rate does not change if the
+        // tick is ever retuned.
+        var flash = ((_introMs / 250) % 2) == 0;
 
         if (flash) {
             Theme.invertScreen(dc);
@@ -182,11 +211,23 @@ class BattleView extends WatchUi.View {
             Theme.ink(dc);
         }
 
-        dc.drawText(centerX, height * 0.40, Graphics.FONT_SMALL,
+        // The enemy slides in from off the right edge and settles at its battle position, so the
+        // creature the player is about to fight is on screen before the fight starts.
+        var elapsed = INTRO_MS - _introMs;
+        var travel = (elapsed < LUNGE_MS) ? (LUNGE_MS - elapsed) : 0;
+        var slide = ((dc.getWidth() * travel) / LUNGE_MS).toNumber();
+
+        // On the flash beat the panel is solid ink, and a black sprite on black is invisible. Skip
+        // it rather than draw nothing-shaped holes.
+        if (!flash) {
+            Sprites.drawIdle(dc, enemyX(dc) + slide, height * 0.40, _engine.enemySpecies().key);
+        }
+
+        dc.drawText(centerX, height * 0.68, Graphics.FONT_SMALL,
                     WatchUi.loadResource(_isBoss ? Rez.Strings.IntroBoss : Rez.Strings.IntroEncounter) as String,
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
-        dc.drawText(centerX, height * 0.58, Graphics.FONT_TINY, _engine.enemySpecies().name,
+        dc.drawText(centerX, height * 0.83, Graphics.FONT_TINY, _engine.enemySpecies().name,
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
@@ -196,7 +237,7 @@ class BattleView extends WatchUi.View {
             return;
         }
         _summonedName = species.name;
-        _summonTicks = RESOLVE_TICKS;
+        _summonMs = SUMMON_MS;
         WatchUi.requestUpdate();
     }
 
@@ -207,12 +248,23 @@ class BattleView extends WatchUi.View {
             return;
         }
         _summonedName = species.name;
-        _summonTicks = RESOLVE_TICKS;
+        _summonMs = SUMMON_MS;
         WatchUi.requestUpdate();
     }
 
     function popView() as Void {
         WatchUi.popView(WatchUi.SLIDE_RIGHT);
+    }
+
+    //! Debug: run this battle as a preview, so nothing it does reaches the save.
+    //!
+    //! settleBattle is already idempotent on `_settled` — it is the guard that stops a battle from
+    //! paying out twice. Marking the fight settled before it starts reuses that guard to neutralise
+    //! every write it would otherwise make: experience, focus, recruits, spirit power, party levels
+    //! and the trek's pending event. The payout screen consequently reports +0 XP, which is correct:
+    //! a preview earns nothing.
+    function markPreview() as Void {
+        _settled = true;
     }
 
     //! Award or deduct experience exactly once, when the battle ends.
@@ -286,20 +338,12 @@ class BattleView extends WatchUi.View {
             return;
         }
 
-        var enemyLabel = _isBoss
-            ? _engine.enemySpecies().name + "*"   // guardians are marked
-            : _engine.enemySpecies().name;
-        drawCombatant(dc, centerX, height * 0.16, enemyLabel,
-                      _engine.enemyLevel(), _engine.enemyStats());
-        var fighter = _engine.playerSpecies();
-        drawCombatant(dc, centerX, height * 0.34, fighter.name,
-                      fighter.friendlyLevel(Party.extraLevel(fighter.key)),
-                      _engine.playerStats());
+        drawScene(dc, height);
 
         // A just-called creature is announced over whatever the screen would otherwise show.
         var summoned = _summonedName;
         if (summoned != null) {
-            Theme.banner(dc, centerX, height * 0.72, summoned + " IN!", Graphics.FONT_TINY);
+            battleBanner(dc, centerX, height * 0.80, summoned + " IN!", Graphics.FONT_TINY);
             return;
         }
 
@@ -312,37 +356,195 @@ class BattleView extends WatchUi.View {
         }
     }
 
-    //! Name + level on one line, HP bar underneath.
-    private function drawCombatant(
+    //! The two combatants stand side by side rather than stacked: two 72px sprites plus a gap is
+    //! 160px, which fits the narrowest supported panel (fr55, 208px) across the middle of the
+    //! screen where a round display is at its widest. Stacking them would not fit vertically once
+    //! the name, bar and attack picker are accounted for.
+    private function playerX(dc as Dc) as Number {
+        return (dc.getWidth() * 0.30).toNumber();
+    }
+
+    private function enemyX(dc as Dc) as Number {
+        return (dc.getWidth() * 0.70).toNumber();
+    }
+
+    //! An emphasis band sized for this screen rather than Theme.banner's app-wide 0.86 width.
+    //!
+    //! At the depth these bands sit, a round panel's chord is far narrower than 0.86 of its
+    //! diameter, so the full-width version has its ends cut off by the bezel. 0.62 clears the
+    //! curve on every supported size.
+    private function battleBanner(dc as Dc, centerX as Number, y as Numeric, text as String,
+                                  font as Graphics.FontType) as Void {
+        Theme.selectionBand(dc, centerX, y, 0.62, 26);
+        Theme.inverted(dc);
+        dc.drawText(centerX, y, font, text,
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    //! Milliseconds since the current turn started resolving. Zero outside STATE_RESOLVE.
+    private function resolveElapsed() as Number {
+        return (_state == STATE_RESOLVE) ? (RESOLVE_MS - _resolveMs) : RESOLVE_MS;
+    }
+
+    //! Who threw the blow this turn: +1 player, -1 enemy, 0 nobody (a clash or a refusal).
+    private function striker() as Number {
+        var result = _lastResult;
+        if (result == null || _state != STATE_RESOLVE) {
+            return 0;
+        }
+        if (result.disobeyed && result.playerAttack == Combat.ATTACK_IDLE) {
+            return 0;   // it never swung; the jitter below carries that instead
+        }
+        if (result.winner == Combat.WINNER_PLAYER) {
+            return 1;
+        }
+        if (result.winner == Combat.WINNER_ENEMY) {
+            return -1;
+        }
+        return 0;
+    }
+
+    //! Horizontal offset for one combatant this frame.
+    //!
+    //! The attacker ramps toward its target and back over LUNGE_MS — a triangle rather than a
+    //! smooth curve, because at 100ms there are only four frames in the move and easing would be
+    //! invisible. A creature that ignored its tamer jitters on the spot instead, which reads as
+    //! "did something, but not what you asked".
+    private function lungeOffset(dc as Dc, mine as Number) as Number {
+        var result = _lastResult;
+        if (result == null || _state != STATE_RESOLVE) {
+            return 0;
+        }
+
+        var elapsed = resolveElapsed();
+
+        // Only a creature that refused outright jitters. One that went rogue did swing, just not
+        // where it was told, so it still lunges — otherwise the enemy would flinch from a blow the
+        // player never sees thrown.
+        if (result.disobeyed && result.playerAttack == Combat.ATTACK_IDLE && mine > 0) {
+            if (elapsed >= LUNGE_MS) {
+                return 0;
+            }
+            return ((elapsed / FLASH_BLINK_MS) % 2 == 0) ? SHAKE_PX : -SHAKE_PX;
+        }
+
+        var swing = striker();
+        var reach = lungeReach(dc);
+
+        // A clash: both sides commit, meet in the middle, and neither lands.
+        if (swing == 0) {
+            if (result.winner != Combat.WINNER_TIE || elapsed >= LUNGE_MS) {
+                return 0;
+            }
+            return travel(elapsed, reach / 2) * ((mine > 0) ? 1 : -1);
+        }
+
+        if (swing != mine || elapsed >= LUNGE_MS) {
+            return 0;
+        }
+        return travel(elapsed, reach) * ((mine > 0) ? 1 : -1);
+    }
+
+    //! Travel distance that keeps the sprites clear of each other at full extension.
+    private function lungeReach(dc as Dc) as Number {
+        var clear = (enemyX(dc) - playerX(dc)) - Sprites.SIZE;
+        return (clear > 0) ? (clear / LUNGE_SHARE) : 0;
+    }
+
+    //! Out and back: 0 at the ends of the window, full reach in the middle.
+    private function travel(elapsed as Number, reach as Number) as Number {
+        var half = LUNGE_MS / 2;
+        var distance = (elapsed < half) ? elapsed : (LUNGE_MS - elapsed);
+        return ((distance * reach) / half).toNumber();
+    }
+
+    //! Whether a combatant's sprite is drawn this frame. The one that just took a hit blinks for
+    //! FLASH_MS after the lunge lands.
+    private function visible(mine as Number) as Boolean {
+        var result = _lastResult;
+        if (result == null || _state != STATE_RESOLVE) {
+            return true;
+        }
+
+        var swing = striker();
+        if (swing == 0 || swing == mine) {
+            return true;   // the attacker never blinks; nor does anyone on a clash
+        }
+
+        var elapsed = resolveElapsed();
+        if (elapsed < LUNGE_MS || elapsed >= LUNGE_MS + FLASH_MS) {
+            return true;
+        }
+        return (((elapsed - LUNGE_MS) / FLASH_BLINK_MS) % 2) == 0;
+    }
+
+    //! Both combatants: name, bar, level/HP, and the sprite itself.
+    private function drawScene(dc as Dc, height as Numeric) as Void {
+        var fighter = _engine.playerSpecies();
+        var enemy = _engine.enemySpecies();
+
+        // Once the fight is over the name and bar rows give way to the payout, which needs the
+        // depth. The sprites stay so the screen still shows who won.
+        var status = (_state != STATE_OVER);
+
+        drawFighter(dc, playerX(dc), height, fighter.name, fighter.key,
+                    fighter.friendlyLevel(Party.extraLevel(fighter.key)),
+                    _engine.playerStats(), 1, status);
+
+        drawFighter(dc, enemyX(dc), height,
+                    _isBoss ? enemy.name + "*" : enemy.name,   // guardians are marked
+                    enemy.key, _engine.enemyLevel(), _engine.enemyStats(), -1, status);
+    }
+
+    private function drawFighter(
         dc as Dc,
-        centerX as Number,
-        y as Numeric,
+        x as Number,
+        height as Numeric,
         name as String,
+        key as String,
         level as Number,
-        stats as Combat.CombatStats
+        stats as Combat.CombatStats,
+        mine as Number,
+        status as Boolean
     ) as Void {
-        Theme.ink(dc);
-        dc.drawText(centerX, y, Graphics.FONT_XTINY,
-                    name + " L" + level.toString(),
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        // Name, level and bar sit *below* the sprite. Above it the panel is at its narrowest — a
+        // round screen's chord that near the top cannot hold two columns of text, which is what
+        // clipped both names and both bars when this block was at the top of the screen.
+        if (status) {
+            Theme.ink(dc);
+            dc.drawText(x, height * 0.60, Graphics.FONT_XTINY,
+                        name + " L" + level.toString(),
+                        Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
-        var barWidth = (dc.getWidth() * 0.55).toNumber();
-        var barHeight = 7;
-        var x = centerX - barWidth / 2;
-        var barY = (y + 14).toNumber();
+            var barWidth = (dc.getWidth() * 0.38).toNumber();
+            Theme.bar(dc, x - barWidth / 2, (height * 0.68).toNumber(), barWidth, 7,
+                      stats.hpFraction());
+        }
 
-        Theme.bar(dc, x, barY, barWidth, barHeight, stats.hpFraction());
+        if (!visible(mine)) {
+            return;
+        }
 
-        Theme.muted(dc);
-        dc.drawText(centerX, barY + barHeight + 8, Graphics.FONT_XTINY,
-                    stats.hp.toString() + "/" + stats.maxHp.toString(),
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        // A creature at zero has left the field — but not until the blow that felled it has landed.
+        // The engine applies damage the instant the turn resolves, so without the timing check the
+        // loser would wink out before the lunge plays and the attacker would swing at empty space.
+        if (stats.hp <= 0 && resolveElapsed() >= LUNGE_MS) {
+            return;
+        }
+
+        var spriteY = height * 0.36;
+        if (!Sprites.drawIdle(dc, x + lungeOffset(dc, mine), spriteY, key)) {
+            // No art for this species: name the slot so the layout keeps its shape.
+            Theme.ink(dc);
+            dc.drawText(x, spriteY, Graphics.FONT_TINY, "?",
+                        Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        }
     }
 
     //! The three attacks in a row, highlighted one boxed, with its damage value below.
     private function drawAttackPicker(dc as Dc, centerX as Number, height as Numeric) as Void {
         var labels = ["EN", "CR", "AB"];
-        var y = (height * 0.68).toNumber();
+        var y = (height * 0.80).toNumber();
         var spacing = 44;
         var startX = centerX - spacing;
 
@@ -362,9 +564,42 @@ class BattleView extends WatchUi.View {
         }
 
         Theme.muted(dc);
-        dc.drawText(centerX, height * 0.83, Graphics.FONT_XTINY,
+        dc.drawText(centerX, height * 0.91, Graphics.FONT_XTINY,
                     "PWR " + _engine.playerStats().attackDamage(_selected).toString()
                         + "   " + _engine.callPoints().toString() + "P",
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    //! The damage floats up off whoever was hit, starting when the lunge lands.
+    //!
+    //! It is drawn only on the frames where the struck sprite is blinked out, and in the space that
+    //! sprite occupies. That keeps the number tied to the creature that took the blow without
+    //! fighting it for pixels — above the sprite there is only 13px between the HP line and the
+    //! sprite's top edge on a 208px panel, which will not hold a line of text. Swapping the number
+    //! in for the sprite on the off beat is also the more period-correct read: the thing flickers,
+    //! and what shows through the gap is the damage.
+    private function drawDamageNumber(dc as Dc, height as Numeric, result as Combat.TurnResult) as Void {
+        var swing = striker();
+        if (swing == 0 || result.damage <= 0) {
+            return;
+        }
+
+        var elapsed = resolveElapsed();
+        if (elapsed < LUNGE_MS || visible(-swing)) {
+            return;
+        }
+
+        var rise = elapsed - LUNGE_MS;
+        if (rise > FLASH_MS) {
+            rise = FLASH_MS;
+        }
+
+        // Rises within the sprite's own band, so it never reaches the HP line or the result text.
+        var lift = ((rise * (height * 0.08)) / FLASH_MS).toNumber();
+        var x = (swing > 0) ? enemyX(dc) : playerX(dc);
+
+        Theme.ink(dc);
+        dc.drawText(x, height * 0.38 - lift, Graphics.FONT_TINY, "-" + result.damage.toString(),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
@@ -380,8 +615,10 @@ class BattleView extends WatchUi.View {
                   + Combat.BattleEngine.attackName(result.enemyAttack);
 
         Theme.muted(dc);
-        dc.drawText(centerX, height * 0.66, Graphics.FONT_XTINY, clash,
+        dc.drawText(centerX, height * 0.91, Graphics.FONT_XTINY, clash,
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+
+        drawDamageNumber(dc, height, result);
 
         var message;
         var banded = false;   // the player landing a blow is the one thing worth inverting
@@ -399,7 +636,7 @@ class BattleView extends WatchUi.View {
         }
 
         if (banded) {
-            Theme.banner(dc, centerX, height * 0.80, message, Graphics.FONT_TINY);
+            battleBanner(dc, centerX, height * 0.80, message, Graphics.FONT_TINY);
         } else {
             Theme.ink(dc);
             dc.drawText(centerX, height * 0.80, Graphics.FONT_TINY, message,
@@ -412,10 +649,10 @@ class BattleView extends WatchUi.View {
         var won = (_engine.outcome() == Combat.WINNER_PLAYER);
 
         if (won) {
-            Theme.banner(dc, centerX, height * 0.68, "VICTORY", Graphics.FONT_SMALL);
+            battleBanner(dc, centerX, height * 0.62, "VICTORY", Graphics.FONT_SMALL);
         } else {
             Theme.ink(dc);
-            dc.drawText(centerX, height * 0.68, Graphics.FONT_SMALL, "DEFEAT",
+            dc.drawText(centerX, height * 0.62, Graphics.FONT_SMALL, "DEFEAT",
                         Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         }
 
@@ -426,7 +663,7 @@ class BattleView extends WatchUi.View {
         }
 
         Theme.muted(dc);
-        dc.drawText(centerX, height * 0.82, Graphics.FONT_XTINY, line,
+        dc.drawText(centerX, height * 0.75, Graphics.FONT_XTINY, line,
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
         var footer = null as String?;
@@ -443,7 +680,7 @@ class BattleView extends WatchUi.View {
 
         if (footer != null) {
             Theme.ink(dc);
-            dc.drawText(centerX, height * 0.91, Graphics.FONT_XTINY, footer,
+            dc.drawText(centerX, height * 0.87, Graphics.FONT_XTINY, footer,
                         Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         }
     }

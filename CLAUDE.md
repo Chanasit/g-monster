@@ -99,6 +99,9 @@ survives if any of the three is missed.
 
 ## Repo hygiene
 
+- `DEBUG.md` documents the compile-time debug flags (instant battle, encounter pacing). They are
+  plain constants, not `(:debug)` code, so they ship as written — check they are all off before
+  packaging with `-e`.
 - `developer_key.der` / `.pem` are signing keys, gitignored — never commit or print them.
 - `gen/` and `external-mir/` are compiler artifacts. `external-mir/` is currently tracked in git;
   do not hand-edit `.mir` files, they are regenerated on every build.

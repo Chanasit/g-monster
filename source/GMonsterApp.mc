@@ -12,6 +12,22 @@ class GMonsterApp extends Application.AppBase {
     //! How often the system may wake the background service. Five minutes is the platform minimum.
     private const BACKGROUND_PERIOD_SECONDS = 300;
 
+    //! Debug: launch straight into a battle instead of the pager, so the battle scene can be looked
+    //! at without walking to an encounter — zero steps required.
+    //!
+    //! The fight is a preview (see Encounter.preview): it pays out nothing and never touches the
+    //! trek, so this can be relaunched as often as you like without inflating a save. While it is on
+    //! the rest of the app is unreachable, which is the point. Set to false for normal play, and
+    //! reset it before packaging a release.
+    private const DEBUG_INSTANT_BATTLE = false;
+
+    //! Which species to fight in that preview. An unrecognised key falls back to a random encounter,
+    //! so this doubles as a way to eyeball any creature's sprite.
+    private const DEBUG_BATTLE_ENEMY = "glacierjaw";
+
+    //! Show it as an area guardian — marks the name and uses the boss intro string.
+    private const DEBUG_BATTLE_IS_BOSS = false;
+
     function initialize() {
         AppBase.initialize();
     }
@@ -57,6 +73,12 @@ class GMonsterApp extends Application.AppBase {
         if (!GameState.hasCharacter()) {
             var intro = new CharacterSelectView();
             return [intro, new CharacterSelectDelegate(intro)];
+        }
+
+        // Checked after the starter gate: a battle needs a partner to field, and a fresh save has
+        // not chosen one yet.
+        if (DEBUG_INSTANT_BATTLE) {
+            return Encounter.preview(DEBUG_BATTLE_ENEMY, DEBUG_BATTLE_IS_BOSS);
         }
 
         var view = new GMonsterView();

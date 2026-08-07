@@ -35,9 +35,9 @@ ground.
 ```
 manifest.xml                        app id, type, target products, min API level
 monkey.jungle                       build config
-source/GMonsterApp.mc           AppBase entry point
-source/GMonsterView.mc          rendering + refresh timer
-source/GMonsterDelegate.mc      button/swipe handling
+source/GMonsterApp.mc               AppBase entry point
+source/GMonsterView.mc              rendering + refresh timer
+source/GMonsterDelegate.mc          button/swipe handling
 source/GameState.mc                 persistent player state (Storage)
 source/BackgroundService.mc         5-minute step accrual while the app is closed
 source/journey/Journey.mc           area table + Trek state machine (pure)

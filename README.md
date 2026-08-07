@@ -1,11 +1,17 @@
-# Garmin Sample — Connect IQ watch-app
+# g-monster
 
-Two-page data app for Connect IQ. Page 1: steps, distance, calories, step-goal bar.
-Page 2: heart rate, battery, memory. Clock in the header, 1 Hz redraw while visible.
-UP / DOWN / START change pages.
+A step-driven creature companion for Garmin Connect IQ. Walking is the game: real pedometer steps
+carry your ally across a chain of areas, turning up encounters and guardians along the way.
 
-Page 3 (JOURNEY) shows the current area, distance left and what is waiting. Page 4 (TAMER) shows
-player level, partner and battle record. START fights whatever the journey is waiting on.
+Four pages, UP / DOWN to move between them:
+
+- **ALLY** — your creature, its standing, and whatever the road is holding. The app opens here.
+- **STATS** — steps, distance, calories, step-goal bar.
+- **JOURNEY** — current area, distance left, what is waiting.
+- **TAMER** — player level, focus, battle record.
+
+START fights whatever the journey is waiting on. MENU opens the roster editor on PARTY, or
+evolution on TAMER.
 
 ## Journey
 

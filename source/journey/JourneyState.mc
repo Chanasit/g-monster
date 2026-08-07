@@ -55,7 +55,7 @@ module JourneyState {
         return new Journey.Trek(
             readNumber(KEY_AREA, 0),
             distance,
-            readNumber(KEY_NEXT_EVENT, 300),
+            Journey.clampEventGap(readNumber(KEY_NEXT_EVENT, Journey.EVENT_GAP_MIN)),
             readNumber(KEY_TOTAL_STEPS, 0),
             readNumber(KEY_PENDING, Journey.EVENT_NONE)
         );

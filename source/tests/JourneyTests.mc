@@ -30,9 +30,9 @@ function testEncounterInterruptsAndBanksSurplus(logger as Logger) as Boolean {
     Test.assertEqual(trek.totalSteps, 40);
     Test.assertEqual(trek.pendingEvent, Journey.EVENT_ENCOUNTER);
 
-    // The gap is rerolled into the documented 300..500 range.
-    Test.assert(trek.stepsToNextEvent >= 300);
-    Test.assert(trek.stepsToNextEvent <= 500);
+    // The gap is rerolled into the documented range.
+    Test.assert(trek.stepsToNextEvent >= Journey.eventGapMin());
+    Test.assert(trek.stepsToNextEvent <= Journey.eventGapMax());
     return true;
 }
 
@@ -90,7 +90,7 @@ function testCompleteAreaAdvances(logger as Logger) as Boolean {
     Test.assertEqual(trek.distance, Atlas.areaDistance(1));
     Test.assertEqual(trek.pendingEvent, Journey.EVENT_NONE);
     Test.assertEqual(trek.totalSteps, 5000); // lifetime steps survive the transition
-    Test.assert(trek.stepsToNextEvent >= 300);
+    Test.assert(trek.stepsToNextEvent >= Journey.eventGapMin());
     return true;
 }
 

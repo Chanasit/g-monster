@@ -28,12 +28,18 @@ module Motion {
     //! was merged, so the whole ladder was untestable machinery.
     const MOVE_ENTER_SPM = 40;
 
-    //! One slot per second, five of them. Five seconds is everything the rules read.
+    //! One slot per second, three of them. The entry rule is the only one that reads a sum over
+    //! the buffer; the quiet and sleep rules each read `sinceStepMs` — the gap since the last step
+    //! — so they need no slots of their own, and the buffer holds no more than entry ever asks for.
     const BUCKET_MS = 1000;
-    const BUCKETS = 5;
+    const BUCKETS = 3;
 
-    //! Entry is judged over the newest three slots. The remaining two exist for the quiet rule,
-    //! which reads the gap since the last step rather than a sum.
+    //! Entry is judged over the newest three slots. BUCKETS and ENTER_BUCKETS carry the same
+    //! number today, but they answer different questions: BUCKETS is how much history the ring
+    //! buffer can hold, ENTER_BUCKETS is how much of that history the entry rule consumes. They
+    //! coincide because entry is the buffer's only reader, not because they are the same constant
+    //! wearing two names — a future rule that needs a longer sum would grow BUCKETS without
+    //! touching this one.
     const ENTER_BUCKETS = 3;
     const ENTER_MS = ENTER_BUCKETS * BUCKET_MS;
 
@@ -45,7 +51,7 @@ module Motion {
 
     const MOVE_ENTER_STEPS = (MOVE_ENTER_SPM * ENTER_MS) / 60000;
 
-    var _buckets as Array<Number> = [0, 0, 0, 0, 0];
+    var _buckets as Array<Number> = [0, 0, 0];
     var _cursor as Number = 0;
     var _bucketStart as Number = 0;
     var _lastRaw as Number = -1;
@@ -71,6 +77,7 @@ module Motion {
     //!
     //!   1. sleep and 2. silence are answered from the gap alone, so a single step resets the gap
     //!      and wakes the creature on the same sample — waking needs no rule of its own.
+    //!   3. entry starts a move once evidence clears the threshold.
     //!   4. coasting sustains a move on evidence that would not have started one. That is the
     //!      hysteresis, and without it a stroll near the entry cadence flickers.
     function classify(state as Number, steps3s as Number, sinceStepMs as Number) as Number {
@@ -128,7 +135,7 @@ module Motion {
     }
 
     //! Fold the current pedometer reading in. Cheap enough to call on every redraw tick: it reads
-    //! the step count and does integer arithmetic over five slots.
+    //! the step count and does integer arithmetic over three slots.
     //!
     //! The state is re-decided here on every sample. An earlier version only decided at a ten
     //! second window boundary, and that boundary was the whole of the creature's lag.

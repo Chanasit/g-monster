@@ -7,6 +7,7 @@
   {"key": "shardpup",    "name": "Shardpup",    "stage": 0, "baseLevel": 7,  "stats": {"HP": 44,  "EN": 20,  "CR": 26,  "AB": 18},  "evolvesTo": "glacierjaw"},
   {"key": "cinderpip",   "name": "Cinderpip",   "stage": 0, "baseLevel": 8,  "stats": {"HP": 42,  "EN": 30,  "CR": 20,  "AB": 22},  "evolvesTo": "pyrewarden"},
   {"key": "silthatch",   "name": "Silthatch",   "stage": 0, "baseLevel": 9,  "stats": {"HP": 52,  "EN": 22,  "CR": 30,  "AB": 20},  "evolvesTo": "duneshell"},
+  {"key": "slime",       "name": "Slime",       "stage": 0, "baseLevel": 2,  "stats": {"HP": 46,  "EN": 14,  "CR": 20,  "AB": 12},  "evolvesTo": null},
 
   {"key": "cinderfang",  "name": "Cinderfang",  "stage": 1, "baseLevel": 12, "stats": {"HP": 72,  "EN": 44,  "CR": 32,  "AB": 38},  "evolvesTo": "pyrewarden"},
   {"key": "tidecaller",  "name": "Tidecaller",  "stage": 1, "baseLevel": 12, "stats": {"HP": 80,  "EN": 36,  "CR": 34,  "AB": 36},  "evolvesTo": "abyssward"},

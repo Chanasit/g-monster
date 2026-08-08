@@ -151,4 +151,9 @@
     <bitmap id="GleammoteMove" filename="gleammote/gleammote_move.png"/>
     <bitmap id="GleammoteFight" filename="gleammote/gleammote_fight.png"/>
     <bitmap id="GleammoteFightLeft" filename="gleammote/gleammote_fight_left.png"/>
+    <bitmap id="SlimeIdle" filename="slime/slime_idle.png"/>
+    <bitmap id="SlimeSleep" filename="slime/slime_sleep.png"/>
+    <bitmap id="SlimeMove" filename="slime/slime_move.png"/>
+    <bitmap id="SlimeFight" filename="slime/slime_fight.png"/>
+    <bitmap id="SlimeFightLeft" filename="slime/slime_fight_left.png"/>
 </drawables>

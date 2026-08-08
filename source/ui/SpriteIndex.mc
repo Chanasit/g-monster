@@ -127,6 +127,10 @@ module SpriteIndex {
             "gleammote" => [
                 Rez.Drawables.GleammoteIdle, Rez.Drawables.GleammoteSleep, Rez.Drawables.GleammoteMove, Rez.Drawables.GleammoteFight,
                 Rez.Drawables.GleammoteFightLeft
+            ],
+            "slime" => [
+                Rez.Drawables.SlimeIdle, Rez.Drawables.SlimeSleep, Rez.Drawables.SlimeMove, Rez.Drawables.SlimeFight,
+                Rez.Drawables.SlimeFightLeft
             ]
         };
     }
@@ -140,6 +144,8 @@ module SpriteIndex {
         if (slot == 0 && key.equals("nonce")) { return 4; }
         if (slot == 2 && key.equals("nonce")) { return 4; }
         if (slot == 1 && key.equals("nonce")) { return 3; }
+        if (slot == 0 && key.equals("slime")) { return 4; }
+        if (slot == 2 && key.equals("slime")) { return 4; }
         return 2;
     }
 }

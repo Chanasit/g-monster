@@ -77,7 +77,7 @@ module Sprites {
     //! Which frame of an action is showing right now. Driven by the clock rather than a counter so
     //! callers do not have to own animation state — any redraw lands on the correct frame.
     //!
-    //! Takes the species because the cycle length is per variant: emberling's walk is a four-frame
+    //! Takes the species because the cycle length is per variant: nonce's walk is a four-frame
     //! hand-drawn cycle where every other creature's is a two-frame derived waddle.
     function currentFrame(key as String, action as Number, facing as Number) as Number {
         return (System.getTimer() / periodFor(action)) % frameCount(key, action, facing);

@@ -92,8 +92,8 @@ about seven more species to about twenty-one.
 ### `tools/sprites/sprites.txt`
 
 - The header comment's five-state list becomes four.
-- `emberling.walk.0:` through `emberling.walk.3:` become `emberling.move.0:` through
-  `emberling.move.3:`. The grids themselves are untouched — this stays the only override.
+- `nonce.walk.0:` through `nonce.walk.3:` become `nonce.move.0:` through
+  `nonce.move.3:`. The grids themselves are untouched — this stays the only override.
 - Comment prose naming the `walk` state is updated; prose describing the Blair walk cycle as the
   reference for the stride stays.
 
@@ -192,5 +192,5 @@ it.
 
 - No speed split between walking and running, for the timer reason above.
 - No `move_left` mirror.
-- No change to `emberling`'s four-frame authored cycle beyond its header rename.
+- No change to `nonce`'s four-frame authored cycle beyond its header rename.
 - No change to `FRAME_MS`, `SLEEP_FRAME_MS`, or either view's redraw timer.

@@ -53,7 +53,19 @@ module Party {
     }
 
     //! The creature that leads every battle. Falls back to the first species if storage is bad.
+    //!
+    //! DebugConfig.ALLY is honoured here rather than in the views because lead() is the single
+    //! source every one of them already reads — the ALLY page, the battle's player side and the
+    //! evolve screen all resolve through it, so one check covers them without any view learning
+    //! about a debug switch. It deliberately does not call setSlot: a build-time flag that rewrote
+    //! slot 0 would outlive the build that set it and quietly replace the player's real lead.
     function lead() as Combat.Creature {
+        if (!DebugConfig.ALLY.equals("")) {
+            var forced = Combat.Bestiary.get(DebugConfig.ALLY);
+            if (forced != null) {
+                return forced;
+            }
+        }
         var species = member(LEAD_SLOT);
         if (species == null) {
             species = Combat.Bestiary.all()[0];

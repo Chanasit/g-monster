@@ -43,7 +43,9 @@ DEBUG_BATTLE_ENEMY   ?=
 DEBUG_BATTLE_IS_BOSS ?=
 DEBUG_EVENT_GAP      ?=
 DEBUG_FORCE_ACTION   ?=
+DEBUG_ALLY           ?=
 export DEBUG_INSTANT_BATTLE DEBUG_BATTLE_ENEMY DEBUG_BATTLE_IS_BOSS DEBUG_EVENT_GAP DEBUG_FORCE_ACTION
+export DEBUG_ALLY
 
 DEBUGGEN := python3 tools/debug/gen_debug_config.py
 
@@ -72,6 +74,7 @@ help:
 	@echo "  DEBUG_BATTLE_IS_BOSS=1        show it as an area guardian"
 	@echo "  DEBUG_EVENT_GAP=<steps>       steps between trek events (0 = real pacing)"
 	@echo "  DEBUG_FORCE_ACTION=<pose>     idle|sleep|move|fight"
+	@echo "  DEBUG_ALLY=<species>          lead the party with that creature"
 	@echo
 	@echo "  e.g.  make run DEBUG_FORCE_ACTION=move"
 	@echo "        make debug-status     show what the built binary has on"

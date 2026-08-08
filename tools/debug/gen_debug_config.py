@@ -96,6 +96,7 @@ def settings(off):
             "BATTLE_IS_BOSS": False,
             "EVENT_GAP": 0,
             "FORCE_ACTION": -1,
+            "ALLY": "",
         }
     return {
         "INSTANT_BATTLE": flag("DEBUG_INSTANT_BATTLE"),
@@ -103,6 +104,10 @@ def settings(off):
         "BATTLE_IS_BOSS": flag("DEBUG_BATTLE_IS_BOSS"),
         "EVENT_GAP": number("DEBUG_EVENT_GAP", 0),
         "FORCE_ACTION": action("DEBUG_FORCE_ACTION"),
+        # Empty is off, so this one has no default species: unlike BATTLE_ENEMY,
+        # which names an enemy the game was going to roll anyway, a default here
+        # would replace whatever the player actually leads with.
+        "ALLY": os.environ.get("DEBUG_ALLY", "").strip(),
     }
 
 
@@ -111,8 +116,9 @@ def mc(name):
 
 
 def render(s):
-    if any(c in s["BATTLE_ENEMY"] for c in '"\\'):
-        raise ConfigError("DEBUG_BATTLE_ENEMY: quotes and backslashes are not allowed")
+    for var, field in (("DEBUG_BATTLE_ENEMY", "BATTLE_ENEMY"), ("DEBUG_ALLY", "ALLY")):
+        if any(c in s[field] for c in '"\\'):
+            raise ConfigError("%s: quotes and backslashes are not allowed" % var)
 
     return '''import Toybox.Lang;
 
@@ -147,6 +153,10 @@ module DebugConfig {
     //! Pin every creature to one Sprites.ACTION_* pose. -1 lets the pedometer decide.
     const FORCE_ACTION = %(force)d;
 
+    //! Species that leads the party, overriding the save. Empty is off, and an
+    //! unknown key is ignored -- see Party.lead, which reads it without writing.
+    const ALLY = "%(ally)s";
+
     //! True when anything above is on. Views can surface a marker so a debug
     //! build is never mistaken for a real one.
     const ANY = %(any)s;
@@ -157,8 +167,10 @@ module DebugConfig {
         "boss": mc(s["BATTLE_IS_BOSS"]),
         "gap": s["EVENT_GAP"],
         "force": s["FORCE_ACTION"],
+        "ally": s["ALLY"],
         "any": mc(s["INSTANT_BATTLE"] or s["BATTLE_IS_BOSS"]
-                  or s["EVENT_GAP"] > 0 or s["FORCE_ACTION"] >= 0),
+                  or s["EVENT_GAP"] > 0 or s["FORCE_ACTION"] >= 0
+                  or bool(s["ALLY"])),
     }
 
 
@@ -172,6 +184,8 @@ def summary(s):
     if s["FORCE_ACTION"] >= 0:
         names = dict((v, k) for k, v in ACTIONS.items())
         on.append("force-action=%s" % names.get(s["FORCE_ACTION"], s["FORCE_ACTION"]))
+    if s["ALLY"]:
+        on.append("ally=%s" % s["ALLY"])
     return ", ".join(on) if on else "all off"
 
 

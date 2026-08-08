@@ -28,7 +28,7 @@
 | File | Responsibility | Change |
 |---|---|---|
 | `tools/sprites/generate_sprites.py` | Derives every action's frames from one authored grid; writes PNGs, `drawables.xml`, `SpriteIndex.mc` | Modify: `VARIANTS`, `frames_for`, delete `shear`, widen `superseded` |
-| `tools/sprites/sprites.txt` | The only hand-authored art | Modify: header prose, `emberling.walk.*` override headers |
+| `tools/sprites/sprites.txt` | The only hand-authored art | Modify: header prose, `nonce.walk.*` override headers |
 | `resources/drawables/**` | Generated PNGs + `drawables.xml` | Regenerated |
 | `source/ui/SpriteIndex.mc` | Generated resource-id table | Regenerated |
 | `source/ui/Sprites.mc` | Action constants, slot mapping, frame clock, draw | Modify |
@@ -77,8 +77,8 @@ like "no output".
 
 ```bash
 cd "$(git rev-parse --show-toplevel)"
-cp resources/drawables/emberling/emberling_idle.png \
-   resources/drawables/emberling/emberling_bogus.png
+cp resources/drawables/nonce/emberling_idle.png \
+   resources/drawables/nonce/emberling_bogus.png
 ```
 
 - [ ] **Step 2: Run the generator and confirm the orphan survives (the bug)**
@@ -86,7 +86,7 @@ cp resources/drawables/emberling/emberling_idle.png \
 Run:
 ```bash
 python3 tools/sprites/generate_sprites.py
-ls resources/drawables/emberling/emberling_bogus.png
+ls resources/drawables/nonce/emberling_bogus.png
 ```
 
 Expected: the generator prints `29 species x 7 variants (2 frames each): 0 written, 203 already correct, 0 removed`, and `ls` still finds `emberling_bogus.png`. That "0 removed" alongside a surviving orphan is the bug.
@@ -155,10 +155,10 @@ to:
 Run:
 ```bash
 python3 tools/sprites/generate_sprites.py
-ls resources/drawables/emberling/emberling_bogus.png
+ls resources/drawables/nonce/emberling_bogus.png
 ```
 
-Expected: the run reports `... 1 removed` and lists `resources/drawables/emberling/emberling_bogus.png (superseded)` in its stale output; `ls` exits non-zero with "No such file or directory".
+Expected: the run reports `... 1 removed` and lists `resources/drawables/nonce/emberling_bogus.png (superseded)` in its stale output; `ls` exits non-zero with "No such file or directory".
 
 - [ ] **Step 6: Confirm nothing real was deleted**
 
@@ -195,7 +195,7 @@ this was unreachable; collapsing walk and run removes two."
 **Interfaces:**
 - Consumes: `superseded(names, keys, outdir)` from Task 1.
 - Produces: `VARIANTS` of exactly 5 entries in this order — `("idle","idle",False)`, `("sleep","sleep",False)`, `("move","move",False)`, `("fight","fight",False)`, `("fight_left","fight",True)`. Task 4 hard-codes these positions as slot numbers, and Task 6 hard-codes them as `ACTIONS` integers.
-- The override key namespace changes with the variant name: `frames_for` is dispatched on the *action* string, and `parse` rejects any `key.action.n:` header whose action is not in `VARIANTS`. So `emberling.walk.*` must be renamed in the same task or parsing fails.
+- The override key namespace changes with the variant name: `frames_for` is dispatched on the *action* string, and `parse` rejects any `key.action.n:` header whose action is not in `VARIANTS`. So `nonce.walk.*` must be renamed in the same task or parsing fails.
 
 **Do not build at the end of this task.** `source/ui/Sprites.mc` still names `ACTION_RUN` and the regenerated `SpriteIndex.mc` no longer has a slot for it. The build is expected to be broken until Task 4.
 
@@ -308,32 +308,32 @@ than four, and no species' poses can drift apart from each other.
 
 Then in the same docstring, `generate_sprites.py:11-13`, replace `bob, waddle, lean, lunge` with `bob, waddle, lunge` — the lean went with the run.
 
-- [ ] **Step 5: Rename the emberling walk override headers**
+- [ ] **Step 5: Rename the nonce walk override headers**
 
 In `tools/sprites/sprites.txt`, rename exactly four header lines. They are at lines 796, 822, 848 and 874, and the grids under them are untouched:
 
 ```
-emberling.walk.0:   ->  emberling.move.0:
-emberling.walk.1:   ->  emberling.move.1:
-emberling.walk.2:   ->  emberling.move.2:
-emberling.walk.3:   ->  emberling.move.3:
+nonce.walk.0:   ->  nonce.move.0:
+nonce.walk.1:   ->  nonce.move.1:
+nonce.walk.2:   ->  nonce.move.2:
+nonce.walk.3:   ->  nonce.move.3:
 ```
 
-Leave `emberling.sleep.*` and `emberling.idle.*` alone.
+Leave `nonce.sleep.*` and `nonce.idle.*` alone.
 
 - [ ] **Step 6: Update the prose above that block**
 
 At `sprites.txt:770`, replace the first line of the override's comment:
 
 ```
-# Walk cycle for emberling: four frames instead of the derived two, so the legs can actually
+# Walk cycle for nonce: four frames instead of the derived two, so the legs can actually
 # step rather than the body just rocking.
 ```
 
 with:
 
 ```
-# Move cycle for emberling: four frames instead of the derived two, so the legs can actually
+# Move cycle for nonce: four frames instead of the derived two, so the legs can actually
 # step rather than the body just rocking. `move` is the one movement state -- walking and running
 # both play it -- so this is drawn as a walk, which is what it reads as at either cadence.
 ```
@@ -1242,7 +1242,7 @@ to:
 stride is what the state depicts at either cadence.
 ```
 
-Rename the subsection **Stop-motion rules that come out of `emberling.walk`** to **... `emberling.move`**, and update the `emberling.walk` reference inside it.
+Rename the subsection **Stop-motion rules that come out of `nonce.walk`** to **... `nonce.move`**, and update the `nonce.walk` reference inside it.
 
 In the per-state **what actually reads at this size** list, replace the `walk` and `run` bullets:
 
@@ -1375,7 +1375,7 @@ The simulator must already be running. Then:
 make run DEBUG_FORCE_ACTION=move
 ```
 
-Expected: the build prints `debug: force-action=move`, and the ally on the ALLY page animates its two-frame movement — emberling shows its four-frame cycle. Then:
+Expected: the build prints `debug: force-action=move`, and the ally on the ALLY page animates its two-frame movement — nonce shows its four-frame cycle. Then:
 
 ```bash
 make run DEBUG_FORCE_ACTION=run
@@ -1418,6 +1418,6 @@ Expected: seven commits, one per task. The diff shows 87 PNG deletions and 29 PN
 
 - No speed split between walking and running. `FRAME_MS` is also the views' redraw timer period, so a 250 ms frame sampled by a 500 ms timer freezes a two-frame animation.
 - No `move_left` mirror.
-- No change to `emberling`'s four-frame authored cycle beyond its header rename, or to its `sleep` and `idle` overrides.
+- No change to `nonce`'s four-frame authored cycle beyond its header rename, or to its `sleep` and `idle` overrides.
 - No change to `FRAME_MS`, `SLEEP_FRAME_MS`, `GMonsterView.mc:51`, or `CharacterSelectView.mc:29`.
 - No `git push`, PR, or merge.

@@ -112,7 +112,7 @@ that state alone. This is how real animation gets in, and the only way a state g
 frames.
 
 ```
-emberling.move.0:      # ...through emberling.move.3 — a four-frame cycle
+nonce.move.0:      # ...through nonce.move.3 — a four-frame cycle
 ```
 
 Rules the parser enforces: the base `key:` grid must exist, frames must be numbered `0..n` with no
@@ -150,7 +150,7 @@ Off-limits at 24x24: arm swing, hip rotation, and the overlapping-action lag Bla
 hands and hair. There are not enough cells for them and they read as flicker. Legs, and the one
 row of body bob, are the whole budget.
 
-### Stop-motion rules that come out of `emberling.move`
+### Stop-motion rules that come out of `nonce.move`
 
 The one worked example in the repo. Its cycle is **contact / passing / contact-mirrored /
 passing-lifted**, matching `assets/blair-walk.jpg`: frame 3 lifts the whole body one row, which is
@@ -161,7 +161,7 @@ Two hard-won constraints, both visible in that block's comment:
 1. **Move the limbs, freeze everything else.** Head, ears, eye and torso cells are the base grid
    byte-for-byte across all four frames, and every frame carries exactly the same 256 ink cells.
    Anything that moves involuntarily at 24x24 reads as a glitch, not as life.
-2. **Do not downscale reference art wholesale.** The Emberling source was 36x40; a 2:1 reduction
+2. **Do not downscale reference art wholesale.** The Nonce source was 36x40; a 2:1 reduction
    onto this grid shrank the silhouette from 20 columns to 18 and landed the 4x4-ish pupil on a
    different half-cell each frame, so it flickered between 2x2 and 1x1. Re-draw the moving limbs
    onto the existing base grid instead of resampling the whole creature.

@@ -297,9 +297,9 @@ function testEncounterAtLevelOne(logger as Logger) as Boolean {
 
 (:test)
 function testBestiaryLookup(logger as Logger) as Boolean {
-    var species = Combat.Bestiary.get("emberling");
+    var species = Combat.Bestiary.get("nonce");
     Test.assert(species != null);
-    Test.assertEqual((species as Combat.Creature).name, "Emberling");
+    Test.assertEqual((species as Combat.Creature).name, "Nonce");
     Test.assert(Combat.Bestiary.get("no_such_creature") == null);
 
     // Every declared evolution target must exist.
@@ -341,7 +341,7 @@ function testBattleTerminates(logger as Logger) as Boolean {
 //! Turns taken after the battle has ended must be inert.
 (:test)
 function testTurnsAfterBattleEndAreInert(logger as Logger) as Boolean {
-    var player = Combat.Bestiary.get("emberling") as Combat.Creature;
+    var player = Combat.Bestiary.get("nonce") as Combat.Creature;
     var enemy = Combat.Bestiary.get("drizzlet") as Combat.Creature;
 
     var engine = new Combat.BattleEngine(player, 0, enemy, 3, new Combat.Rng(5));

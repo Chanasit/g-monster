@@ -6,7 +6,7 @@ process environment to read at runtime. The only way a build-time switch reaches
 the code is as source, so the Makefile generates that source from env and the
 compiler sees ordinary constants.
 
-    DEBUG_FORCE_ACTION=walk make run
+    DEBUG_FORCE_ACTION=move make run
     make run DEBUG_INSTANT_BATTLE=1 DEBUG_BATTLE_ENEMY=twinflare
 
 Unset means off, so a plain `make build` is always a clean build. `--off`
@@ -37,9 +37,8 @@ TARGET = os.path.join(REPO, "source", "DebugConfig.mc")
 ACTIONS = {
     "idle": 0,
     "sleep": 1,
-    "walk": 2,
+    "move": 2,
     "fight": 3,
-    "run": 4,
 }
 
 TRUE = ("1", "true", "yes", "on", "y")
@@ -121,7 +120,7 @@ def render(s):
 //!
 //! Do not edit: set the environment variables and rebuild. See DEBUG.md.
 //!
-//!     DEBUG_FORCE_ACTION=walk make run
+//!     DEBUG_FORCE_ACTION=move make run
 //!     make run DEBUG_INSTANT_BATTLE=1 DEBUG_BATTLE_ENEMY=twinflare
 //!
 //! Committed in its all-off form so that building with monkeyc directly, without

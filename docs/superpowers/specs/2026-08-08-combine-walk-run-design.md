@@ -77,8 +77,17 @@ about seven more species to about twenty-one.
   `action == "run"` branch is deleted.
 - `shear()` is deleted — the run branch was its only caller.
 - The module comment describing five action states is rewritten for four.
-- `superseded()` already removes PNGs no longer named by `VARIANTS`, so the 58 `*_run*.png` files
-  and the 29 `*_walk.png` files are deleted by the regeneration rather than by hand.
+- `superseded()` must be widened before it can help here. It scans `os.listdir(OUTDIR)` — the top
+  level of `resources/drawables/` only — because every earlier sprite scheme it was written for put
+  its files there. Today's PNGs live in per-species subdirectories, so nothing inside them is a
+  deletion candidate and the 87 orphans this change creates (29 `*_walk.png`, 29 `*_run.png`,
+  29 `*_run_left.png`) would survive the regeneration untouched, and `--check` would stay green
+  with them present.
+
+  No variant has ever been removed before, so this gap has never been reachable. Widen
+  `superseded()` to also walk each live species' directory and treat any `<key>_*.png` whose label
+  is not in `VARIANTS` as superseded. That deletes the orphans, and it makes `--check` fail on a
+  stale variant from now on rather than silently accumulating dead art.
 
 ### `tools/sprites/sprites.txt`
 
@@ -162,7 +171,9 @@ it.
 ## Verification
 
 1. `python3 tools/sprites/generate_sprites.py` — expect 145 PNGs written or unchanged, and 87
-   legacy files reported and removed.
+   superseded files reported and removed (29 `*_walk.png`, 29 `*_run.png`, 29 `*_run_left.png`).
+   `find resources/drawables -name '*.png' | wc -l` goes from 204 to 146, the extra one being the
+   hand-authored `launcher_icon.png`.
 2. The clamp notes must still be exactly five, and all five must name `walk`/`move` or `fight`:
    `pyrewarden fight`, `abyssward move`, `abyssward fight`, `gleammote move`, `gleammote fight`.
    None of today's five notes come from the run transform, so the count does not change — only the

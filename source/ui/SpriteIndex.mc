@@ -146,6 +146,7 @@ module SpriteIndex {
         if (slot == 1 && key.equals("nonce")) { return 3; }
         if (slot == 0 && key.equals("slime")) { return 4; }
         if (slot == 2 && key.equals("slime")) { return 4; }
+        if (slot == 1 && key.equals("slime")) { return 4; }
         return 2;
     }
 }

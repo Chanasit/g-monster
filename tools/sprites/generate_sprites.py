@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Emit creature sprite PNGs from the ASCII art in sprites.txt.
 
-The watch app wants five action states per species -- idle, sleep, walk, fight,
-run -- two frames each. Only one grid per species is authored; every action's
+The watch app wants four action states per species -- idle, sleep, move, fight
+-- two frames each. Only one grid per species is authored; every action's
 frames are derived from it by grid transforms, the same way the idle breath was
 always derived by dropping the whole silhouette one row. Deriving means the
-artist maintains 29 grids instead of 145, a new species costs one grid rather
-than five, and no species' poses can drift apart from each other.
+artist maintains 29 grids instead of 116, a new species costs one grid rather
+than four, and no species' poses can drift apart from each other.
 
 What a derived pose can be is limited, and the transforms are honest about it:
-these are motion cues built out of one silhouette -- bob, waddle, lean, lunge.
+these are motion cues built out of one silhouette -- bob, waddle, lunge.
 A sleeping creature here is a squashed creature, not a curled-up one.
 
 Output is 24x24 scaled 3x with nearest-neighbour to 72x72, in exactly two
@@ -69,24 +69,22 @@ BLANK = "." * GRID
 
 #! Action order is load-bearing: Sprites.mc indexes each species' flat id array
 #! as slot * 2 + frame, so a variant's position here is its slot number, and the
-#! first five have to stay in the order of ACTION_*.
+#! first four have to stay in the order of ACTION_*.
 #!
-#! Lunging and leaning are the only transforms with a direction in them, so they
-#! are the only ones with a mirrored variant. In battle the player's creature
-#! commits to the right and the enemy to the left; drawing both with the same
-#! rightward lean would have the enemy leaning away from its own charge. Idle,
-#! sleep and walk carry no direction -- walk swings both ways across its two
-#! frames -- so mirroring them would cost resources to say nothing.
+#! Lunging is the only transform with a direction in it, so it is the only one
+#! with a mirrored variant. In battle the player's creature commits to the right
+#! and the enemy to the left; drawing both with the same rightward lunge would
+#! have the enemy striking away from its target. Idle, sleep and move carry no
+#! direction -- move swings both ways across its two frames -- so mirroring them
+#! would cost resources to say nothing.
 #!
 #! (label, action, mirrored)
 VARIANTS = (
     ("idle", "idle", False),
     ("sleep", "sleep", False),
-    ("walk", "walk", False),
+    ("move", "move", False),
     ("fight", "fight", False),
-    ("run", "run", False),
     ("fight_left", "fight", True),
-    ("run_left", "run", True),
 )
 
 #! The rows that read as legs. Row 23 is excluded because it must stay blank.
@@ -229,17 +227,6 @@ def hshift(rows, which, dx):
     return out
 
 
-def shear(rows, amount):
-    """Lean the silhouette right, ramping from 0 at the feet to amount at the top."""
-    if amount == 0:
-        return list(rows)
-    out = []
-    for i, row in enumerate(rows):
-        dx = amount * (GRID - 1 - i) // (GRID - 1)
-        out.append(("." * dx + row)[:GRID])
-    return out
-
-
 def squash(rows, factor, floor):
     """Compress the silhouette vertically and rest it on the floor row.
 
@@ -315,7 +302,7 @@ def frames_for(rows, action, clamps, override=None):
         slumped = squash(rows, SLEEP_SQUASH, SLEEP_FLOOR)
         return [slumped, down(slumped)]
 
-    if action == "walk":
+    if action == "move":
         # Body and legs counter-swing: the torso goes one way, the feet the other.
         #
         # The legs are shifted by twice the body's magnitude because that shift lands on rows the
@@ -344,19 +331,6 @@ def frames_for(rows, action, clamps, override=None):
             clamps.append((action, "lunge reach"))
             return [list(rows), bob(rows)]
         return build(f)
-
-    if action == "run":
-        # The lean is the run. Legs split under it and the body leaves the
-        # ground on frame B.
-        def build(a):
-            leaned = shear(rows, a)
-            return [hshift(leaned, LEGS, 1), up(hshift(leaned, LEGS, -1))]
-
-        a = clamp(rows, build, 3)
-        if a == 0:
-            clamps.append((action, "forward lean"))
-            return [list(rows), bob(rows)]
-        return build(a)
 
     raise ValueError("unknown action %r" % action)
 

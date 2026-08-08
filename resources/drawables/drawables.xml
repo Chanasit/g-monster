@@ -8,205 +8,147 @@
          not this list. -->
     <bitmap id="EmberlingIdle" filename="emberling/emberling_idle.png"/>
     <bitmap id="EmberlingSleep" filename="emberling/emberling_sleep.png"/>
-    <bitmap id="EmberlingWalk" filename="emberling/emberling_walk.png"/>
+    <bitmap id="EmberlingMove" filename="emberling/emberling_move.png"/>
     <bitmap id="EmberlingFight" filename="emberling/emberling_fight.png"/>
-    <bitmap id="EmberlingRun" filename="emberling/emberling_run.png"/>
     <bitmap id="EmberlingFightLeft" filename="emberling/emberling_fight_left.png"/>
-    <bitmap id="EmberlingRunLeft" filename="emberling/emberling_run_left.png"/>
     <bitmap id="DrizzletIdle" filename="drizzlet/drizzlet_idle.png"/>
     <bitmap id="DrizzletSleep" filename="drizzlet/drizzlet_sleep.png"/>
-    <bitmap id="DrizzletWalk" filename="drizzlet/drizzlet_walk.png"/>
+    <bitmap id="DrizzletMove" filename="drizzlet/drizzlet_move.png"/>
     <bitmap id="DrizzletFight" filename="drizzlet/drizzlet_fight.png"/>
-    <bitmap id="DrizzletRun" filename="drizzlet/drizzlet_run.png"/>
     <bitmap id="DrizzletFightLeft" filename="drizzlet/drizzlet_fight_left.png"/>
-    <bitmap id="DrizzletRunLeft" filename="drizzlet/drizzlet_run_left.png"/>
     <bitmap id="SparkmiteIdle" filename="sparkmite/sparkmite_idle.png"/>
     <bitmap id="SparkmiteSleep" filename="sparkmite/sparkmite_sleep.png"/>
-    <bitmap id="SparkmiteWalk" filename="sparkmite/sparkmite_walk.png"/>
+    <bitmap id="SparkmiteMove" filename="sparkmite/sparkmite_move.png"/>
     <bitmap id="SparkmiteFight" filename="sparkmite/sparkmite_fight.png"/>
-    <bitmap id="SparkmiteRun" filename="sparkmite/sparkmite_run.png"/>
     <bitmap id="SparkmiteFightLeft" filename="sparkmite/sparkmite_fight_left.png"/>
-    <bitmap id="SparkmiteRunLeft" filename="sparkmite/sparkmite_run_left.png"/>
     <bitmap id="MosscubIdle" filename="mosscub/mosscub_idle.png"/>
     <bitmap id="MosscubSleep" filename="mosscub/mosscub_sleep.png"/>
-    <bitmap id="MosscubWalk" filename="mosscub/mosscub_walk.png"/>
+    <bitmap id="MosscubMove" filename="mosscub/mosscub_move.png"/>
     <bitmap id="MosscubFight" filename="mosscub/mosscub_fight.png"/>
-    <bitmap id="MosscubRun" filename="mosscub/mosscub_run.png"/>
     <bitmap id="MosscubFightLeft" filename="mosscub/mosscub_fight_left.png"/>
-    <bitmap id="MosscubRunLeft" filename="mosscub/mosscub_run_left.png"/>
     <bitmap id="GustlingIdle" filename="gustling/gustling_idle.png"/>
     <bitmap id="GustlingSleep" filename="gustling/gustling_sleep.png"/>
-    <bitmap id="GustlingWalk" filename="gustling/gustling_walk.png"/>
+    <bitmap id="GustlingMove" filename="gustling/gustling_move.png"/>
     <bitmap id="GustlingFight" filename="gustling/gustling_fight.png"/>
-    <bitmap id="GustlingRun" filename="gustling/gustling_run.png"/>
     <bitmap id="GustlingFightLeft" filename="gustling/gustling_fight_left.png"/>
-    <bitmap id="GustlingRunLeft" filename="gustling/gustling_run_left.png"/>
     <bitmap id="ShardpupIdle" filename="shardpup/shardpup_idle.png"/>
     <bitmap id="ShardpupSleep" filename="shardpup/shardpup_sleep.png"/>
-    <bitmap id="ShardpupWalk" filename="shardpup/shardpup_walk.png"/>
+    <bitmap id="ShardpupMove" filename="shardpup/shardpup_move.png"/>
     <bitmap id="ShardpupFight" filename="shardpup/shardpup_fight.png"/>
-    <bitmap id="ShardpupRun" filename="shardpup/shardpup_run.png"/>
     <bitmap id="ShardpupFightLeft" filename="shardpup/shardpup_fight_left.png"/>
-    <bitmap id="ShardpupRunLeft" filename="shardpup/shardpup_run_left.png"/>
     <bitmap id="CinderpipIdle" filename="cinderpip/cinderpip_idle.png"/>
     <bitmap id="CinderpipSleep" filename="cinderpip/cinderpip_sleep.png"/>
-    <bitmap id="CinderpipWalk" filename="cinderpip/cinderpip_walk.png"/>
+    <bitmap id="CinderpipMove" filename="cinderpip/cinderpip_move.png"/>
     <bitmap id="CinderpipFight" filename="cinderpip/cinderpip_fight.png"/>
-    <bitmap id="CinderpipRun" filename="cinderpip/cinderpip_run.png"/>
     <bitmap id="CinderpipFightLeft" filename="cinderpip/cinderpip_fight_left.png"/>
-    <bitmap id="CinderpipRunLeft" filename="cinderpip/cinderpip_run_left.png"/>
     <bitmap id="SilthatchIdle" filename="silthatch/silthatch_idle.png"/>
     <bitmap id="SilthatchSleep" filename="silthatch/silthatch_sleep.png"/>
-    <bitmap id="SilthatchWalk" filename="silthatch/silthatch_walk.png"/>
+    <bitmap id="SilthatchMove" filename="silthatch/silthatch_move.png"/>
     <bitmap id="SilthatchFight" filename="silthatch/silthatch_fight.png"/>
-    <bitmap id="SilthatchRun" filename="silthatch/silthatch_run.png"/>
     <bitmap id="SilthatchFightLeft" filename="silthatch/silthatch_fight_left.png"/>
-    <bitmap id="SilthatchRunLeft" filename="silthatch/silthatch_run_left.png"/>
     <bitmap id="CinderfangIdle" filename="cinderfang/cinderfang_idle.png"/>
     <bitmap id="CinderfangSleep" filename="cinderfang/cinderfang_sleep.png"/>
-    <bitmap id="CinderfangWalk" filename="cinderfang/cinderfang_walk.png"/>
+    <bitmap id="CinderfangMove" filename="cinderfang/cinderfang_move.png"/>
     <bitmap id="CinderfangFight" filename="cinderfang/cinderfang_fight.png"/>
-    <bitmap id="CinderfangRun" filename="cinderfang/cinderfang_run.png"/>
     <bitmap id="CinderfangFightLeft" filename="cinderfang/cinderfang_fight_left.png"/>
-    <bitmap id="CinderfangRunLeft" filename="cinderfang/cinderfang_run_left.png"/>
     <bitmap id="TidecallerIdle" filename="tidecaller/tidecaller_idle.png"/>
     <bitmap id="TidecallerSleep" filename="tidecaller/tidecaller_sleep.png"/>
-    <bitmap id="TidecallerWalk" filename="tidecaller/tidecaller_walk.png"/>
+    <bitmap id="TidecallerMove" filename="tidecaller/tidecaller_move.png"/>
     <bitmap id="TidecallerFight" filename="tidecaller/tidecaller_fight.png"/>
-    <bitmap id="TidecallerRun" filename="tidecaller/tidecaller_run.png"/>
     <bitmap id="TidecallerFightLeft" filename="tidecaller/tidecaller_fight_left.png"/>
-    <bitmap id="TidecallerRunLeft" filename="tidecaller/tidecaller_run_left.png"/>
     <bitmap id="VoltcrestIdle" filename="voltcrest/voltcrest_idle.png"/>
     <bitmap id="VoltcrestSleep" filename="voltcrest/voltcrest_sleep.png"/>
-    <bitmap id="VoltcrestWalk" filename="voltcrest/voltcrest_walk.png"/>
+    <bitmap id="VoltcrestMove" filename="voltcrest/voltcrest_move.png"/>
     <bitmap id="VoltcrestFight" filename="voltcrest/voltcrest_fight.png"/>
-    <bitmap id="VoltcrestRun" filename="voltcrest/voltcrest_run.png"/>
     <bitmap id="VoltcrestFightLeft" filename="voltcrest/voltcrest_fight_left.png"/>
-    <bitmap id="VoltcrestRunLeft" filename="voltcrest/voltcrest_run_left.png"/>
     <bitmap id="ThornmaneIdle" filename="thornmane/thornmane_idle.png"/>
     <bitmap id="ThornmaneSleep" filename="thornmane/thornmane_sleep.png"/>
-    <bitmap id="ThornmaneWalk" filename="thornmane/thornmane_walk.png"/>
+    <bitmap id="ThornmaneMove" filename="thornmane/thornmane_move.png"/>
     <bitmap id="ThornmaneFight" filename="thornmane/thornmane_fight.png"/>
-    <bitmap id="ThornmaneRun" filename="thornmane/thornmane_run.png"/>
     <bitmap id="ThornmaneFightLeft" filename="thornmane/thornmane_fight_left.png"/>
-    <bitmap id="ThornmaneRunLeft" filename="thornmane/thornmane_run_left.png"/>
     <bitmap id="GalewingIdle" filename="galewing/galewing_idle.png"/>
     <bitmap id="GalewingSleep" filename="galewing/galewing_sleep.png"/>
-    <bitmap id="GalewingWalk" filename="galewing/galewing_walk.png"/>
+    <bitmap id="GalewingMove" filename="galewing/galewing_move.png"/>
     <bitmap id="GalewingFight" filename="galewing/galewing_fight.png"/>
-    <bitmap id="GalewingRun" filename="galewing/galewing_run.png"/>
     <bitmap id="GalewingFightLeft" filename="galewing/galewing_fight_left.png"/>
-    <bitmap id="GalewingRunLeft" filename="galewing/galewing_run_left.png"/>
     <bitmap id="GlacierjawIdle" filename="glacierjaw/glacierjaw_idle.png"/>
     <bitmap id="GlacierjawSleep" filename="glacierjaw/glacierjaw_sleep.png"/>
-    <bitmap id="GlacierjawWalk" filename="glacierjaw/glacierjaw_walk.png"/>
+    <bitmap id="GlacierjawMove" filename="glacierjaw/glacierjaw_move.png"/>
     <bitmap id="GlacierjawFight" filename="glacierjaw/glacierjaw_fight.png"/>
-    <bitmap id="GlacierjawRun" filename="glacierjaw/glacierjaw_run.png"/>
     <bitmap id="GlacierjawFightLeft" filename="glacierjaw/glacierjaw_fight_left.png"/>
-    <bitmap id="GlacierjawRunLeft" filename="glacierjaw/glacierjaw_run_left.png"/>
     <bitmap id="DuneshellIdle" filename="duneshell/duneshell_idle.png"/>
     <bitmap id="DuneshellSleep" filename="duneshell/duneshell_sleep.png"/>
-    <bitmap id="DuneshellWalk" filename="duneshell/duneshell_walk.png"/>
+    <bitmap id="DuneshellMove" filename="duneshell/duneshell_move.png"/>
     <bitmap id="DuneshellFight" filename="duneshell/duneshell_fight.png"/>
-    <bitmap id="DuneshellRun" filename="duneshell/duneshell_run.png"/>
     <bitmap id="DuneshellFightLeft" filename="duneshell/duneshell_fight_left.png"/>
-    <bitmap id="DuneshellRunLeft" filename="duneshell/duneshell_run_left.png"/>
     <bitmap id="AshlynxIdle" filename="ashlynx/ashlynx_idle.png"/>
     <bitmap id="AshlynxSleep" filename="ashlynx/ashlynx_sleep.png"/>
-    <bitmap id="AshlynxWalk" filename="ashlynx/ashlynx_walk.png"/>
+    <bitmap id="AshlynxMove" filename="ashlynx/ashlynx_move.png"/>
     <bitmap id="AshlynxFight" filename="ashlynx/ashlynx_fight.png"/>
-    <bitmap id="AshlynxRun" filename="ashlynx/ashlynx_run.png"/>
     <bitmap id="AshlynxFightLeft" filename="ashlynx/ashlynx_fight_left.png"/>
-    <bitmap id="AshlynxRunLeft" filename="ashlynx/ashlynx_run_left.png"/>
     <bitmap id="PyrewardenIdle" filename="pyrewarden/pyrewarden_idle.png"/>
     <bitmap id="PyrewardenSleep" filename="pyrewarden/pyrewarden_sleep.png"/>
-    <bitmap id="PyrewardenWalk" filename="pyrewarden/pyrewarden_walk.png"/>
+    <bitmap id="PyrewardenMove" filename="pyrewarden/pyrewarden_move.png"/>
     <bitmap id="PyrewardenFight" filename="pyrewarden/pyrewarden_fight.png"/>
-    <bitmap id="PyrewardenRun" filename="pyrewarden/pyrewarden_run.png"/>
     <bitmap id="PyrewardenFightLeft" filename="pyrewarden/pyrewarden_fight_left.png"/>
-    <bitmap id="PyrewardenRunLeft" filename="pyrewarden/pyrewarden_run_left.png"/>
     <bitmap id="AbysswardIdle" filename="abyssward/abyssward_idle.png"/>
     <bitmap id="AbysswardSleep" filename="abyssward/abyssward_sleep.png"/>
-    <bitmap id="AbysswardWalk" filename="abyssward/abyssward_walk.png"/>
+    <bitmap id="AbysswardMove" filename="abyssward/abyssward_move.png"/>
     <bitmap id="AbysswardFight" filename="abyssward/abyssward_fight.png"/>
-    <bitmap id="AbysswardRun" filename="abyssward/abyssward_run.png"/>
     <bitmap id="AbysswardFightLeft" filename="abyssward/abyssward_fight_left.png"/>
-    <bitmap id="AbysswardRunLeft" filename="abyssward/abyssward_run_left.png"/>
     <bitmap id="StormcrownIdle" filename="stormcrown/stormcrown_idle.png"/>
     <bitmap id="StormcrownSleep" filename="stormcrown/stormcrown_sleep.png"/>
-    <bitmap id="StormcrownWalk" filename="stormcrown/stormcrown_walk.png"/>
+    <bitmap id="StormcrownMove" filename="stormcrown/stormcrown_move.png"/>
     <bitmap id="StormcrownFight" filename="stormcrown/stormcrown_fight.png"/>
-    <bitmap id="StormcrownRun" filename="stormcrown/stormcrown_run.png"/>
     <bitmap id="StormcrownFightLeft" filename="stormcrown/stormcrown_fight_left.png"/>
-    <bitmap id="StormcrownRunLeft" filename="stormcrown/stormcrown_run_left.png"/>
     <bitmap id="GrovekeeperIdle" filename="grovekeeper/grovekeeper_idle.png"/>
     <bitmap id="GrovekeeperSleep" filename="grovekeeper/grovekeeper_sleep.png"/>
-    <bitmap id="GrovekeeperWalk" filename="grovekeeper/grovekeeper_walk.png"/>
+    <bitmap id="GrovekeeperMove" filename="grovekeeper/grovekeeper_move.png"/>
     <bitmap id="GrovekeeperFight" filename="grovekeeper/grovekeeper_fight.png"/>
-    <bitmap id="GrovekeeperRun" filename="grovekeeper/grovekeeper_run.png"/>
     <bitmap id="GrovekeeperFightLeft" filename="grovekeeper/grovekeeper_fight_left.png"/>
-    <bitmap id="GrovekeeperRunLeft" filename="grovekeeper/grovekeeper_run_left.png"/>
     <bitmap id="SandmonarchIdle" filename="sandmonarch/sandmonarch_idle.png"/>
     <bitmap id="SandmonarchSleep" filename="sandmonarch/sandmonarch_sleep.png"/>
-    <bitmap id="SandmonarchWalk" filename="sandmonarch/sandmonarch_walk.png"/>
+    <bitmap id="SandmonarchMove" filename="sandmonarch/sandmonarch_move.png"/>
     <bitmap id="SandmonarchFight" filename="sandmonarch/sandmonarch_fight.png"/>
-    <bitmap id="SandmonarchRun" filename="sandmonarch/sandmonarch_run.png"/>
     <bitmap id="SandmonarchFightLeft" filename="sandmonarch/sandmonarch_fight_left.png"/>
-    <bitmap id="SandmonarchRunLeft" filename="sandmonarch/sandmonarch_run_left.png"/>
     <bitmap id="EmberdrakeIdle" filename="emberdrake/emberdrake_idle.png"/>
     <bitmap id="EmberdrakeSleep" filename="emberdrake/emberdrake_sleep.png"/>
-    <bitmap id="EmberdrakeWalk" filename="emberdrake/emberdrake_walk.png"/>
+    <bitmap id="EmberdrakeMove" filename="emberdrake/emberdrake_move.png"/>
     <bitmap id="EmberdrakeFight" filename="emberdrake/emberdrake_fight.png"/>
-    <bitmap id="EmberdrakeRun" filename="emberdrake/emberdrake_run.png"/>
     <bitmap id="EmberdrakeFightLeft" filename="emberdrake/emberdrake_fight_left.png"/>
-    <bitmap id="EmberdrakeRunLeft" filename="emberdrake/emberdrake_run_left.png"/>
     <bitmap id="SolmonarchIdle" filename="solmonarch/solmonarch_idle.png"/>
     <bitmap id="SolmonarchSleep" filename="solmonarch/solmonarch_sleep.png"/>
-    <bitmap id="SolmonarchWalk" filename="solmonarch/solmonarch_walk.png"/>
+    <bitmap id="SolmonarchMove" filename="solmonarch/solmonarch_move.png"/>
     <bitmap id="SolmonarchFight" filename="solmonarch/solmonarch_fight.png"/>
-    <bitmap id="SolmonarchRun" filename="solmonarch/solmonarch_run.png"/>
     <bitmap id="SolmonarchFightLeft" filename="solmonarch/solmonarch_fight_left.png"/>
-    <bitmap id="SolmonarchRunLeft" filename="solmonarch/solmonarch_run_left.png"/>
     <bitmap id="VoidsentinelIdle" filename="voidsentinel/voidsentinel_idle.png"/>
     <bitmap id="VoidsentinelSleep" filename="voidsentinel/voidsentinel_sleep.png"/>
-    <bitmap id="VoidsentinelWalk" filename="voidsentinel/voidsentinel_walk.png"/>
+    <bitmap id="VoidsentinelMove" filename="voidsentinel/voidsentinel_move.png"/>
     <bitmap id="VoidsentinelFight" filename="voidsentinel/voidsentinel_fight.png"/>
-    <bitmap id="VoidsentinelRun" filename="voidsentinel/voidsentinel_run.png"/>
     <bitmap id="VoidsentinelFightLeft" filename="voidsentinel/voidsentinel_fight_left.png"/>
-    <bitmap id="VoidsentinelRunLeft" filename="voidsentinel/voidsentinel_run_left.png"/>
     <bitmap id="FlarewispIdle" filename="flarewisp/flarewisp_idle.png"/>
     <bitmap id="FlarewispSleep" filename="flarewisp/flarewisp_sleep.png"/>
-    <bitmap id="FlarewispWalk" filename="flarewisp/flarewisp_walk.png"/>
+    <bitmap id="FlarewispMove" filename="flarewisp/flarewisp_move.png"/>
     <bitmap id="FlarewispFight" filename="flarewisp/flarewisp_fight.png"/>
-    <bitmap id="FlarewispRun" filename="flarewisp/flarewisp_run.png"/>
     <bitmap id="FlarewispFightLeft" filename="flarewisp/flarewisp_fight_left.png"/>
-    <bitmap id="FlarewispRunLeft" filename="flarewisp/flarewisp_run_left.png"/>
     <bitmap id="StonefangIdle" filename="stonefang/stonefang_idle.png"/>
     <bitmap id="StonefangSleep" filename="stonefang/stonefang_sleep.png"/>
-    <bitmap id="StonefangWalk" filename="stonefang/stonefang_walk.png"/>
+    <bitmap id="StonefangMove" filename="stonefang/stonefang_move.png"/>
     <bitmap id="StonefangFight" filename="stonefang/stonefang_fight.png"/>
-    <bitmap id="StonefangRun" filename="stonefang/stonefang_run.png"/>
     <bitmap id="StonefangFightLeft" filename="stonefang/stonefang_fight_left.png"/>
-    <bitmap id="StonefangRunLeft" filename="stonefang/stonefang_run_left.png"/>
     <bitmap id="TwinflareIdle" filename="twinflare/twinflare_idle.png"/>
     <bitmap id="TwinflareSleep" filename="twinflare/twinflare_sleep.png"/>
-    <bitmap id="TwinflareWalk" filename="twinflare/twinflare_walk.png"/>
+    <bitmap id="TwinflareMove" filename="twinflare/twinflare_move.png"/>
     <bitmap id="TwinflareFight" filename="twinflare/twinflare_fight.png"/>
-    <bitmap id="TwinflareRun" filename="twinflare/twinflare_run.png"/>
     <bitmap id="TwinflareFightLeft" filename="twinflare/twinflare_fight_left.png"/>
-    <bitmap id="TwinflareRunLeft" filename="twinflare/twinflare_run_left.png"/>
     <bitmap id="ElderflameIdle" filename="elderflame/elderflame_idle.png"/>
     <bitmap id="ElderflameSleep" filename="elderflame/elderflame_sleep.png"/>
-    <bitmap id="ElderflameWalk" filename="elderflame/elderflame_walk.png"/>
+    <bitmap id="ElderflameMove" filename="elderflame/elderflame_move.png"/>
     <bitmap id="ElderflameFight" filename="elderflame/elderflame_fight.png"/>
-    <bitmap id="ElderflameRun" filename="elderflame/elderflame_run.png"/>
     <bitmap id="ElderflameFightLeft" filename="elderflame/elderflame_fight_left.png"/>
-    <bitmap id="ElderflameRunLeft" filename="elderflame/elderflame_run_left.png"/>
     <bitmap id="GleammoteIdle" filename="gleammote/gleammote_idle.png"/>
     <bitmap id="GleammoteSleep" filename="gleammote/gleammote_sleep.png"/>
-    <bitmap id="GleammoteWalk" filename="gleammote/gleammote_walk.png"/>
+    <bitmap id="GleammoteMove" filename="gleammote/gleammote_move.png"/>
     <bitmap id="GleammoteFight" filename="gleammote/gleammote_fight.png"/>
-    <bitmap id="GleammoteRun" filename="gleammote/gleammote_run.png"/>
     <bitmap id="GleammoteFightLeft" filename="gleammote/gleammote_fight_left.png"/>
-    <bitmap id="GleammoteRunLeft" filename="gleammote/gleammote_run_left.png"/>
 </drawables>

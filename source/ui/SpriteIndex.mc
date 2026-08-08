@@ -137,6 +137,7 @@ module SpriteIndex {
     //! two frames, so the common answer should cost no allocation and no lookup. Hand-drawn
     //! overrides are the only source of anything else.
     function frameCount(key as String, slot as Number) as Number {
+        if (slot == 1 && key.equals("emberling")) { return 3; }
         if (slot == 2 && key.equals("emberling")) { return 4; }
         return 2;
     }

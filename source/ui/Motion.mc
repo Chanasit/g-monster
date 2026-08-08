@@ -6,51 +6,44 @@ import Toybox.System;
 //! The pedometer is the only signal — the watch already counts steps for the journey, and a
 //! creature that walks when its tamer walks is the whole point of the game.
 //!
-//! The rules are deliberately asymmetric: a state is entered on three seconds of evidence and left
-//! only after five seconds of silence. That gap is what makes the creature look like it is
-//! following the wearer rather than lagging them, and it is also what stops a cadence sitting near
-//! a threshold from strobing the state every sample.
+//! The rules are deliberately asymmetric: the move state is entered on three seconds of evidence
+//! and left only after five seconds of silence. That gap is what makes the creature look like it
+//! is following the wearer rather than lagging them, and it is also what stops a cadence sitting
+//! near the threshold from strobing the state every sample.
 //!
 //! State lives in memory and is thrown away when the view hides. Persisting it would mean a
 //! storage write for something that is only ever true right now, and the journey already owns the
 //! durable step accounting.
 module Motion {
 
-    //! Cadences are the tunables; the step counts below derive from them, so a reader sees the
-    //! intent rather than a magic integer. Every division here is exact.
+    //! The cadence is the tunable; the step count below derives from it, so a reader sees the
+    //! intent rather than a magic integer. The division is exact.
 
-    //! Steps per minute that count as walking at all. Low, because two steps inside the entry
+    //! Steps per minute that count as moving at all. Low, because two steps inside the entry
     //! window is already someone on their feet.
-    const WALK_ENTER_SPM = 40;
-
-    //! Steps per minute at which a walk becomes a run. Deliberately clear of a brisk walk (~110)
-    //! so the run state means running rather than hurrying.
-    const RUN_ENTER_SPM = 120;
-
-    //! ...and the cadence a run has to fall below to end. Lower than the entry threshold on
-    //! purpose: with one threshold, a runner holding 120 spm would flicker across it.
-    const RUN_EXIT_SPM = 96;
+    //!
+    //! There is one movement state and one threshold. An earlier version had a second, higher
+    //! cadence that promoted a walk to a run, with its own lower exit threshold for hysteresis.
+    //! Nothing could observe it: run and walk drew the same sheet at the same rate once their art
+    //! was merged, so the whole ladder was untestable machinery.
+    const MOVE_ENTER_SPM = 40;
 
     //! One slot per second, five of them. Five seconds is everything the rules read.
     const BUCKET_MS = 1000;
     const BUCKETS = 5;
 
-    //! Entry is judged over the newest three slots, exit over all five. Reading the longer window
-    //! to leave a state is what gives the run's exit its dwell, without a second timer to keep in
-    //! sync with the first.
+    //! Entry is judged over the newest three slots. The remaining two exist for the quiet rule,
+    //! which reads the gap since the last step rather than a sum.
     const ENTER_BUCKETS = 3;
     const ENTER_MS = ENTER_BUCKETS * BUCKET_MS;
-    const EXIT_MS = BUCKETS * BUCKET_MS;
 
-    //! Silence that ends a walk.
-    const WALK_QUIET_MS = 5000;
+    //! Silence that ends a move.
+    const MOVE_QUIET_MS = 5000;
 
     //! No steps for this long and the creature settles down to sleep.
     const SLEEP_AFTER_MS = 300000;
 
-    const WALK_ENTER_STEPS = (WALK_ENTER_SPM * ENTER_MS) / 60000;
-    const RUN_ENTER_STEPS = (RUN_ENTER_SPM * ENTER_MS) / 60000;
-    const RUN_EXIT_STEPS = (RUN_EXIT_SPM * EXIT_MS) / 60000;
+    const MOVE_ENTER_STEPS = (MOVE_ENTER_SPM * ENTER_MS) / 60000;
 
     var _buckets as Array<Number> = [0, 0, 0, 0, 0];
     var _cursor as Number = 0;
@@ -78,30 +71,20 @@ module Motion {
     //!
     //!   1. sleep and 2. silence are answered from the gap alone, so a single step resets the gap
     //!      and wakes the creature on the same sample — waking needs no rule of its own.
-    //!   3. run entry outranks 4. the run's own exit check. The other way round, the first seconds
-    //!      of a run would bounce: the five-second sum is still low then, because two of its
-    //!      seconds were spent standing still.
-    //!   6. coasting sustains a walk on evidence that would not have started one. That is the
+    //!   4. coasting sustains a move on evidence that would not have started one. That is the
     //!      hysteresis, and without it a stroll near the entry cadence flickers.
-    function classify(state as Number, steps3s as Number, steps5s as Number,
-                      sinceStepMs as Number) as Number {
+    function classify(state as Number, steps3s as Number, sinceStepMs as Number) as Number {
         if (sinceStepMs >= SLEEP_AFTER_MS) {
             return Sprites.ACTION_SLEEP;
         }
-        if (sinceStepMs >= WALK_QUIET_MS) {
+        if (sinceStepMs >= MOVE_QUIET_MS) {
             return Sprites.ACTION_IDLE;
         }
-        if (steps3s >= RUN_ENTER_STEPS) {
-            return Sprites.ACTION_RUN;
+        if (steps3s >= MOVE_ENTER_STEPS) {
+            return Sprites.ACTION_MOVE;
         }
-        if (state == Sprites.ACTION_RUN) {
-            return (steps5s >= RUN_EXIT_STEPS) ? Sprites.ACTION_RUN : Sprites.ACTION_WALK;
-        }
-        if (steps3s >= WALK_ENTER_STEPS) {
-            return Sprites.ACTION_WALK;
-        }
-        if (state == Sprites.ACTION_WALK) {
-            return Sprites.ACTION_WALK;
+        if (state == Sprites.ACTION_MOVE) {
+            return Sprites.ACTION_MOVE;
         }
         return Sprites.ACTION_IDLE;
     }
@@ -180,8 +163,7 @@ module Motion {
             _lastStepAt = now;
         }
 
-        _action = classify(_action, recentSteps(ENTER_BUCKETS), recentSteps(BUCKETS),
-                           now - _lastStepAt);
+        _action = classify(_action, recentSteps(ENTER_BUCKETS), now - _lastStepAt);
     }
 
     //! What the creature should be doing right now.

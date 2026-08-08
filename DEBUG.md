@@ -24,6 +24,7 @@ debug: force-action=move
 | `DEBUG_BATTLE_IS_BOSS` | `1`/`true`/`yes`/`on` | off | Show that battle as an area guardian. |
 | `DEBUG_EVENT_GAP` | steps, e.g. `50` | `0` | Steps between trek events. `0` keeps the real 300/400/500 pacing. |
 | `DEBUG_FORCE_ACTION` | `idle`\|`sleep`\|`move`\|`fight` | off | Pin every creature to one pose instead of letting the pedometer choose. |
+| `DEBUG_ALLY` | a species key | off | Lead the party with that species. Unknown key is ignored. Reads only — the save is untouched. |
 
 Anything unparseable fails the build rather than compiling something unintended:
 
@@ -148,6 +149,38 @@ reachable only this way on the ALLY page — the pedometer never classifies it.
 Only `Motion.current` consults it. `Motion.classify` stays pure and untouched, so `MotionTests` goes
 on asserting the real `MOVE_ENTER_SPM` / `SLEEP_AFTER_MS` thresholds with the override on — the
 suite is not quietly weakened to accommodate the cheat.
+
+## `DEBUG_ALLY`
+
+`DEBUG_BATTLE_ENEMY` can put any species on the enemy side of a battle, but there was no equivalent
+for the player's own creature: seeing a species as the ally meant recruiting it and promoting it to
+slot 0, which is a walk. This names the lead directly.
+
+```bash
+make run DEBUG_ALLY=slime
+make run DEBUG_ALLY=slime DEBUG_FORCE_ACTION=move    # that creature's move cycle, on demand
+```
+
+Any key from `resources/data/creatures.json`. An unknown key is ignored and the real lead stands, so
+a typo degrades to the normal game rather than to an empty party.
+
+**It is read-only.** `Party.lead` returns the forced species without calling `setSlot`. That is the
+whole design constraint: a build-time flag that wrote slot 0 would persist into the save and still be
+there after a rebuild with the flag off, having replaced whatever the player actually led with.
+Storage is never touched, so turning the flag off restores the real lead immediately.
+
+The check sits in `Party.lead` rather than in the views because every consumer already resolves
+through it — the ALLY page, the player side of a battle, and the evolve screen. One check covers all
+three and no view has to know a debug switch exists.
+
+Two consequences of it being an override rather than a real party change:
+
+- **The PARTY page still shows the real slot 0.** It lists slots through `Party.slot`, not through
+  `lead`. The discrepancy is deliberate — the page is about roster storage, which the flag does not
+  alter.
+- **Growth banked while it is on lands on the forced species.** `partnerExtraLevel` keys off
+  `partnerKey`, which is `lead().key`. Levels earned under `DEBUG_ALLY=slime` are slime's, and they
+  stay in the save after the flag goes away.
 
 ---
 

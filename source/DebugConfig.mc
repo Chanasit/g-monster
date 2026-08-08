@@ -31,6 +31,10 @@ module DebugConfig {
     //! Pin every creature to one Sprites.ACTION_* pose. -1 lets the pedometer decide.
     const FORCE_ACTION = -1;
 
+    //! Species that leads the party, overriding the save. Empty is off, and an
+    //! unknown key is ignored -- see Party.lead, which reads it without writing.
+    const ALLY = "";
+
     //! True when anything above is on. Views can surface a marker so a debug
     //! build is never mistaken for a real one.
     const ANY = false;

@@ -61,12 +61,19 @@ classify(state, steps3s, steps5s, sinceStepMs) -> state
 
 1. sinceStepMs >= SLEEP_AFTER_MS   (300_000)  -> SLEEP
 2. sinceStepMs >= WALK_QUIET_MS      (5_000)  -> IDLE
-3. state == RUN                               -> steps5s >= RUN_EXIT_STEPS ? RUN : WALK
-4. steps3s >= RUN_ENTER_STEPS                 -> RUN
+3. steps3s >= RUN_ENTER_STEPS                 -> RUN
+4. state == RUN                               -> steps5s >= RUN_EXIT_STEPS ? RUN : WALK
 5. steps3s >= WALK_ENTER_STEPS                -> WALK
-6. state == WALK or state == RUN              -> WALK
+6. state == WALK                              -> WALK
    otherwise                                  -> IDLE
 ```
+
+**Run entry outranks the run's own exit check, and it has to.** With the exit check first, the
+opening seconds of a run bounce: `steps3s` is already over the entry threshold while `steps5s` is
+still short, because two of its five seconds were spent standing still. The exit rule would drop
+the state to WALK and the entry rule would restore it on the next sample, for about two seconds of
+RUN/WALK strobe at every run onset. Ordering entry first costs nothing and removes the case
+entirely. Rule 6 therefore only has to coast a WALK — a RUN never reaches it.
 
 Why it is shaped this way:
 
@@ -76,13 +83,13 @@ Why it is shaped this way:
 - **Rule 6 is the hysteresis.** Once walking, a single step every few seconds sustains the state,
   well below the cadence that would have started it. A 40 spm amble enters walk; a 20 spm shuffle
   can only sustain one.
-- **Rule 3 is the run's hysteresis, and its dwell.** Enter at 120 spm over 3 s, leave below 96 spm
+- **Rule 4 is the run's hysteresis, and its dwell.** Enter at 120 spm over 3 s, leave below 96 spm
   over 5 s. The longer exit window *is* the dwell timer, so no separate timer exists to keep in
   sync.
 - **Sleep and wake need one rule between them.** Sleep is a function of silence, so any step drops
   `sinceStepMs` to zero and rule 2 or rule 5 answers on the same sample. Waking is instant and has
   no case of its own.
-- **Rules 4 and 5 do not care which state you were in**, so a standing start straight into a run
+- **Rules 3 and 5 do not care which state you were in**, so a standing start straight into a run
   reaches `RUN` without passing through `WALK`.
 
 Two consequences worth stating:

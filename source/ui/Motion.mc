@@ -7,9 +7,10 @@ import Toybox.System;
 //! creature that walks when its tamer walks is the whole point of the game.
 //!
 //! The rules are deliberately asymmetric: the move state is entered on three seconds of evidence
-//! and left only after five seconds of silence. That gap is what makes the creature look like it
-//! is following the wearer rather than lagging them, and it is also what stops a cadence sitting
-//! near the threshold from strobing the state every sample.
+//! and left five seconds after that evidence stops arriving. That gap is what makes the creature
+//! look like it is following the wearer rather than lagging them, and it is also what stops a
+//! cadence sitting near the threshold from strobing the state every sample. Both ends of the
+//! asymmetry read the same evidence, so the only way to hold the move pose is to keep walking.
 //!
 //! State lives in memory and is thrown away when the view hides. Persisting it would mean a
 //! storage write for something that is only ever true right now, and the journey already owns the
@@ -43,7 +44,13 @@ module Motion {
     const ENTER_BUCKETS = 3;
     const ENTER_MS = ENTER_BUCKETS * BUCKET_MS;
 
-    //! Silence that ends a move.
+    //! How long a move coasts once the cadence stops clearing the entry bar.
+    //!
+    //! Measured from the last sample that had real cadence, not from the last step. An earlier
+    //! version measured the gap since any step at all, which let a single stray step every few
+    //! seconds — a wrist knocked while driving, a gesture at a desk — renew the coast forever: entry
+    //! wanted 40 spm but holding wanted only 12, so the creature could get pinned in the move pose
+    //! with nobody walking. Renewing on cadence closes that gap, because noise never clears entry.
     const MOVE_QUIET_MS = 5000;
 
     //! No steps for this long and the creature settles down to sleep.
@@ -56,6 +63,7 @@ module Motion {
     var _bucketStart as Number = 0;
     var _lastRaw as Number = -1;
     var _lastStepAt as Number = 0;
+    var _lastCadenceAt as Number = 0;
     var _action as Number = Sprites.ACTION_IDLE;
 
     //! Forget everything and start measuring again. Called when a view appears, since whatever was
@@ -75,22 +83,24 @@ module Motion {
     //!
     //! A priority list, and the order is behaviour rather than style:
     //!
-    //!   1. sleep and 2. silence are answered from the gap alone, so a single step resets the gap
-    //!      and wakes the creature on the same sample — waking needs no rule of its own.
-    //!   3. entry starts a move once evidence clears the threshold.
-    //!   4. coasting sustains a move on evidence that would not have started one. That is the
-    //!      hysteresis, and without it a stroll near the entry cadence flickers.
-    function classify(state as Number, steps3s as Number, sinceStepMs as Number) as Number {
+    //!   1. sleep is answered from the step gap alone, so a single step resets that gap and wakes
+    //!      the creature on the same sample — waking needs no rule of its own.
+    //!   2. entry starts a move once evidence clears the threshold.
+    //!   3. coasting sustains a move for a while after the cadence drops below the entry bar. That
+    //!      is the hysteresis, and without it a stroll near the entry cadence flickers. It is bounded
+    //!      by `sinceCadenceMs` rather than open-ended, so a move always ends on its own.
+    //!
+    //! `sinceCadenceMs` is the gap since the window last held entry evidence, and is therefore
+    //! never smaller than `sinceStepMs`. Idle is the fallthrough, so nothing needs a rule of its own.
+    function classify(state as Number, steps3s as Number, sinceStepMs as Number,
+                      sinceCadenceMs as Number) as Number {
         if (sinceStepMs >= SLEEP_AFTER_MS) {
             return Sprites.ACTION_SLEEP;
-        }
-        if (sinceStepMs >= MOVE_QUIET_MS) {
-            return Sprites.ACTION_IDLE;
         }
         if (steps3s >= MOVE_ENTER_STEPS) {
             return Sprites.ACTION_MOVE;
         }
-        if (state == Sprites.ACTION_MOVE) {
+        if (state == Sprites.ACTION_MOVE && sinceCadenceMs < MOVE_QUIET_MS) {
             return Sprites.ACTION_MOVE;
         }
         return Sprites.ACTION_IDLE;
@@ -149,6 +159,7 @@ module Motion {
             _lastRaw = raw;
             _bucketStart = now;
             _lastStepAt = now;
+            _lastCadenceAt = now;
             _cursor = 0;
             for (var i = 0; i < BUCKETS; i += 1) {
                 _buckets[i] = 0;
@@ -170,7 +181,15 @@ module Motion {
             _lastStepAt = now;
         }
 
-        _action = classify(_action, recentSteps(ENTER_BUCKETS), now - _lastStepAt);
+        // Cadence is stamped here rather than inside classify, because classify is pure and the
+        // stamp is state: the coast has to know when the window last looked like walking, and only
+        // the sampler owns a clock.
+        var steps3s = recentSteps(ENTER_BUCKETS);
+        if (steps3s >= MOVE_ENTER_STEPS) {
+            _lastCadenceAt = now;
+        }
+
+        _action = classify(_action, steps3s, now - _lastStepAt, now - _lastCadenceAt);
     }
 
     //! What the creature should be doing right now.

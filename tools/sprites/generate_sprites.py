@@ -386,11 +386,35 @@ def rez_id(key, label):
 LEGACY_PNG = re.compile(r"^[a-z]+(_[a-z]+)*_[01]\.png$")
 
 
-def superseded(names, keys):
+def superseded(names, keys, outdir):
+    """Every PNG under drawables/ that this run would not have written.
+
+    Two scopes, because the layout has moved once. The top level holds only
+    leftovers from the schemes above. A species directory holds exactly one
+    file per live variant, so anything else in it is a variant that has since
+    been dropped or renamed -- which is unreachable until a variant actually
+    goes away, and is why this was for a long time only a top-level sweep.
+
+    Names come back relative to outdir so the caller deletes and reports them
+    the same way whichever scope they came from.
+    """
     flat = tuple("%s_" % key for key in keys)
-    return sorted(n for n in names
-                  if n.endswith(".png")
-                  and (LEGACY_PNG.match(n) or n.startswith(flat)))
+    dead = [n for n in names
+            if n.endswith(".png") and (LEGACY_PNG.match(n) or n.startswith(flat))]
+
+    live = frozenset(png_name(key, label)
+                     for key in keys
+                     for label, _action, _mirrored in VARIANTS)
+    for key in keys:
+        species = os.path.join(outdir, key)
+        if not os.path.isdir(species):
+            continue
+        for name in os.listdir(species):
+            rel = "%s/%s" % (key, name)
+            if name.endswith(".png") and rel not in live:
+                dead.append(rel)
+
+    return sorted(dead)
 
 
 # --- PNG encode / decode ---------------------------------------------------
@@ -641,7 +665,7 @@ def main(argv):
     sync_text(DRAWABLES_XML, drawables_xml(keys), check_only, stale)
     sync_text(INDEX_MC, index_mc(keys, counts), check_only, stale)
 
-    legacy = superseded(os.listdir(OUTDIR), sprites.keys())
+    legacy = superseded(os.listdir(OUTDIR), sprites.keys(), OUTDIR)
     for name in legacy:
         stale.append(os.path.relpath(os.path.join(OUTDIR, name), REPO) + " (superseded)")
         if not check_only:

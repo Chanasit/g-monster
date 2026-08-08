@@ -23,14 +23,14 @@ function makeUnkillable(engine as Combat.BattleEngine) as Void {
 function testSpiritTypeParsing(logger as Logger) as Boolean {
     var flarewisp = Combat.Bestiary.get("flarewisp") as Combat.Creature;
     var elderflame = Combat.Bestiary.get("elderflame") as Combat.Creature;
-    var emberling = Combat.Bestiary.get("emberling") as Combat.Creature;
+    var nonce = Combat.Bestiary.get("nonce") as Combat.Creature;
 
     Test.assertEqual(flarewisp.spiritType, Combat.Spirit.TYPE_WARRIOR);
     Test.assertEqual(elderflame.spiritType, Combat.Spirit.TYPE_ANCIENT);
-    Test.assertEqual(emberling.spiritType, Combat.Spirit.TYPE_NONE);
+    Test.assertEqual(nonce.spiritType, Combat.Spirit.TYPE_NONE);
 
     Test.assert(flarewisp.isSpirit());
-    Test.assert(!emberling.isSpirit());
+    Test.assert(!nonce.isSpirit());
     return true;
 }
 
@@ -114,13 +114,13 @@ function testCostOrderingAcrossForms(logger as Logger) as Boolean {
 //! A non-spirit costs nothing because it can never be invoked at all.
 (:test)
 function testOrdinaryCreatureHasNoSpiritCost(logger as Logger) as Boolean {
-    var emberling = Combat.Bestiary.get("emberling") as Combat.Creature;
-    Test.assertEqual(Combat.Spirit.cost(emberling, 10), 0);
+    var nonce = Combat.Bestiary.get("nonce") as Combat.Creature;
+    Test.assertEqual(Combat.Spirit.cost(nonce, 10), 0);
 
-    var engine = spiritEngine("emberling", "drizzlet", 10);
+    var engine = spiritEngine("nonce", "drizzlet", 10);
     engine.setSpiritPower(99);
-    Test.assert(!engine.canInvokeSpirit(emberling));
-    Test.assert(!engine.invokeSpirit(emberling, 0));
+    Test.assert(!engine.canInvokeSpirit(nonce));
+    Test.assert(!engine.invokeSpirit(nonce, 0));
     return true;
 }
 
@@ -138,7 +138,7 @@ function testOnlyAncientFormIsDrainFree(logger as Logger) as Boolean {
 
 (:test)
 function testSpiritPowerClamps(logger as Logger) as Boolean {
-    var engine = spiritEngine("emberling", "drizzlet", 10);
+    var engine = spiritEngine("nonce", "drizzlet", 10);
 
     engine.setSpiritPower(500);
     Test.assertEqual(engine.spiritPower(), Combat.Spirit.MAX_POWER);
@@ -199,7 +199,7 @@ function testSpiritsDoNotStack(logger as Logger) as Boolean {
 
 (:test)
 function testNoSpiritAfterTheBattleEnds(logger as Logger) as Boolean {
-    var engine = spiritEngine("emberling", "drizzlet", 3);
+    var engine = spiritEngine("nonce", "drizzlet", 3);
     var form = Combat.Bestiary.get("gleammote") as Combat.Creature;
     engine.setSpiritPower(99);
 

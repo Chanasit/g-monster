@@ -6,11 +6,11 @@
          All generated from tools/sprites/sprites.txt by
          tools/sprites/generate_sprites.py. Edit the ASCII there, not these PNGs, and
          not this list. -->
-    <bitmap id="EmberlingIdle" filename="emberling/emberling_idle.png"/>
-    <bitmap id="EmberlingSleep" filename="emberling/emberling_sleep.png"/>
-    <bitmap id="EmberlingMove" filename="emberling/emberling_move.png"/>
-    <bitmap id="EmberlingFight" filename="emberling/emberling_fight.png"/>
-    <bitmap id="EmberlingFightLeft" filename="emberling/emberling_fight_left.png"/>
+    <bitmap id="NonceIdle" filename="nonce/nonce_idle.png"/>
+    <bitmap id="NonceSleep" filename="nonce/nonce_sleep.png"/>
+    <bitmap id="NonceMove" filename="nonce/nonce_move.png"/>
+    <bitmap id="NonceFight" filename="nonce/nonce_fight.png"/>
+    <bitmap id="NonceFightLeft" filename="nonce/nonce_fight_left.png"/>
     <bitmap id="DrizzletIdle" filename="drizzlet/drizzlet_idle.png"/>
     <bitmap id="DrizzletSleep" filename="drizzlet/drizzlet_sleep.png"/>
     <bitmap id="DrizzletMove" filename="drizzlet/drizzlet_move.png"/>

@@ -1,5 +1,5 @@
 [
-  {"key": "emberling",   "name": "Emberling",   "stage": 0, "baseLevel": 3,  "stats": {"HP": 36,  "EN": 22,  "CR": 14,  "AB": 18},  "evolvesTo": "cinderfang"},
+  {"key": "nonce",   "name": "Nonce",   "stage": 0, "baseLevel": 3,  "stats": {"HP": 36,  "EN": 22,  "CR": 14,  "AB": 18},  "evolvesTo": "cinderfang"},
   {"key": "drizzlet",    "name": "Drizzlet",    "stage": 0, "baseLevel": 3,  "stats": {"HP": 40,  "EN": 18,  "CR": 16,  "AB": 16},  "evolvesTo": "tidecaller"},
   {"key": "sparkmite",   "name": "Sparkmite",   "stage": 0, "baseLevel": 4,  "stats": {"HP": 32,  "EN": 26,  "CR": 12,  "AB": 20},  "evolvesTo": "voltcrest"},
   {"key": "mosscub",     "name": "Mosscub",     "stage": 0, "baseLevel": 5,  "stats": {"HP": 48,  "EN": 16,  "CR": 22,  "AB": 14},  "evolvesTo": "thornmane"},

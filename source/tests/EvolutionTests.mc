@@ -7,7 +7,7 @@ import Toybox.Test;
 //! A partner short of its growth cap cannot evolve, however much focus is banked.
 (:test)
 function testEvolutionNeedsMaxedGrowth(logger as Logger) as Boolean {
-    var partner = Combat.Bestiary.get("emberling") as Combat.Creature;
+    var partner = Combat.Bestiary.get("nonce") as Combat.Creature;
     var cap = partner.maxExtraLevel();
 
     Test.assert(!Evolution.isReady(partner, 0, Evolution.MAX_FOCUS));
@@ -19,7 +19,7 @@ function testEvolutionNeedsMaxedGrowth(logger as Logger) as Boolean {
 //! Focus is the other half of the gate.
 (:test)
 function testEvolutionNeedsFocus(logger as Logger) as Boolean {
-    var partner = Combat.Bestiary.get("emberling") as Combat.Creature;
+    var partner = Combat.Bestiary.get("nonce") as Combat.Creature;
     var cap = partner.maxExtraLevel();
 
     Test.assert(!Evolution.isReady(partner, cap, 0));

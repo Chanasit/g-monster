@@ -12,9 +12,9 @@ module SpriteIndex {
 
     function build() as Dictionary<String, Array<ResourceId> > {
         return {
-            "emberling" => [
-                Rez.Drawables.EmberlingIdle, Rez.Drawables.EmberlingSleep, Rez.Drawables.EmberlingMove, Rez.Drawables.EmberlingFight,
-                Rez.Drawables.EmberlingFightLeft
+            "nonce" => [
+                Rez.Drawables.NonceIdle, Rez.Drawables.NonceSleep, Rez.Drawables.NonceMove, Rez.Drawables.NonceFight,
+                Rez.Drawables.NonceFightLeft
             ],
             "drizzlet" => [
                 Rez.Drawables.DrizzletIdle, Rez.Drawables.DrizzletSleep, Rez.Drawables.DrizzletMove, Rez.Drawables.DrizzletFight,
@@ -137,9 +137,9 @@ module SpriteIndex {
     //! two frames, so the common answer should cost no allocation and no lookup. Hand-drawn
     //! overrides are the only source of anything else.
     function frameCount(key as String, slot as Number) as Number {
-        if (slot == 0 && key.equals("emberling")) { return 4; }
-        if (slot == 2 && key.equals("emberling")) { return 4; }
-        if (slot == 1 && key.equals("emberling")) { return 3; }
+        if (slot == 0 && key.equals("nonce")) { return 4; }
+        if (slot == 2 && key.equals("nonce")) { return 4; }
+        if (slot == 1 && key.equals("nonce")) { return 3; }
         return 2;
     }
 }

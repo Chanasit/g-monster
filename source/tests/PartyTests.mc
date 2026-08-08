@@ -16,7 +16,7 @@ function freshEngine(playerKey as String, enemyKey as String, playerLevel as Num
 //! A battle opens with the full call-point pool.
 (:test)
 function testBattleStartsWithFullCallPool(logger as Logger) as Boolean {
-    var engine = freshEngine("emberling", "tidecaller", 12);
+    var engine = freshEngine("nonce", "tidecaller", 12);
     Test.assertEqual(engine.callPoints(), Combat.STARTING_CALL_POINTS);
     return true;
 }
@@ -24,16 +24,16 @@ function testBattleStartsWithFullCallPool(logger as Logger) as Boolean {
 //! The creature already fighting counts as called, so it cannot be re-summoned to heal itself.
 (:test)
 function testActiveCreatureCannotBeRecalled(logger as Logger) as Boolean {
-    var engine = freshEngine("emberling", "tidecaller", 12);
-    var emberling = Combat.Bestiary.get("emberling") as Combat.Creature;
+    var engine = freshEngine("nonce", "tidecaller", 12);
+    var nonce = Combat.Bestiary.get("nonce") as Combat.Creature;
 
-    Test.assert(engine.hasBeenCalled("emberling"));
-    Test.assert(!engine.canSummon(emberling));
+    Test.assert(engine.hasBeenCalled("nonce"));
+    Test.assert(!engine.canSummon(nonce));
 
     // Damage it, then confirm a recall still cannot be used as a heal.
     engine.playerStats().applyDamage(10);
     var wounded = engine.playerStats().hp;
-    Test.assert(!engine.summon(emberling, 0));
+    Test.assert(!engine.summon(nonce, 0));
     Test.assertEqual(engine.playerStats().hp, wounded);
     return true;
 }
@@ -41,7 +41,7 @@ function testActiveCreatureCannotBeRecalled(logger as Logger) as Boolean {
 //! Summoning swaps the fighter, spends its cost, and brings the newcomer in at full health.
 (:test)
 function testSummonSwapsFighterAndSpendsPoints(logger as Logger) as Boolean {
-    var engine = freshEngine("emberling", "tidecaller", 12);
+    var engine = freshEngine("nonce", "tidecaller", 12);
     var drizzlet = Combat.Bestiary.get("drizzlet") as Combat.Creature;
 
     var cost = engine.summonCost(drizzlet);
@@ -60,7 +60,7 @@ function testSummonSwapsFighterAndSpendsPoints(logger as Logger) as Boolean {
 //! The enemy keeps every point of damage it has taken across a swap.
 (:test)
 function testSummonDoesNotResetTheEnemy(logger as Logger) as Boolean {
-    var engine = freshEngine("emberling", "tidecaller", 12);
+    var engine = freshEngine("nonce", "tidecaller", 12);
     var drizzlet = Combat.Bestiary.get("drizzlet") as Combat.Creature;
 
     engine.enemyStats().applyDamage(15);
@@ -74,7 +74,7 @@ function testSummonDoesNotResetTheEnemy(logger as Logger) as Boolean {
 //! Calling costs points, not a turn.
 (:test)
 function testSummonCostsNoTurn(logger as Logger) as Boolean {
-    var engine = freshEngine("emberling", "tidecaller", 12);
+    var engine = freshEngine("nonce", "tidecaller", 12);
     var drizzlet = Combat.Bestiary.get("drizzlet") as Combat.Creature;
 
     var turnsBefore = engine.turnCount();
@@ -86,7 +86,7 @@ function testSummonCostsNoTurn(logger as Logger) as Boolean {
 //! Each species gets exactly one call per battle.
 (:test)
 function testEachSpeciesCallableOnce(logger as Logger) as Boolean {
-    var engine = freshEngine("emberling", "tidecaller", 12);
+    var engine = freshEngine("nonce", "tidecaller", 12);
     var drizzlet = Combat.Bestiary.get("drizzlet") as Combat.Creature;
     var sparkmite = Combat.Bestiary.get("sparkmite") as Combat.Creature;
 
@@ -104,7 +104,7 @@ function testEachSpeciesCallableOnce(logger as Logger) as Boolean {
 //! Something far above the player's standing costs the whole pool and cannot be afforded twice.
 (:test)
 function testUnaffordableSummonIsRefused(logger as Logger) as Boolean {
-    var engine = freshEngine("emberling", "tidecaller", 12);
+    var engine = freshEngine("nonce", "tidecaller", 12);
     var apex = Combat.Bestiary.get("voidsentinel") as Combat.Creature;
     var drizzlet = Combat.Bestiary.get("drizzlet") as Combat.Creature;
 
@@ -124,8 +124,8 @@ function testUnaffordableSummonIsRefused(logger as Logger) as Boolean {
 function testSummonCostsFallWithPlayerLevel(logger as Logger) as Boolean {
     var apex = Combat.Bestiary.get("solmonarch") as Combat.Creature;
 
-    var early = freshEngine("emberling", "tidecaller", 5).summonCost(apex);
-    var late = freshEngine("emberling", "tidecaller", 50).summonCost(apex);
+    var early = freshEngine("nonce", "tidecaller", 5).summonCost(apex);
+    var late = freshEngine("nonce", "tidecaller", 50).summonCost(apex);
 
     Test.assert(late < early);
     Test.assert(late >= 0);
@@ -135,7 +135,7 @@ function testSummonCostsFallWithPlayerLevel(logger as Logger) as Boolean {
 //! Nothing can be called once the battle is decided.
 (:test)
 function testNoSummoningAfterTheBattleEnds(logger as Logger) as Boolean {
-    var engine = freshEngine("emberling", "drizzlet", 3);
+    var engine = freshEngine("nonce", "drizzlet", 3);
     var sparkmite = Combat.Bestiary.get("sparkmite") as Combat.Creature;
 
     while (!engine.isOver()) {
@@ -150,7 +150,7 @@ function testNoSummoningAfterTheBattleEnds(logger as Logger) as Boolean {
 //! A called creature fights with its own growth, not the lead's.
 (:test)
 function testSummonUsesItsOwnGrowth(logger as Logger) as Boolean {
-    var engine = freshEngine("emberling", "tidecaller", 12);
+    var engine = freshEngine("nonce", "tidecaller", 12);
     var mosscub = Combat.Bestiary.get("mosscub") as Combat.Creature;
 
     Test.assert(engine.summon(mosscub, mosscub.maxExtraLevel()));
@@ -166,8 +166,8 @@ function testSummonUsesItsOwnGrowth(logger as Logger) as Boolean {
 function testDefaultRoster(logger as Logger) as Boolean {
     Storage.clearValues();
 
-    Test.assertEqual(Party.lead().key, "emberling");
-    Test.assert(Party.isUnlocked("emberling"));
+    Test.assertEqual(Party.lead().key, "nonce");
+    Test.assert(Party.isUnlocked("nonce"));
     Test.assert(!Party.isUnlocked("mosscub"));
 
     for (var i = 1; i < Party.SIZE; i += 1) {

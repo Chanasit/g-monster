@@ -74,19 +74,35 @@ or adding a species is a JSON edit, not a code edit. Strings go in `resources/st
 
 ### Sprites
 
-`resources/drawables/*_0.png` / `*_1.png` are **generated** — do not hand-edit them. The art lives as
-24x24 ASCII in `tools/sprites/sprites.txt` (`#` ink, `.` clear), one grid per species key:
+`resources/drawables/<species>/*.png` (one directory per species; `launcher_icon.png` at the top
+level is hand-authored and not one of them), the `<bitmap>` block of
+`resources/drawables/drawables.xml`, and all of `source/ui/SpriteIndex.mc` are **generated** — do not
+hand-edit them. The art lives as 24x24 ASCII in `tools/sprites/sprites.txt` (`#` ink, `.` clear), one
+grid per species key:
 
 ```bash
-python3 tools/sprites/generate_sprites.py           # rewrite the PNGs
-python3 tools/sprites/generate_sprites.py --check    # fail if PNGs are stale
+python3 tools/sprites/generate_sprites.py           # rewrite the PNGs, the xml and the index
+python3 tools/sprites/generate_sprites.py --check    # fail if any of the three is stale
 ```
 
-Only frame A is authored; frame B is derived by shifting the grid down one row, which is the idle
-breath. That is why the last row of every grid must stay blank. Adding a species means a grid in
-`sprites.txt`, a `<bitmap>` pair in `resources/drawables/drawables.xml`, and an entry in the
-`Sprites.index()` table. `Sprites.draw` still returns false for an unknown key, so the text fallback
-survives if any of the three is missed.
+Adding a species is therefore a grid in `sprites.txt` and a rerun — the xml and the index follow.
+`Sprites.draw` still returns false for an unknown key, so the text fallback survives a species with
+no grid.
+
+One grid per species is authored. Everything else is derived from it: five action states (idle,
+sleep, walk, fight, run), two frames each, plus mirrored lunge and lean frames for a creature facing
+left. Several transforms shift the body down, which is why the last row of every grid must stay
+blank.
+
+Two constraints shape the pipeline and are easy to trip over:
+
+- **`Rez.Drawables` takes at most 254 members.** A bitmap per frame would need 406. Both frames of a
+  state therefore share one file, stacked, and `Sprites.draw` clips to the half it wants. Do not
+  split them back out.
+- **The authored grids have no spare margin** — eight of them touch column 0 or 23. Horizontal
+  magnitudes are clamped per species to whatever keeps ink loss under 2%, and the generator prints a
+  note naming any species whose motion it had to drop. Those notes are the signal that a grid edit
+  cost a creature its animation; they are not noise.
 
 ## Conventions
 
@@ -99,9 +115,10 @@ survives if any of the three is missed.
 
 ## Repo hygiene
 
-- `DEBUG.md` documents the compile-time debug flags (instant battle, encounter pacing). They are
-  plain constants, not `(:debug)` code, so they ship as written — check they are all off before
-  packaging with `-e`.
+- Debug switches come from the environment and are compiled in: `make run DEBUG_FORCE_ACTION=walk`.
+  `tools/debug/gen_debug_config.py` writes `source/DebugConfig.mc` (generated, committed all-off,
+  never hand-edited); `make release` / `make package` regenerate it with `--off` so nothing leaks
+  into a bundle. See `DEBUG.md`.
 - `developer_key.der` / `.pem` are signing keys, gitignored — never commit or print them.
 - `gen/` and `external-mir/` are compiler artifacts. `external-mir/` is currently tracked in git;
   do not hand-edit `.mir` files, they are regenerated on every build.

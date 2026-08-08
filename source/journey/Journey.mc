@@ -28,21 +28,16 @@ module Journey {
     const EVENT_GAP_STEP = 100;
     const EVENT_GAP_CHOICES = 3;
 
-    //! Debug override. While non-zero every event gap collapses to this many steps, so the
-    //! encounter loop can be exercised in the simulator without walking several hundred steps per
-    //! event. Set back to 0 to restore the real 300..500 pacing — this is a tuning cheat, not a
-    //! feature, and shipping it would trivialise the game.
-    const DEBUG_EVENT_GAP = 0;
 
     //! Bounds `rollEventGap` can actually return, override included. Tests assert against these
     //! rather than against 300/500 literals, so flipping the override does not fake a passing suite.
     function eventGapMin() as Number {
-        return (DEBUG_EVENT_GAP > 0) ? DEBUG_EVENT_GAP : EVENT_GAP_MIN;
+        return (DebugConfig.EVENT_GAP > 0) ? DebugConfig.EVENT_GAP : EVENT_GAP_MIN;
     }
 
     function eventGapMax() as Number {
-        return (DEBUG_EVENT_GAP > 0)
-            ? DEBUG_EVENT_GAP
+        return (DebugConfig.EVENT_GAP > 0)
+            ? DebugConfig.EVENT_GAP
             : EVENT_GAP_MIN + ((EVENT_GAP_CHOICES - 1) * EVENT_GAP_STEP);
     }
 
@@ -50,14 +45,14 @@ module Journey {
     //! identically with the override on or off — a seeded trek still replays step-for-step.
     function rollEventGap(rng as Combat.Rng) as Number {
         var rolled = EVENT_GAP_MIN + (rng.nextInt(EVENT_GAP_CHOICES) * EVENT_GAP_STEP);
-        return (DEBUG_EVENT_GAP > 0) ? DEBUG_EVENT_GAP : rolled;
+        return (DebugConfig.EVENT_GAP > 0) ? DebugConfig.EVENT_GAP : rolled;
     }
 
     //! Cap a gap that was persisted before the override was switched on. Without this a save
     //! sitting on 380 steps would still have to walk all 380 before the override bit.
     function clampEventGap(steps as Number) as Number {
-        if (DEBUG_EVENT_GAP > 0 && steps > DEBUG_EVENT_GAP) {
-            return DEBUG_EVENT_GAP;
+        if (DebugConfig.EVENT_GAP > 0 && steps > DebugConfig.EVENT_GAP) {
+            return DebugConfig.EVENT_GAP;
         }
         return steps;
     }

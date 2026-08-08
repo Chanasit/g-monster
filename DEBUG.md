@@ -1,29 +1,64 @@
 # Debug flags
 
-Switches for exercising the game without walking to an encounter. All are plain compile-time
-constants — flip one, rebuild, relaunch.
-
-> **Reset every flag to its default before packaging a release.** These are constants, not
-> `(:debug)`-annotated code, so they compile into store builds exactly as written. See
-> [Why not `(:debug)`?](#why-not-debug) below.
-
-## Current defaults
-
-| Flag | File | Default | Effect when changed |
-|---|---|---|---|
-| `DEBUG_EVENT_GAP` | `source/journey/Journey.mc:35` | `0` (off) | Steps between trek events. Non-zero collapses every gap to that many steps. |
-| `DEBUG_INSTANT_BATTLE` | `source/GMonsterApp.mc:22` | `false` | `true` launches straight into a battle instead of the pager. |
-| `DEBUG_BATTLE_ENEMY` | `source/GMonsterApp.mc:26` | `"glacierjaw"` | Species fought in that battle. Only read when `DEBUG_INSTANT_BATTLE` is on. |
-| `DEBUG_BATTLE_IS_BOSS` | `source/GMonsterApp.mc:29` | `false` | Shows that battle as an area guardian. Only read when `DEBUG_INSTANT_BATTLE` is on. |
-
-Verify they are all off before a release build:
+Switches for exercising the game without walking to an encounter. They are passed through the
+**environment** and compiled in by the Makefile — nothing is hand-edited.
 
 ```bash
-grep -rn "DEBUG_EVENT_GAP = \|DEBUG_INSTANT_BATTLE = " source/
-# expect: DEBUG_EVENT_GAP = 0   /   DEBUG_INSTANT_BATTLE = false
+make run DEBUG_FORCE_ACTION=walk
+DEBUG_INSTANT_BATTLE=1 DEBUG_BATTLE_ENEMY=twinflare make run
+make run DEBUG_EVENT_GAP=50
 ```
 
----
+Unset means off, so a plain `make build` is always clean. Every build prints what is on:
+
+```
+$ make run DEBUG_FORCE_ACTION=walk
+debug: force-action=walk
+==> build fenix6pro
+```
+
+| Variable | Values | Default | Effect |
+|---|---|---|---|
+| `DEBUG_INSTANT_BATTLE` | `1`/`true`/`yes`/`on` | off | Boot straight into a battle instead of the pager. |
+| `DEBUG_BATTLE_ENEMY` | a species key | `glacierjaw` | Which creature to fight there. Unknown key falls back to a roll. |
+| `DEBUG_BATTLE_IS_BOSS` | `1`/`true`/`yes`/`on` | off | Show that battle as an area guardian. |
+| `DEBUG_EVENT_GAP` | steps, e.g. `50` | `0` | Steps between trek events. `0` keeps the real 300/400/500 pacing. |
+| `DEBUG_FORCE_ACTION` | `idle`\|`sleep`\|`walk`\|`fight`\|`run` | off | Pin every creature to one pose instead of letting the pedometer choose. |
+
+Anything unparseable fails the build rather than compiling something unintended:
+
+```
+$ make build DEBUG_FORCE_ACTION=flying
+debug config: DEBUG_FORCE_ACTION: expected one of fight, idle, run, sleep, walk, got 'flying'
+make: *** [debug-config] Error 2
+```
+
+Useful targets:
+
+```bash
+make debug-status    # what the current source/DebugConfig.mc has on
+make debug-off       # clear every switch
+```
+
+## How it works
+
+Monkey C has no preprocessor and no `-D` build define, and a watch app has no process environment to
+read at runtime. So the switches cannot be read — they have to be *compiled in*.
+`tools/debug/gen_debug_config.py` turns the `DEBUG_*` environment into `source/DebugConfig.mc`, and
+the Makefile runs it before every build. The app just reads ordinary constants.
+
+`source/DebugConfig.mc` is generated but **committed in its all-off form**, so building with
+`monkeyc` directly, without make, still compiles. Do not hand-edit it; set the environment and
+rebuild.
+
+It is `(:background)` because `Journey` reads `EVENT_GAP` while the app is closed. That is also why
+`FORCE_ACTION` is emitted as a bare integer rather than as `Sprites.ACTION_*` — referencing the
+drawing layer would drag it into background scope. Those integers are slot indices and must keep
+matching both `Sprites.ACTION_*` and the `VARIANTS` order in `tools/sprites/generate_sprites.py`.
+
+> **`make release` and `make package` regenerate the config with `--off` first**, ignoring the
+> environment entirely. A switch left exported in a shell therefore cannot ride into a store bundle.
+> This replaces the old "remember to reset the constants" discipline.
 
 ## `DEBUG_EVENT_GAP`
 
@@ -31,8 +66,8 @@ Normal pacing rolls 300, 400 or 500 steps between events, which makes any change
 rewards slow to test. Set this to something small — 50 is comfortable — to trigger events almost
 immediately.
 
-```monkeyc
-const DEBUG_EVENT_GAP = 50;   // source/journey/Journey.mc
+```bash
+make run DEBUG_EVENT_GAP=50
 ```
 
 Three things make it behave:
@@ -49,7 +84,7 @@ Three things make it behave:
 `Journey.eventGapMin()` / `eventGapMax()` follow the override rather than restating 300/500, which
 is why `JourneyTests` stays green with the flag on instead of having to be loosened.
 
-Turning it off is a single edit — set it back to `0`. A save carrying a clamped gap rerolls into the
+Turning it off means simply not passing it. A save carrying a clamped gap rerolls into the
 real range at its next event.
 
 ## `DEBUG_INSTANT_BATTLE`
@@ -57,10 +92,8 @@ real range at its next event.
 Opens the battle scene on launch, zero steps required. Useful for looking at sprite work and the
 turn animation.
 
-```monkeyc
-private const DEBUG_INSTANT_BATTLE = true;    // source/GMonsterApp.mc
-private const DEBUG_BATTLE_ENEMY = "twinflare";
-private const DEBUG_BATTLE_IS_BOSS = false;
+```bash
+make run DEBUG_INSTANT_BATTLE=1 DEBUG_BATTLE_ENEMY=twinflare
 ```
 
 **The preview writes nothing.** `Encounter.preview` calls `BattleView.markPreview()`, which sets
@@ -88,8 +121,8 @@ Any species key from `resources/data/creatures.json`. An unrecognised key falls 
 level-appropriate random encounter, so this doubles as a way to eyeball any creature's sprite in the
 battle scene:
 
-```monkeyc
-private const DEBUG_BATTLE_ENEMY = "voidsentinel";
+```bash
+make run DEBUG_INSTANT_BATTLE=1 DEBUG_BATTLE_ENEMY=voidsentinel
 ```
 
 ### `DEBUG_BATTLE_IS_BOSS`
@@ -97,14 +130,39 @@ private const DEBUG_BATTLE_ENEMY = "voidsentinel";
 `true` marks the enemy name with `*` and uses the guardian intro string, for checking the boss
 presentation without clearing an area.
 
+## `DEBUG_FORCE_ACTION`
+
+The ally on the ALLY page mirrors its tamer — `GMonsterView` draws it with `Motion.current()`, which
+classifies pedometer cadence into idle, walk, run or sleep. A simulator has no legs, so it sits at
+`ACTION_IDLE` and the other three poses are unreachable without walking around wearing the watch.
+
+Pin it to one pose instead:
+
+```bash
+make run DEBUG_FORCE_ACTION=walk
+```
+
+Any of `idle`, `sleep`, `walk`, `fight`, `run`. Omitting it hands control back to the pedometer.
+
+Only `Motion.current` consults it. `Motion.classify` stays pure and untouched, so `MotionTests` goes
+on asserting the real `WALK_SPM` / `RUN_SPM` / `SLEEP_AFTER_MS` thresholds with the override on —
+the suite is not quietly weakened to accommodate the cheat.
+
+It applies wherever a creature is drawn from `Motion.current()`, which today is the ALLY page. The
+battle screen picks its own actions (`ACTION_FIGHT`, `ACTION_RUN`) and ignores this.
+
+The honest alternative, if you want the ally to walk permanently rather than for a look: that is not
+this switch, it is deleting the `Motion` call site. It would cost the idle, run and sleep poses
+entirely, since cadence would no longer select anything.
+
 ---
 
 ## Why not `(:debug)`?
 
-Connect IQ has `(:debug)` / `(:release)` annotations that would make these structurally unshippable.
-They are not used here because **the unit-test build is a debug build** — `monkeyc --unit-test`
-would take the debug path, so the suite would run against 50-step gaps and an instant battle rather
-than the real game.
+Connect IQ has `(:debug)` / `(:release)` annotations that exclude code per build type. They are not
+used here because **the unit-test build is a debug build** — `monkeyc --unit-test` would take the
+debug path, so the suite would run against 50-step gaps and an instant battle rather than the real
+game.
 
-The tradeoff is that nothing stops a flag reaching a store package except remembering to reset it.
-Hence the check at the top of this file.
+Generating the config instead keeps tests on the real values by default, and `make release` /
+`make package` provide the shipping guarantee the annotations would have given.

@@ -124,6 +124,16 @@ Overrides do not consume extra drawables. They make one bitmap taller and add an
 `SpriteIndex.frameCount`, which is an if-chain over just the exceptions so the common two-frame
 answer costs no lookup.
 
+**The comment above an override must describe the grid that is actually there.** These blocks are
+long and they are the only record of intent — nothing downstream validates them, `--check` compares
+PNGs to grids and never reads a word of prose. A comment that promises a reach the cells do not
+contain is worse than no comment: the next person reads it, believes the state is animated, and
+stops looking. Before committing an override, read the claims back against the rows — if it says
+"one column toward the target", diff the two frames and confirm a column actually moved; if it says
+"out to column 23", confirm column 23 is inked. `nonce.fight` shipped with a comment describing a
+lunge over a frame 1 that was the body dropped one row, which is exactly the derived bob the
+override existed to replace.
+
 ### Move follows Blair
 
 `assets/blair-walk.jpg` is the spec for the `move` state. A stride is what it specifies, and a
@@ -173,7 +183,33 @@ Per state, what actually reads at this size:
 - **move** — Blair. Feet must change *which* foot is forward, not merely translate; the body dips
   and lifts one row between contacts. See *Move follows Blair* above.
 - **fight** — a single decisive extension with a snap back to neutral. Two frames is enough;
-  anticipation is not readable at 500 ms.
+  anticipation is not readable at 500 ms. Drawn side-on — see *Fight stands side-on, facing right*.
+
+### Fight stands side-on, facing right
+
+`fight` is the one state with a direction in it, and the direction has to be in the *silhouette*,
+not just in the eye. A hand-authored fight stands in profile, facing right; `fight_left` is the
+generated mirror and is what the enemy plays, so the enemy strikes toward its target instead of
+away from it.
+
+Turning a front-facing base grid by moving the eye a couple of columns does not read at 72px. The
+base grids are bilaterally symmetric — two ears at opposite edges, a torso spanning the full width —
+and that symmetry is what the viewer resolves first; an off-centre eye inside it reads as a
+lazy eye, not as a head turn. To actually get side-on:
+
+- **Drop or collapse the far ear.** Two ears at opposite edges is the single strongest front-on cue.
+  In profile the far ear is occluded or is a stub behind the near one.
+- **Narrow the torso.** A creature seen edge-on is not as wide as one seen face-on. Give back the
+  columns; the reach needs them anyway.
+- **Put the far limbs behind the near ones,** not mirrored beside them. Splayed-symmetric legs are
+  a front stance.
+- **Then** move the eye. It is the last cue, not the first.
+
+The extension in frame 1 is what the profile buys: the lead arm has somewhere to go, and it should
+go there — ink in column 23, the fist carried out with it. The lead foot stays planted on row 22
+while the rear foot leaves the ground; that contact is the difference between a lunge and the sprite
+sliding, which is what `move` is for. A frame 1 that only translates vertically is a bob, and the
+derivation already gives a bob for free.
 
 ## Timing (`source/ui/Sprites.mc`)
 
@@ -205,3 +241,7 @@ drawables. Do not split stacked frames back out.
   anywhere.
 - Do not reorder `VARIANTS`, change `GRID`, or change `SCALE` without changing `Sprites.mc` in the
   same commit.
+- Do not ship an override whose comment claims motion the grid does not contain. Nothing checks
+  prose against cells — you do. See *Hand-authored motion (overrides)*.
+- Do not hand-author a `fight` that stands front-on. Side-on facing right, or the mirror sends the
+  enemy swinging away from its target. See *Fight stands side-on, facing right*.

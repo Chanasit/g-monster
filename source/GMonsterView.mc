@@ -44,6 +44,9 @@ class GMonsterView extends WatchUi.View {
         StepTracker.sync();
         _ticksToSync = SYNC_EVERY_TICKS;
 
+        // Whatever the player was doing before this view was hidden says nothing about now.
+        Motion.reset();
+
         _timer = new Timer.Timer();
         _timer.start(method(:onTick), Sprites.FRAME_MS, true);
     }
@@ -61,6 +64,10 @@ class GMonsterView extends WatchUi.View {
     }
 
     function onTick() as Void {
+        // Sampled every tick rather than every sync: the sprite should react to the player breaking
+        // into a walk in a second or two, where the journey only cares about totals.
+        Motion.sample();
+
         _ticksToSync -= 1;
         if (_ticksToSync <= 0) {
             StepTracker.sync();
@@ -130,8 +137,12 @@ class GMonsterView extends WatchUi.View {
         var partner = GameState.partner();
         var extra = GameState.partnerExtraLevel();
 
+        // The ally mirrors its tamer: walking while the player walks, asleep once they have been
+        // still long enough.
+        //
         // No art for this species yet: its name takes the sprite's place rather than leaving a hole.
-        if (!Sprites.drawIdle(dc, centerX, height * 0.42, partner.key)) {
+        if (!Sprites.drawAction(dc, centerX, height * 0.42, partner.key, Motion.current(),
+                                Sprites.FACE_RIGHT)) {
             Theme.ink(dc);
             dc.drawText(centerX, height * 0.42, Graphics.FONT_SMALL, partner.name,
                         Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);

@@ -220,7 +220,10 @@ class BattleView extends WatchUi.View {
         // On the flash beat the panel is solid ink, and a black sprite on black is invisible. Skip
         // it rather than draw nothing-shaped holes.
         if (!flash) {
-            Sprites.drawIdle(dc, enemyX(dc) + slide, height * 0.40, _engine.enemySpecies().key);
+            // It is charging in from off screen, so it runs in — the slide and the lean are the
+            // same motion, which is why the lean has to point the way the slide travels.
+            Sprites.drawAction(dc, enemyX(dc) + slide, height * 0.40,
+                               _engine.enemySpecies().key, Sprites.ACTION_RUN, Sprites.FACE_LEFT);
         }
 
         dc.drawText(centerX, height * 0.68, Graphics.FONT_SMALL,
@@ -533,7 +536,11 @@ class BattleView extends WatchUi.View {
         }
 
         var spriteY = height * 0.36;
-        if (!Sprites.drawIdle(dc, x + lungeOffset(dc, mine), spriteY, key)) {
+        // Facing matches the way lungeOffset throws this side: the player's creature commits to the
+        // right, the enemy to the left.
+        var facing = (mine > 0) ? Sprites.FACE_RIGHT : Sprites.FACE_LEFT;
+        if (!Sprites.drawAction(dc, x + lungeOffset(dc, mine), spriteY, key,
+                                Sprites.ACTION_FIGHT, facing)) {
             // No art for this species: name the slot so the layout keeps its shape.
             Theme.ink(dc);
             dc.drawText(x, spriteY, Graphics.FONT_TINY, "?",

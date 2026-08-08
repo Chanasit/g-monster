@@ -97,10 +97,12 @@ function testIdleDoesNotCoastIntoAMove(logger as Logger) as Boolean {
     return true;
 }
 
-//! Opening the app measures nothing, and nothing is idle — never mid-stride.
+//! No rule fires on zero evidence, and the fallthrough is idle regardless of what state walked in
+//! — it does not carry the previous state through. Start from sleep so a fallthrough of `state`
+//! would answer wrong and this actually pins the fallthrough down.
 (:test)
 function testColdStartIsIdle(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, 0, 0), Sprites.ACTION_IDLE);
+    Test.assertEqual(Motion.classify(Sprites.ACTION_SLEEP, 0, 0), Sprites.ACTION_IDLE);
     return true;
 }
 
@@ -134,8 +136,8 @@ function testStrollDoesNotStrobe(logger as Logger) as Boolean {
 function testSprintToDeadStopGoesStraightToIdle(logger as Logger) as Boolean {
     var state = Sprites.ACTION_MOVE;
 
-    // 1s of silence: coasting holds it.
-    state = Motion.classify(state, 4, 1000);
+    // 1s of silence, one straggling step: below the entry cadence, so coasting is what holds it.
+    state = Motion.classify(state, 1, 1000);
     Test.assertEqual(state, Sprites.ACTION_MOVE);
 
     // 3s of silence, no steps in the short window: still coasting, still under the quiet rule.

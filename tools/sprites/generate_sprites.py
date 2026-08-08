@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Emit creature sprite PNGs from the ASCII art in sprites.txt.
 
-The watch app wants five action states per species -- idle, sleep, walk, fight,
-run -- two frames each. Only one grid per species is authored; every action's
+The watch app wants four action states per species -- idle, sleep, move, fight
+-- two frames each. Only one grid per species is authored; every action's
 frames are derived from it by grid transforms, the same way the idle breath was
 always derived by dropping the whole silhouette one row. Deriving means the
-artist maintains 29 grids instead of 145, a new species costs one grid rather
-than five, and no species' poses can drift apart from each other.
+artist maintains 29 grids instead of 116, a new species costs one grid rather
+than four, and no species' poses can drift apart from each other.
 
 What a derived pose can be is limited, and the transforms are honest about it:
-these are motion cues built out of one silhouette -- bob, waddle, lean, lunge.
+these are motion cues built out of one silhouette -- bob, waddle, lunge.
 A sleeping creature here is a squashed creature, not a curled-up one.
 
 Output is 24x24 scaled 3x with nearest-neighbour to 72x72, in exactly two
@@ -69,24 +69,22 @@ BLANK = "." * GRID
 
 #! Action order is load-bearing: Sprites.mc indexes each species' flat id array
 #! as slot * 2 + frame, so a variant's position here is its slot number, and the
-#! first five have to stay in the order of ACTION_*.
+#! first four have to stay in the order of ACTION_*.
 #!
-#! Lunging and leaning are the only transforms with a direction in them, so they
-#! are the only ones with a mirrored variant. In battle the player's creature
-#! commits to the right and the enemy to the left; drawing both with the same
-#! rightward lean would have the enemy leaning away from its own charge. Idle,
-#! sleep and walk carry no direction -- walk swings both ways across its two
-#! frames -- so mirroring them would cost resources to say nothing.
+#! Lunging is the only transform with a direction in it, so it is the only one
+#! with a mirrored variant. In battle the player's creature commits to the right
+#! and the enemy to the left; drawing both with the same rightward lunge would
+#! have the enemy striking away from its target. Idle, sleep and move carry no
+#! direction -- move swings both ways across its two frames -- so mirroring them
+#! would cost resources to say nothing.
 #!
 #! (label, action, mirrored)
 VARIANTS = (
     ("idle", "idle", False),
     ("sleep", "sleep", False),
-    ("walk", "walk", False),
+    ("move", "move", False),
     ("fight", "fight", False),
-    ("run", "run", False),
     ("fight_left", "fight", True),
-    ("run_left", "run", True),
 )
 
 #! The rows that read as legs. Row 23 is excluded because it must stay blank.
@@ -229,17 +227,6 @@ def hshift(rows, which, dx):
     return out
 
 
-def shear(rows, amount):
-    """Lean the silhouette right, ramping from 0 at the feet to amount at the top."""
-    if amount == 0:
-        return list(rows)
-    out = []
-    for i, row in enumerate(rows):
-        dx = amount * (GRID - 1 - i) // (GRID - 1)
-        out.append(("." * dx + row)[:GRID])
-    return out
-
-
 def squash(rows, factor, floor):
     """Compress the silhouette vertically and rest it on the floor row.
 
@@ -315,7 +302,7 @@ def frames_for(rows, action, clamps, override=None):
         slumped = squash(rows, SLEEP_SQUASH, SLEEP_FLOOR)
         return [slumped, down(slumped)]
 
-    if action == "walk":
+    if action == "move":
         # Body and legs counter-swing: the torso goes one way, the feet the other.
         #
         # The legs are shifted by twice the body's magnitude because that shift lands on rows the
@@ -345,19 +332,6 @@ def frames_for(rows, action, clamps, override=None):
             return [list(rows), bob(rows)]
         return build(f)
 
-    if action == "run":
-        # The lean is the run. Legs split under it and the body leaves the
-        # ground on frame B.
-        def build(a):
-            leaned = shear(rows, a)
-            return [hshift(leaned, LEGS, 1), up(hshift(leaned, LEGS, -1))]
-
-        a = clamp(rows, build, 3)
-        if a == 0:
-            clamps.append((action, "forward lean"))
-            return [list(rows), bob(rows)]
-        return build(a)
-
     raise ValueError("unknown action %r" % action)
 
 
@@ -386,11 +360,35 @@ def rez_id(key, label):
 LEGACY_PNG = re.compile(r"^[a-z]+(_[a-z]+)*_[01]\.png$")
 
 
-def superseded(names, keys):
+def superseded(names, keys, outdir):
+    """Every PNG under drawables/ that this run would not have written.
+
+    Two scopes, because the layout has moved once. The top level holds only
+    leftovers from the schemes above. A species directory holds exactly one
+    file per live variant, so anything else in it is a variant that has since
+    been dropped or renamed -- which is unreachable until a variant actually
+    goes away, and is why this was for a long time only a top-level sweep.
+
+    Names come back relative to outdir so the caller deletes and reports them
+    the same way whichever scope they came from.
+    """
     flat = tuple("%s_" % key for key in keys)
-    return sorted(n for n in names
-                  if n.endswith(".png")
-                  and (LEGACY_PNG.match(n) or n.startswith(flat)))
+    dead = [n for n in names
+            if n.endswith(".png") and (LEGACY_PNG.match(n) or n.startswith(flat))]
+
+    live = frozenset(png_name(key, label)
+                     for key in keys
+                     for label, _action, _mirrored in VARIANTS)
+    for key in keys:
+        species = os.path.join(outdir, key)
+        if not os.path.isdir(species):
+            continue
+        for name in os.listdir(species):
+            rel = "%s/%s" % (key, name)
+            if name.endswith(".png") and rel not in live:
+                dead.append(rel)
+
+    return sorted(dead)
 
 
 # --- PNG encode / decode ---------------------------------------------------
@@ -537,9 +535,9 @@ def index_mc(keys, counts):
              "//! Species key -> drawable ids, generated by tools/sprites/generate_sprites.py.",
              "//!",
              "//! Do not edit: rerun the generator. Each species maps to one array of slots, where",
-             "//! the first five are the ACTION_* values in order and the last two are the",
-             "//! left-facing lunge and lean. A slot's bitmap holds all of its frames stacked, so",
-             "//! Sprites clips to the slice it wants. Flat rather than nested because this table is",
+             "//! the first four are the ACTION_* values in order and the last is the left-facing",
+             "//! lunge. A slot's bitmap holds all of its frames stacked, so Sprites clips to the",
+             "//! slice it wants. Flat rather than nested because this table is",
              "//! built lazily on a watch and an array of ids is the cheapest shape that works.",
              "module SpriteIndex {",
              "",
@@ -641,7 +639,7 @@ def main(argv):
     sync_text(DRAWABLES_XML, drawables_xml(keys), check_only, stale)
     sync_text(INDEX_MC, index_mc(keys, counts), check_only, stale)
 
-    legacy = superseded(os.listdir(OUTDIR), sprites.keys())
+    legacy = superseded(os.listdir(OUTDIR), sprites.keys(), OUTDIR)
     for name in legacy:
         stale.append(os.path.relpath(os.path.join(OUTDIR, name), REPO) + " (superseded)")
         if not check_only:

@@ -33,7 +33,7 @@ CHECKABLE  := $(filter $(INSTALLED),$(PRODUCTS))
 # no runtime environment, so these are compiled in: gen_debug_config.py turns them into
 # source/DebugConfig.mc before every build. Unset means off.
 #
-#   make run DEBUG_FORCE_ACTION=walk
+#   make run DEBUG_FORCE_ACTION=move
 #   DEBUG_INSTANT_BATTLE=1 DEBUG_BATTLE_ENEMY=twinflare make run
 #
 # `?=` so a value already exported in the shell wins, and `export` so a value given on the make
@@ -71,9 +71,9 @@ help:
 	@echo "  DEBUG_BATTLE_ENEMY=<species>  which creature to fight there"
 	@echo "  DEBUG_BATTLE_IS_BOSS=1        show it as an area guardian"
 	@echo "  DEBUG_EVENT_GAP=<steps>       steps between trek events (0 = real pacing)"
-	@echo "  DEBUG_FORCE_ACTION=<pose>     idle|sleep|walk|fight|run"
+	@echo "  DEBUG_FORCE_ACTION=<pose>     idle|sleep|move|fight"
 	@echo
-	@echo "  e.g.  make run DEBUG_FORCE_ACTION=walk"
+	@echo "  e.g.  make run DEBUG_FORCE_ACTION=move"
 	@echo "        make debug-status     show what the built binary has on"
 	@echo "        make debug-off        clear every switch"
 

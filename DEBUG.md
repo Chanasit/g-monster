@@ -4,7 +4,7 @@ Switches for exercising the game without walking to an encounter. They are passe
 **environment** and compiled in by the Makefile — nothing is hand-edited.
 
 ```bash
-make run DEBUG_FORCE_ACTION=walk
+make run DEBUG_FORCE_ACTION=move
 DEBUG_INSTANT_BATTLE=1 DEBUG_BATTLE_ENEMY=twinflare make run
 make run DEBUG_EVENT_GAP=50
 ```
@@ -12,8 +12,8 @@ make run DEBUG_EVENT_GAP=50
 Unset means off, so a plain `make build` is always clean. Every build prints what is on:
 
 ```
-$ make run DEBUG_FORCE_ACTION=walk
-debug: force-action=walk
+$ make run DEBUG_FORCE_ACTION=move
+debug: force-action=move
 ==> build fenix6pro
 ```
 
@@ -23,13 +23,13 @@ debug: force-action=walk
 | `DEBUG_BATTLE_ENEMY` | a species key | `glacierjaw` | Which creature to fight there. Unknown key falls back to a roll. |
 | `DEBUG_BATTLE_IS_BOSS` | `1`/`true`/`yes`/`on` | off | Show that battle as an area guardian. |
 | `DEBUG_EVENT_GAP` | steps, e.g. `50` | `0` | Steps between trek events. `0` keeps the real 300/400/500 pacing. |
-| `DEBUG_FORCE_ACTION` | `idle`\|`sleep`\|`walk`\|`fight`\|`run` | off | Pin every creature to one pose instead of letting the pedometer choose. |
+| `DEBUG_FORCE_ACTION` | `idle`\|`sleep`\|`move`\|`fight` | off | Pin every creature to one pose instead of letting the pedometer choose. |
 
 Anything unparseable fails the build rather than compiling something unintended:
 
 ```
 $ make build DEBUG_FORCE_ACTION=flying
-debug config: DEBUG_FORCE_ACTION: expected one of fight, idle, run, sleep, walk, got 'flying'
+debug config: DEBUG_FORCE_ACTION: expected one of fight, idle, move, sleep, got 'flying'
 make: *** [debug-config] Error 2
 ```
 
@@ -133,27 +133,21 @@ presentation without clearing an area.
 ## `DEBUG_FORCE_ACTION`
 
 The ally on the ALLY page mirrors its tamer — `GMonsterView` draws it with `Motion.current()`, which
-classifies pedometer cadence into idle, walk, run or sleep. A simulator has no legs, so it sits at
-`ACTION_IDLE` and the other three poses are unreachable without walking around wearing the watch.
+classifies pedometer cadence into idle, move or sleep. A simulator has no legs, so it sits at
+`ACTION_IDLE` and the other two poses are unreachable without walking around wearing the watch.
 
 Pin it to one pose instead:
 
 ```bash
-make run DEBUG_FORCE_ACTION=walk
+make run DEBUG_FORCE_ACTION=move
 ```
 
-Any of `idle`, `sleep`, `walk`, `fight`, `run`. Omitting it hands control back to the pedometer.
+Any of `idle`, `sleep`, `move`, `fight`. Omitting it hands control back to the pedometer. `fight` is
+reachable only this way on the ALLY page — the pedometer never classifies it.
 
 Only `Motion.current` consults it. `Motion.classify` stays pure and untouched, so `MotionTests` goes
-on asserting the real `WALK_SPM` / `RUN_SPM` / `SLEEP_AFTER_MS` thresholds with the override on —
-the suite is not quietly weakened to accommodate the cheat.
-
-It applies wherever a creature is drawn from `Motion.current()`, which today is the ALLY page. The
-battle screen picks its own actions (`ACTION_FIGHT`, `ACTION_RUN`) and ignores this.
-
-The honest alternative, if you want the ally to walk permanently rather than for a look: that is not
-this switch, it is deleting the `Motion` call site. It would cost the idle, run and sleep poses
-entirely, since cadence would no longer select anything.
+on asserting the real `MOVE_ENTER_SPM` / `SLEEP_AFTER_MS` thresholds with the override on — the
+suite is not quietly weakened to accommodate the cheat.
 
 ---
 

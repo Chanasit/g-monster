@@ -220,10 +220,10 @@ class BattleView extends WatchUi.View {
         // On the flash beat the panel is solid ink, and a black sprite on black is invisible. Skip
         // it rather than draw nothing-shaped holes.
         if (!flash) {
-            // It is charging in from off screen, so it runs in — the slide and the lean are the
-            // same motion, which is why the lean has to point the way the slide travels.
+            // It is charging in from off screen. The slide is the whole charge now: movement is one
+            // bidirectional state, so there is no leftward lean left to point the way it travels.
             Sprites.drawAction(dc, enemyX(dc) + slide, height * 0.40,
-                               _engine.enemySpecies().key, Sprites.ACTION_RUN, Sprites.FACE_LEFT);
+                               _engine.enemySpecies().key, Sprites.ACTION_MOVE, Sprites.FACE_LEFT);
         }
 
         dc.drawText(centerX, height * 0.68, Graphics.FONT_SMALL,

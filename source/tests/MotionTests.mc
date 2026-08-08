@@ -5,23 +5,23 @@ import Toybox.Test;
 //! the sampler would have measured, so none of this needs a pedometer or a clock.
 //!
 //! The table is a priority list, so each test names the rule it pins down. Ordering is behaviour
-//! here, not style: entry outranks the run's exit check, and both outrank coasting.
+//! here, not style: sleep outranks silence, entry outranks coasting.
 
 // ---------------------------------------------------------------- rule 1: sleep
 
-//! A long enough gap since the last step is sleep, whatever the windows hold.
+//! A long enough gap since the last step is sleep, whatever the window holds.
 (:test)
 function testSleepsAfterALongStillStretch(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, 0, 0, Motion.SLEEP_AFTER_MS),
+    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, 0, Motion.SLEEP_AFTER_MS),
                      Sprites.ACTION_SLEEP);
     return true;
 }
 
 //! Sleep outranks cadence: steps in the window with an old last-step time is stale measurement,
-//! not someone both asleep and running.
+//! not someone both asleep and moving.
 (:test)
 function testSleepOutranksStaleCadence(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_RUN, 20, 40, Motion.SLEEP_AFTER_MS + 1),
+    Test.assertEqual(Motion.classify(Sprites.ACTION_MOVE, 20, Motion.SLEEP_AFTER_MS + 1),
                      Sprites.ACTION_SLEEP);
     return true;
 }
@@ -29,200 +29,135 @@ function testSleepOutranksStaleCadence(logger as Logger) as Boolean {
 //! One millisecond short of the threshold is still awake.
 (:test)
 function testDoesNotSleepJustBeforeTheThreshold(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, 0, 0, Motion.SLEEP_AFTER_MS - 1),
+    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, 0, Motion.SLEEP_AFTER_MS - 1),
                      Sprites.ACTION_IDLE);
     return true;
 }
 
 // ----------------------------------------------------------------- rule 2: quiet
 
-//! Five seconds without a step ends a walk. This is the slow half of "fast in, slow out".
+//! Five seconds without a step ends a move. This is the slow half of "fast in, slow out".
 (:test)
-function testWalkEndsAfterFiveSecondsOfSilence(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_WALK, 0, 0, Motion.WALK_QUIET_MS),
+function testMoveEndsAfterFiveSecondsOfSilence(logger as Logger) as Boolean {
+    Test.assertEqual(Motion.classify(Sprites.ACTION_MOVE, 0, Motion.MOVE_QUIET_MS),
                      Sprites.ACTION_IDLE);
     return true;
 }
 
 //! A step four seconds ago is a slow walk, not a stop.
 (:test)
-function testWalkSurvivesAGapUnderTheQuietThreshold(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_WALK, 0, 1, Motion.WALK_QUIET_MS - 1),
-                     Sprites.ACTION_WALK);
+function testMoveSurvivesAGapUnderTheQuietThreshold(logger as Logger) as Boolean {
+    Test.assertEqual(Motion.classify(Sprites.ACTION_MOVE, 0, Motion.MOVE_QUIET_MS - 1),
+                     Sprites.ACTION_MOVE);
     return true;
 }
 
-//! Silence ends a run the same way it ends a walk, without waiting for the exit sum to decay.
+// ------------------------------------------------------------ rule 3: move entry
+
+//! Two steps in the short window starts a move. This is the fast half of "fast in, slow out".
 (:test)
-function testRunEndsAtTheSameSilence(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_RUN, 0, 0, Motion.WALK_QUIET_MS),
+function testEntersMoveOnTheEntryEvidence(logger as Logger) as Boolean {
+    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, Motion.MOVE_ENTER_STEPS, 0),
+                     Sprites.ACTION_MOVE);
+    return true;
+}
+
+//! One step is not a move from a standing start.
+(:test)
+function testOneStepDoesNotStartAMove(logger as Logger) as Boolean {
+    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, Motion.MOVE_ENTER_STEPS - 1, 0),
                      Sprites.ACTION_IDLE);
     return true;
 }
 
-// ------------------------------------------------------------- rule 3: run entry
-
-//! Enough steps in the short window and it is a run, from any state.
+//! A running cadence is the same state as a walking one. There is one movement threshold, and
+//! everything above it is the same pose — this is the test that would fail if a run state came
+//! back without art of its own.
 (:test)
-function testEntersRunFromStandingStart(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, Motion.RUN_ENTER_STEPS,
-                                     Motion.RUN_ENTER_STEPS, 0),
-                     Sprites.ACTION_RUN);
+function testARunningCadenceIsTheSameMoveState(logger as Logger) as Boolean {
+    Test.assertEqual(Motion.classify(Sprites.ACTION_MOVE, Motion.MOVE_ENTER_STEPS * 4, 0),
+                     Sprites.ACTION_MOVE);
     return true;
 }
 
-//! One step short of the run threshold is a walk.
-(:test)
-function testJustUnderTheRunThresholdIsAWalk(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_WALK, Motion.RUN_ENTER_STEPS - 1,
-                                     Motion.RUN_ENTER_STEPS - 1, 0),
-                     Sprites.ACTION_WALK);
-    return true;
-}
+// ----------------------------------------------------------------- rule 4: coast
 
-//! Entry outranks the exit check, so the first seconds of a run do not flicker: the five-second
-//! sum is still low then, because two of its seconds were spent standing still.
-(:test)
-function testRunOnsetDoesNotBounceOffTheExitSum(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_RUN, Motion.RUN_ENTER_STEPS,
-                                     Motion.RUN_EXIT_STEPS - 1, 0),
-                     Sprites.ACTION_RUN);
-    return true;
-}
-
-// -------------------------------------------------------------- rule 4: run exit
-
-//! Below the entry cadence but above the exit one, the run continues. That gap is the hysteresis.
-(:test)
-function testRunContinuesAboveTheExitSum(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_RUN, Motion.RUN_ENTER_STEPS - 1,
-                                     Motion.RUN_EXIT_STEPS, 0),
-                     Sprites.ACTION_RUN);
-    return true;
-}
-
-//! One step below the exit sum and the run is over.
-(:test)
-function testRunDropsToWalkUnderTheExitSum(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_RUN, Motion.RUN_ENTER_STEPS - 1,
-                                     Motion.RUN_EXIT_STEPS - 1, 0),
-                     Sprites.ACTION_WALK);
-    return true;
-}
-
-// ------------------------------------------------------------- rule 5: walk entry
-
-//! Two steps in the short window starts a walk. This is the fast half of "fast in, slow out".
-(:test)
-function testEntersWalkOnTheEntryEvidence(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, Motion.WALK_ENTER_STEPS,
-                                     Motion.WALK_ENTER_STEPS, 0),
-                     Sprites.ACTION_WALK);
-    return true;
-}
-
-//! One step is not a walk from a standing start.
-(:test)
-function testOneStepDoesNotStartAWalk(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, Motion.WALK_ENTER_STEPS - 1,
-                                     Motion.WALK_ENTER_STEPS - 1, 0),
-                     Sprites.ACTION_IDLE);
-    return true;
-}
-
-// ----------------------------------------------------------------- rule 6: coast
-
-//! Already walking, one step every few seconds sustains it — below the cadence that would have
+//! Already moving, one step every few seconds sustains it — below the cadence that would have
 //! started it. Without this the state strobes at the threshold.
 (:test)
-function testWalkCoastsBelowTheEntryCadence(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_WALK, 1, 1, 2000), Sprites.ACTION_WALK);
+function testMoveCoastsBelowTheEntryCadence(logger as Logger) as Boolean {
+    Test.assertEqual(Motion.classify(Sprites.ACTION_MOVE, 1, 2000), Sprites.ACTION_MOVE);
     return true;
 }
 
 //! The same evidence from idle stays idle. Coasting sustains a state, it never starts one.
 (:test)
-function testIdleDoesNotCoastIntoAWalk(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, 1, 1, 2000), Sprites.ACTION_IDLE);
+function testIdleDoesNotCoastIntoAMove(logger as Logger) as Boolean {
+    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, 1, 2000), Sprites.ACTION_IDLE);
     return true;
 }
 
-//! Opening the app measures nothing, and nothing is idle — never mid-stride.
+//! No rule fires on zero evidence, and the fallthrough is idle regardless of what state walked in
+//! — it does not carry the previous state through. Start from sleep so a fallthrough of `state`
+//! would answer wrong and this actually pins the fallthrough down.
 (:test)
 function testColdStartIsIdle(logger as Logger) as Boolean {
-    Test.assertEqual(Motion.classify(Sprites.ACTION_IDLE, 0, 0, 0), Sprites.ACTION_IDLE);
+    Test.assertEqual(Motion.classify(Sprites.ACTION_SLEEP, 0, 0), Sprites.ACTION_IDLE);
     return true;
 }
 
 // -------------------------------------------------------------------- scenarios
 
-//! A stroll of one step every two seconds, sampled every second. Once it starts walking it must
-//! stay walking: the gap never reaches the quiet threshold, even though the cadence keeps dipping
+//! A stroll of one step every two seconds, sampled every second. Once it starts moving it must
+//! keep moving: the gap never reaches the quiet threshold, even though the cadence keeps dipping
 //! under the entry one. This is the anti-strobe test.
 (:test)
 function testStrollDoesNotStrobe(logger as Logger) as Boolean {
     var state = Sprites.ACTION_IDLE;
 
-    // Two steps land three seconds apart at first, which is what starts the walk.
-    state = Motion.classify(state, 2, 2, 0);
-    Test.assertEqual(state, Sprites.ACTION_WALK);
+    // Two steps land three seconds apart at first, which is what starts the move.
+    state = Motion.classify(state, 2, 0);
+    Test.assertEqual(state, Sprites.ACTION_MOVE);
 
     // Then it settles into one step every two seconds: the short window holds 1 or 2, and the
     // longest silence is 2s.
     for (var i = 0; i < 20; i += 1) {
         var steps3s = (i % 2 == 0) ? 1 : 2;
-        state = Motion.classify(state, steps3s, 3, (i % 2) * 1000);
-        Test.assertEqual(state, Sprites.ACTION_WALK);
+        state = Motion.classify(state, steps3s, (i % 2) * 1000);
+        Test.assertEqual(state, Sprites.ACTION_MOVE);
     }
     return true;
 }
 
-//! A sprint stopped dead. The five-second sum decays as the sprint leaves the window, so the run
-//! becomes a walk first and only then an idle — the creature decelerates rather than snapping.
+//! A sprint stopped dead. One movement state means there is no intermediate rung to pass through:
+//! it holds the move pose while the coast rule carries it, then goes idle when the silence rule
+//! fires. It does not decelerate through a slower pose, because there is no longer a slower pose.
 (:test)
-function testSprintToDeadStopDecelerates(logger as Logger) as Boolean {
-    var state = Sprites.ACTION_RUN;
+function testSprintToDeadStopGoesStraightToIdle(logger as Logger) as Boolean {
+    var state = Sprites.ACTION_MOVE;
 
-    // 1s of silence: the window still holds most of the sprint.
-    state = Motion.classify(state, 4, Motion.RUN_EXIT_STEPS + 2, 1000);
-    Test.assertEqual(state, Sprites.ACTION_RUN);
+    // 1s of silence, one straggling step: below the entry cadence, so coasting is what holds it.
+    state = Motion.classify(state, 1, 1000);
+    Test.assertEqual(state, Sprites.ACTION_MOVE);
 
-    // 3s of silence: only the tail of the sprint is left in the five-second window.
-    state = Motion.classify(state, 0, Motion.RUN_EXIT_STEPS - 2, 3000);
-    Test.assertEqual(state, Sprites.ACTION_WALK);
+    // 3s of silence, no steps in the short window: still coasting, still under the quiet rule.
+    state = Motion.classify(state, 0, 3000);
+    Test.assertEqual(state, Sprites.ACTION_MOVE);
 
     // 5s: the quiet rule ends it.
-    state = Motion.classify(state, 0, 0, Motion.WALK_QUIET_MS);
+    state = Motion.classify(state, 0, Motion.MOVE_QUIET_MS);
     Test.assertEqual(state, Sprites.ACTION_IDLE);
     return true;
 }
 
-//! Slowing from a run into a walk without ever stopping. The exit is a lower cadence than the
-//! entry, so the state changes once rather than oscillating across a single threshold.
-(:test)
-function testRunSlowingIntoAWalkCrossesOnce(logger as Logger) as Boolean {
-    var state = Sprites.ACTION_RUN;
-
-    state = Motion.classify(state, Motion.RUN_ENTER_STEPS - 1, Motion.RUN_EXIT_STEPS, 500);
-    Test.assertEqual(state, Sprites.ACTION_RUN);
-
-    state = Motion.classify(state, Motion.RUN_ENTER_STEPS - 2, Motion.RUN_EXIT_STEPS - 1, 500);
-    Test.assertEqual(state, Sprites.ACTION_WALK);
-
-    // Still walking at that cadence — it does not climb back into a run.
-    state = Motion.classify(state, Motion.RUN_ENTER_STEPS - 2, Motion.RUN_EXIT_STEPS - 1, 500);
-    Test.assertEqual(state, Sprites.ACTION_WALK);
-    return true;
-}
-
 //! Asleep, then a single step. Waking needs no rule of its own: the step resets the silence, and
-//! one step is not yet a walk, so the creature wakes to idle on the very next sample.
+//! one step is not yet a move, so the creature wakes to idle on the very next sample.
 (:test)
 function testOneStepWakesTheCreature(logger as Logger) as Boolean {
-    var state = Motion.classify(Sprites.ACTION_IDLE, 0, 0, Motion.SLEEP_AFTER_MS);
+    var state = Motion.classify(Sprites.ACTION_IDLE, 0, Motion.SLEEP_AFTER_MS);
     Test.assertEqual(state, Sprites.ACTION_SLEEP);
 
-    state = Motion.classify(state, 1, 1, 0);
+    state = Motion.classify(state, 1, 0);
     Test.assertEqual(state, Sprites.ACTION_IDLE);
     return true;
 }

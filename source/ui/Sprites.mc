@@ -3,7 +3,7 @@ import Toybox.Lang;
 import Toybox.System;
 import Toybox.WatchUi;
 
-//! Creature artwork: five two-frame action states per species, looked up by species key.
+//! Creature artwork: four two-frame action states per species, looked up by species key.
 //!
 //! Not every species has art, and that is expected — `draw` reports whether it managed to, so a
 //! caller can fall back to text rather than leaving a hole in the layout.
@@ -17,26 +17,29 @@ module Sprites {
 
     //! Sleep breathes slower than everything else. Kept a multiple of FRAME_MS so the existing
     //! redraw timer still lands on every frame change — a faster action would mean a faster timer,
-    //! which is battery the animation is not worth. Running reads quick through how far the body
-    //! moves between frames, not through how often they swap.
+    //! which is battery the animation is not worth. That is also why there is no separate running
+    //! cadence: a 250 ms frame sampled by a 500 ms timer lands on the same frame every tick.
     const SLEEP_FRAME_MS = 1500;
 
     //! Action states. These are slot numbers in the generated table, so their values have to keep
     //! matching the variant order in tools/sprites/generate_sprites.py.
+    //!
+    //! One movement state, not two. Walking and running both draw ACTION_MOVE: they animated at
+    //! the same rate from the same base grid, and a forward shear at 72px read as a second waddle
+    //! rather than as a run. Giving the run a real cadence would mean retiming the views' redraw
+    //! timer, which is battery this animation does not justify.
     const ACTION_IDLE = 0;
     const ACTION_SLEEP = 1;
-    const ACTION_WALK = 2;
+    const ACTION_MOVE = 2;
     const ACTION_FIGHT = 3;
-    const ACTION_RUN = 4;
-    const ACTION_COUNT = 5;
+    const ACTION_COUNT = 4;
 
-    //! Which way the creature is pointed. Only the lunge and the lean have a direction in them, so
-    //! only those two carry a mirrored slot; every other action ignores facing entirely.
+    //! Which way the creature is pointed. Only the lunge has a direction in it, so it is the only
+    //! action carrying a mirrored slot; every other action ignores facing entirely.
     const FACE_RIGHT = 0;
     const FACE_LEFT = 1;
 
-    const SLOT_FIGHT_LEFT = 5;
-    const SLOT_RUN_LEFT = 6;
+    const SLOT_FIGHT_LEFT = 4;
 
     //! One-entry cache. Only ever one creature is on screen at a time, and holding every bitmap
     //! resident would be a poor trade against the app's memory budget.
@@ -84,12 +87,8 @@ module Sprites {
     //! idle rather than running off the end of the array.
     function slotFor(action as Number, facing as Number) as Number {
         var slot = (action >= 0 && action < ACTION_COUNT) ? action : ACTION_IDLE;
-        if (facing == FACE_LEFT) {
-            if (slot == ACTION_FIGHT) {
-                slot = SLOT_FIGHT_LEFT;
-            } else if (slot == ACTION_RUN) {
-                slot = SLOT_RUN_LEFT;
-            }
+        if (facing == FACE_LEFT && slot == ACTION_FIGHT) {
+            slot = SLOT_FIGHT_LEFT;
         }
         return slot;
     }

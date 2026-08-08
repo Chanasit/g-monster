@@ -89,14 +89,14 @@ Adding a species is therefore a grid in `sprites.txt` and a rerun — the xml an
 `Sprites.draw` still returns false for an unknown key, so the text fallback survives a species with
 no grid.
 
-One grid per species is authored. Everything else is derived from it: five action states (idle,
-sleep, walk, fight, run), two frames each, plus mirrored lunge and lean frames for a creature facing
-left. Several transforms shift the body down, which is why the last row of every grid must stay
-blank.
+One grid per species is authored. Everything else is derived from it: four action states (idle,
+sleep, move, fight), two frames each, plus a mirrored lunge for a creature facing left. `move` is
+the one movement state — walking and running both play it. Several transforms shift the body down,
+which is why the last row of every grid must stay blank.
 
 Two constraints shape the pipeline and are easy to trip over:
 
-- **`Rez.Drawables` takes at most 254 members.** A bitmap per frame would need 406. Both frames of a
+- **`Rez.Drawables` takes at most 254 members.** A bitmap per frame would need 290. Both frames of a
   state therefore share one file, stacked, and `Sprites.draw` clips to the half it wants. Do not
   split them back out.
 - **The authored grids have no spare margin** — eight of them touch column 0 or 23. Horizontal
@@ -115,7 +115,7 @@ Two constraints shape the pipeline and are easy to trip over:
 
 ## Repo hygiene
 
-- Debug switches come from the environment and are compiled in: `make run DEBUG_FORCE_ACTION=walk`.
+- Debug switches come from the environment and are compiled in: `make run DEBUG_FORCE_ACTION=move`.
   `tools/debug/gen_debug_config.py` writes `source/DebugConfig.mc` (generated, committed all-off,
   never hand-edited); `make release` / `make package` regenerate it with `--off` so nothing leaks
   into a bundle. See `DEBUG.md`.

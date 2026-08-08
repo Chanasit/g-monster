@@ -4,7 +4,7 @@ import Toybox.Lang;
 //!
 //! Do not edit: set the environment variables and rebuild. See DEBUG.md.
 //!
-//!     DEBUG_FORCE_ACTION=walk make run
+//!     DEBUG_FORCE_ACTION=move make run
 //!     make run DEBUG_INSTANT_BATTLE=1 DEBUG_BATTLE_ENEMY=twinflare
 //!
 //! Committed in its all-off form so that building with monkeyc directly, without

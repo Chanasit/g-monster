@@ -54,7 +54,13 @@ module Motion {
     const MOVE_QUIET_MS = 5000;
 
     //! No steps for this long and the creature settles down to sleep.
-    const SLEEP_AFTER_MS = 300000;
+    //!
+    //! A minute, not the five it used to be. Five was picked to match the background sync period,
+    //! but nothing about sleep depends on that period — the pose is decided in the foreground off
+    //! the 1 Hz sample, and a viewer who stands still watching the screen had to wait out five
+    //! minutes to ever see the sleep art. A minute still sits an order of magnitude above
+    //! MOVE_QUIET_MS, so the idle-to-sleep edge cannot flutter.
+    const SLEEP_AFTER_MS = 60000;
 
     const MOVE_ENTER_STEPS = (MOVE_ENTER_SPM * ENTER_MS) / 60000;
 
@@ -68,7 +74,7 @@ module Motion {
 
     //! Forget everything and start measuring again. Called when a view appears, since whatever was
     //! measured before it was hidden says nothing about now — which is also why an opened app
-    //! always shows an idle creature and needs a fresh five minutes of stillness to sleep.
+    //! always shows an idle creature and needs a fresh minute of stillness to sleep.
     function reset() as Void {
         for (var i = 0; i < BUCKETS; i += 1) {
             _buckets[i] = 0;

@@ -34,11 +34,20 @@ TARGET = os.path.join(REPO, "source", "DebugConfig.mc")
 #! They are written as bare integers rather than as Sprites.ACTION_* because
 #! DebugConfig is (:background) and Sprites, which draws, is not -- referencing
 #! it would drag the whole UI layer into background scope.
+#!
+#! The three attacks are here so a hand-drawn attack can be looked at on the main
+#! pager instead of waiting for a battle to roll it. Only the species that draw
+#! them have the art, and the pager's fallback is the creature's name in text --
+#! the stance fallback lives in BattleView, not in Sprites -- so pin an attack
+#! with DEBUG_ALLY set to a species that has one.
 ACTIONS = {
     "idle": 0,
     "sleep": 1,
     "move": 2,
     "fight": 3,
+    "rock": 5,
+    "paper": 7,
+    "scissors": 9,
 }
 
 TRUE = ("1", "true", "yes", "on", "y")

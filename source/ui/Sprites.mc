@@ -28,18 +28,30 @@ module Sprites {
     //! the same rate from the same base grid, and a forward shear at 72px read as a second waddle
     //! rather than as a run. Giving the run a real cadence would mean retiming the views' redraw
     //! timer, which is battery this animation does not justify.
+    //!
+    //! The three attacks are hand-drawn per species and nothing derives them, so most of the
+    //! roster has no bitmap for them at all — `hasAction` reports that and the caller falls back
+    //! to ACTION_FIGHT. They are separate states rather than frames of the fight slot because the
+    //! stance is what a creature holds for the whole encounter, while an attack is only on screen
+    //! while the blow travels.
     const ACTION_IDLE = 0;
     const ACTION_SLEEP = 1;
     const ACTION_MOVE = 2;
     const ACTION_FIGHT = 3;
-    const ACTION_COUNT = 4;
+    const ACTION_ROCK = 5;
+    const ACTION_PAPER = 7;
+    const ACTION_SCISSORS = 9;
+    const SLOT_COUNT = 11;
 
-    //! Which way the creature is pointed. Only the lunge has a direction in it, so it is the only
-    //! action carrying a mirrored slot; every other action ignores facing entirely.
+    //! Which way the creature is pointed. Everything that throws something has a direction in it,
+    //! and everything that does not ignores facing entirely.
     const FACE_RIGHT = 0;
     const FACE_LEFT = 1;
 
-    const SLOT_FIGHT_LEFT = 4;
+    //! The first action with a mirror. Every action from here up is stored as the right-facing
+    //! slot immediately followed by its left-facing one, which is what makes slotFor a +1 rather
+    //! than a table — see the VARIANTS order in tools/sprites/generate_sprites.py.
+    const FIRST_MIRRORED = ACTION_FIGHT;
 
     //! One-entry cache. Only ever one creature is on screen at a time, and holding every bitmap
     //! resident would be a poor trade against the app's memory budget.
@@ -52,9 +64,10 @@ module Sprites {
     //! Built on first lookup rather than at module load: a player who never opens a screen with
     //! artwork on it never pays for the table. What it holds is only resource ids -- numbers, not
     //! bitmaps -- so the whole roster costs far less than the single bitmap cached below.
-    var _index as Dictionary<String, Array<ResourceId> >?;
+    //! A slot is null where the species has no art for it: the attacks are drawn per species.
+    var _index as Dictionary<String, Array<ResourceId?> >?;
 
-    function index() as Dictionary<String, Array<ResourceId> > {
+    function index() as Dictionary<String, Array<ResourceId?> > {
         var built = _index;
         if (built != null) {
             return built;
@@ -85,10 +98,14 @@ module Sprites {
 
     //! Which of a species' bitmaps an action and facing want. Anything out of range falls back to
     //! idle rather than running off the end of the array.
+    //!
+    //! A left-facing draw of a directional action is the slot after it — the generator writes each
+    //! mirror immediately behind its own action, so this stays arithmetic instead of a table that
+    //! would have to be edited in step with the art.
     function slotFor(action as Number, facing as Number) as Number {
-        var slot = (action >= 0 && action < ACTION_COUNT) ? action : ACTION_IDLE;
-        if (facing == FACE_LEFT && slot == ACTION_FIGHT) {
-            slot = SLOT_FIGHT_LEFT;
+        var slot = (action >= 0 && action < SLOT_COUNT) ? action : ACTION_IDLE;
+        if (facing == FACE_LEFT && slot >= FIRST_MIRRORED) {
+            slot += 1;
         }
         return slot;
     }
@@ -104,6 +121,12 @@ module Sprites {
 
     function hasArt(key as String) as Boolean {
         return index().hasKey(key);
+    }
+
+    //! Whether this species has art for one action. False for an attack nobody drew for it, which
+    //! is the common case — the caller draws the fight stance instead.
+    function hasAction(key as String, action as Number, facing as Number) as Boolean {
+        return resourceIdFor(key, action, facing) != null;
     }
 
     //! Load a slot's bitmap, reusing the cached one when it is already what is wanted. Both frames

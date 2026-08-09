@@ -1,8 +1,9 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png"/>
 
-    <!-- Five action states per creature, plus a mirrored lunge and lean for creatures
-         facing left. Each file holds every frame of its state, stacked top to bottom.
+    <!-- Four action states per creature and a mirrored lunge, plus the three attack
+         poses for the species that hand-draw them and their mirrors. Each file holds
+         every frame of its state, stacked top to bottom.
          All generated from tools/sprites/sprites.txt by
          tools/sprites/generate_sprites.py. Edit the ASCII there, not these PNGs, and
          not this list. -->
@@ -156,4 +157,10 @@
     <bitmap id="SlimeMove" filename="slime/slime_move.png"/>
     <bitmap id="SlimeFight" filename="slime/slime_fight.png"/>
     <bitmap id="SlimeFightLeft" filename="slime/slime_fight_left.png"/>
+    <bitmap id="SlimeRock" filename="slime/slime_rock.png"/>
+    <bitmap id="SlimeRockLeft" filename="slime/slime_rock_left.png"/>
+    <bitmap id="SlimePaper" filename="slime/slime_paper.png"/>
+    <bitmap id="SlimePaperLeft" filename="slime/slime_paper_left.png"/>
+    <bitmap id="SlimeScissors" filename="slime/slime_scissors.png"/>
+    <bitmap id="SlimeScissorsLeft" filename="slime/slime_scissors_left.png"/>
 </drawables>

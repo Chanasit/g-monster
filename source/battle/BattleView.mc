@@ -407,6 +407,35 @@ class BattleView extends WatchUi.View {
         return 0;
     }
 
+    //! The sprite state a combatant is in this frame: the attack it is throwing, or the stance.
+    //!
+    //! This is the one place the wheel meets the artwork, so the mapping is spelled out rather
+    //! than arithmetic on the ATTACK_* ordinals — those are storage values, and a silent renumber
+    //! there should not swap a creature's hammer for its maw.
+    //!
+    //! Tied to the LUNGE_MS window the sprite travels over rather than to the whole of
+    //! STATE_RESOLVE: the attack is the blow, so it has to be over by the time the sprite is back
+    //! on its mark and the damage text is being read. A creature that refused its tamer holds the
+    //! stance, which is the honest answer — it never threw anything.
+    private function spriteAction(mine as Number) as Number {
+        var result = _lastResult;
+        if (result == null || _state != STATE_RESOLVE || resolveElapsed() >= LUNGE_MS) {
+            return Sprites.ACTION_FIGHT;
+        }
+
+        var attack = (mine > 0) ? result.playerAttack : result.enemyAttack;
+        if (attack == Combat.ATTACK_CRUSH) {
+            return Sprites.ACTION_ROCK;
+        }
+        if (attack == Combat.ATTACK_ABILITY) {
+            return Sprites.ACTION_PAPER;
+        }
+        if (attack == Combat.ATTACK_ENERGY) {
+            return Sprites.ACTION_SCISSORS;
+        }
+        return Sprites.ACTION_FIGHT;
+    }
+
     //! Horizontal offset for one combatant this frame.
     //!
     //! The attacker ramps toward its target and back over LUNGE_MS — a triangle rather than a
@@ -539,8 +568,13 @@ class BattleView extends WatchUi.View {
         // Facing matches the way lungeOffset throws this side: the player's creature commits to the
         // right, the enemy to the left.
         var facing = (mine > 0) ? Sprites.FACE_RIGHT : Sprites.FACE_LEFT;
-        if (!Sprites.drawAction(dc, x + lungeOffset(dc, mine), spriteY, key,
-                                Sprites.ACTION_FIGHT, facing)) {
+        // Attack art is drawn per species and most of the roster has none, so a creature without
+        // it throws its blow in the stance rather than losing its sprite for the length of a lunge.
+        var action = spriteAction(mine);
+        if (!Sprites.hasAction(key, action, facing)) {
+            action = Sprites.ACTION_FIGHT;
+        }
+        if (!Sprites.drawAction(dc, x + lungeOffset(dc, mine), spriteY, key, action, facing)) {
             // No art for this species: name the slot so the layout keeps its shape.
             Theme.ink(dc);
             dc.drawText(x, spriteY, Graphics.FONT_TINY, "?",

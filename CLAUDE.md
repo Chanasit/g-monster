@@ -94,6 +94,10 @@ sleep, move, fight), two frames each, plus a mirrored lunge for a creature facin
 the one movement state — walking and running both play it. Several transforms shift the body down,
 which is why the last row of every grid must stay blank.
 
+The three attacks on the combat wheel — `rock`, `paper`, `scissors`, plus their mirrors — are the
+exception: nothing derives them, so a species has them only where `sprites.txt` hand-draws the
+frames, and everything else throws its blow in the fight stance. `slime` is the only one so far.
+
 Two constraints shape the pipeline and are easy to trip over:
 
 - **`Rez.Drawables` takes at most 254 members.** A bitmap per frame would need 290. Both frames of a

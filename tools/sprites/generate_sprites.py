@@ -5,8 +5,12 @@ The watch app wants four action states per species -- idle, sleep, move, fight
 -- two frames each. Only one grid per species is authored; every action's
 frames are derived from it by grid transforms, the same way the idle breath was
 always derived by dropping the whole silhouette one row. Deriving means the
-artist maintains 29 grids instead of 116, a new species costs one grid rather
-than four, and no species' poses can drift apart from each other.
+artist maintains one grid per species instead of four, a new species costs one
+grid, and no species' poses can drift apart from each other.
+
+The three attack states -- rock, paper, scissors -- are the exception: nothing
+derives them, so a species has them only where sprites.txt draws them, and the
+rest of the roster fights with its stance.
 
 What a derived pose can be is limited, and the transforms are honest about it:
 these are motion cues built out of one silhouette -- bob, waddle, lunge.
@@ -67,9 +71,10 @@ CLEAR = b"\x00\x00\x00\x00"
 
 BLANK = "." * GRID
 
-#! Action order is load-bearing: Sprites.mc indexes each species' flat id array
-#! as slot * 2 + frame, so a variant's position here is its slot number, and the
-#! first four have to stay in the order of ACTION_*.
+#! Action order is load-bearing: a variant's position here is its slot number in
+#! the species' id array, so the order has to stay in step with ACTION_* in
+#! Sprites.mc, and every directional action has to sit immediately before its
+#! own mirror -- Sprites.slotFor turns a left-facing draw into slot + 1.
 #!
 #! Lunging is the only transform with a direction in it, so it is the only one
 #! with a mirrored variant. In battle the player's creature commits to the right
@@ -78,13 +83,25 @@ BLANK = "." * GRID
 #! direction -- move swings both ways across its two frames -- so mirroring them
 #! would cost resources to say nothing.
 #!
-#! (label, action, mirrored)
+#! The last six are authored-only: there is no transform that turns a
+#! silhouette into a hammer, so a species gets those bitmaps if and only if
+#! sprites.txt hand-draws them, and Sprites falls back to the fight stance for
+#! everything else. That is also the only way they fit -- three mirrored attacks
+#! across the whole roster would be 180 more drawables against a cap of 254.
+#!
+#! (label, action, mirrored, authored_only)
 VARIANTS = (
-    ("idle", "idle", False),
-    ("sleep", "sleep", False),
-    ("move", "move", False),
-    ("fight", "fight", False),
-    ("fight_left", "fight", True),
+    ("idle", "idle", False, False),
+    ("sleep", "sleep", False, False),
+    ("move", "move", False, False),
+    ("fight", "fight", False, False),
+    ("fight_left", "fight", True, False),
+    ("rock", "rock", False, True),
+    ("rock_left", "rock", True, True),
+    ("paper", "paper", False, True),
+    ("paper_left", "paper", True, True),
+    ("scissors", "scissors", False, True),
+    ("scissors_left", "scissors", True, True),
 )
 
 #! The rows that read as legs. Row 23 is excluded because it must stay blank.
@@ -168,7 +185,7 @@ def parse(path):
                     if len(parts) != 3:
                         raise ValueError("expected key.action.frame, got %r" % header)
                     key, action, index = parts[0], parts[1], parts[2]
-                    if action not in set(a for _l, a, _m in VARIANTS):
+                    if action not in set(a for _l, a, _m, _o in VARIANTS):
                         raise ValueError("%s: unknown action %r" % (header, action))
                     try:
                         frame = int(index)
@@ -360,7 +377,7 @@ def rez_id(key, label):
 LEGACY_PNG = re.compile(r"^[a-z]+(_[a-z]+)*_[01]\.png$")
 
 
-def superseded(names, keys, outdir):
+def superseded(names, keys, outdir, emitted):
     """Every PNG under drawables/ that this run would not have written.
 
     Two scopes, because the layout has moved once. The top level holds only
@@ -376,9 +393,7 @@ def superseded(names, keys, outdir):
     dead = [n for n in names
             if n.endswith(".png") and (LEGACY_PNG.match(n) or n.startswith(flat))]
 
-    live = frozenset(png_name(key, label)
-                     for key in keys
-                     for label, _action, _mirrored in VARIANTS)
+    live = frozenset(png_name(key, label) for key, label in emitted)
     for key in keys:
         species = os.path.join(outdir, key)
         if not os.path.isdir(species):
@@ -511,41 +526,48 @@ def normalise(raw):
 # --- generated companions --------------------------------------------------
 
 
-def drawables_xml(keys):
+def drawables_xml(keys, emitted):
     lines = ["<drawables>",
              '    <bitmap id="LauncherIcon" filename="launcher_icon.png"/>',
              "",
-             "    <!-- Five action states per creature, plus a mirrored lunge and lean for creatures",
-             "         facing left. Each file holds every frame of its state, stacked top to bottom.",
+             "    <!-- Four action states per creature and a mirrored lunge, plus the three attack",
+             "         poses for the species that hand-draw them and their mirrors. Each file holds",
+             "         every frame of its state, stacked top to bottom.",
              "         All generated from tools/sprites/sprites.txt by",
              "         tools/sprites/generate_sprites.py. Edit the ASCII there, not these PNGs, and",
              "         not this list. -->"]
     for key in keys:
-        for label, _action, _mirrored in VARIANTS:
+        for label, _action, _mirrored, _authored in VARIANTS:
+            if (key, label) not in emitted:
+                continue
             lines.append('    <bitmap id="%s" filename="%s"/>'
                          % (rez_id(key, label), png_name(key, label)))
     lines.append("</drawables>")
     return "\n".join(lines) + "\n"
 
 
-def index_mc(keys, counts):
+def index_mc(keys, counts, emitted):
     lines = ["import Toybox.Lang;",
              "import Toybox.WatchUi;",
              "",
              "//! Species key -> drawable ids, generated by tools/sprites/generate_sprites.py.",
              "//!",
-             "//! Do not edit: rerun the generator. Each species maps to one array of slots, where",
-             "//! the first four are the ACTION_* values in order and the last is the left-facing",
-             "//! lunge. A slot's bitmap holds all of its frames stacked, so Sprites clips to the",
-             "//! slice it wants. Flat rather than nested because this table is",
-             "//! built lazily on a watch and an array of ids is the cheapest shape that works.",
+             "//! Do not edit: rerun the generator. Each species maps to one array of slots in",
+             "//! ACTION_* order, each directional action followed by its left-facing mirror. A slot",
+             "//! is null when the species has no art for it, which is how the hand-drawn attack",
+             "//! poses stay off the drawable budget of the species that do not have them --",
+             "//! Sprites falls back to the fight stance there. A slot's bitmap holds all of its",
+             "//! frames stacked, so Sprites clips to the slice it wants. Flat rather than nested",
+             "//! because this table is built lazily on a watch and an array of ids is the cheapest",
+             "//! shape that works.",
              "module SpriteIndex {",
              "",
-             "    function build() as Dictionary<String, Array<ResourceId> > {",
+             "    function build() as Dictionary<String, Array<ResourceId?> > {",
              "        return {"]
     for n, key in enumerate(keys):
-        ids = ["Rez.Drawables." + rez_id(key, label)
-               for label, _action, _mirrored in VARIANTS]
+        ids = [("Rez.Drawables." + rez_id(key, label))
+               if (key, label) in emitted else "null"
+               for label, _action, _mirrored, _authored in VARIANTS]
         lines.append('            "%s" => [' % key)
         for start in range(0, len(ids), 4):
             row = ", ".join(ids[start:start + 4])
@@ -553,7 +575,7 @@ def index_mc(keys, counts):
         lines.append("            ]" + ("," if n < len(keys) - 1 else ""))
     lines += ["        };", "    }", ""]
 
-    slot_of = dict((label, n) for n, (label, _a, _m) in enumerate(VARIANTS))
+    slot_of = dict((label, n) for n, (label, _a, _m, _o) in enumerate(VARIANTS))
     lines += [
         "    //! Frames in one species' variant, when it is not the usual two.",
         "    //!",
@@ -595,6 +617,8 @@ def main(argv):
 
     # slot -> frame count, for the variants that are not the usual two.
     counts = {}
+    # (key, label) actually written: the authored-only variants exist per species.
+    emitted = set()
 
     written = 0
     unchanged = 0
@@ -603,10 +627,15 @@ def main(argv):
 
     for key, rows in sprites.items():
         clamps = []
-        for label, action, mirrored in VARIANTS:
+        for label, action, mirrored, authored_only in VARIANTS:
             # A mirrored variant is the same transform seen from the other side, so it clamps
             # identically -- reporting it again would just double every note.
             override = overrides.get((key, action))
+            # An attack has no derivation. A species without the art simply has no bitmap for
+            # it, and Sprites draws its fight stance instead.
+            if authored_only and override is None:
+                continue
+            emitted.add((key, label))
             frames = frames_for(rows, action, [] if mirrored else clamps, override)
             if mirrored:
                 frames = [mirror(grid) for grid in frames]
@@ -636,10 +665,10 @@ def main(argv):
             clamped.append("%s %s: no room for the %s, using a bob instead"
                            % (key, action, what))
 
-    sync_text(DRAWABLES_XML, drawables_xml(keys), check_only, stale)
-    sync_text(INDEX_MC, index_mc(keys, counts), check_only, stale)
+    sync_text(DRAWABLES_XML, drawables_xml(keys, emitted), check_only, stale)
+    sync_text(INDEX_MC, index_mc(keys, counts, emitted), check_only, stale)
 
-    legacy = superseded(os.listdir(OUTDIR), sprites.keys(), OUTDIR)
+    legacy = superseded(os.listdir(OUTDIR), sprites.keys(), OUTDIR, emitted)
     for name in legacy:
         stale.append(os.path.relpath(os.path.join(OUTDIR, name), REPO) + " (superseded)")
         if not check_only:
@@ -655,8 +684,8 @@ def main(argv):
         print("%d sprites up to date" % unchanged)
         return 0
 
-    print("%d species x %d variants (2 frames each): %d written, %d already correct, %d removed"
-          % (len(sprites), len(VARIANTS), written, unchanged, len(legacy)))
+    print("%d species, %d bitmaps: %d written, %d already correct, %d removed"
+          % (len(sprites), len(emitted), written, unchanged, len(legacy)))
     return 0
 
 

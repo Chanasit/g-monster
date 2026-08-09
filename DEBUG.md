@@ -23,7 +23,7 @@ debug: force-action=move
 | `DEBUG_BATTLE_ENEMY` | a species key | `glacierjaw` | Which creature to fight there. Unknown key falls back to a roll. |
 | `DEBUG_BATTLE_IS_BOSS` | `1`/`true`/`yes`/`on` | off | Show that battle as an area guardian. |
 | `DEBUG_EVENT_GAP` | steps, e.g. `50` | `0` | Steps between trek events. `0` keeps the real 300/400/500 pacing. |
-| `DEBUG_FORCE_ACTION` | `idle`\|`sleep`\|`move`\|`fight` | off | Pin every creature to one pose instead of letting the pedometer choose. |
+| `DEBUG_FORCE_ACTION` | `idle`\|`sleep`\|`move`\|`fight`\|`rock`\|`paper`\|`scissors` | off | Pin every creature to one pose instead of letting the pedometer choose. |
 | `DEBUG_ALLY` | a species key | off | Lead the party with that species. Unknown key is ignored. Reads only — the save is untouched. |
 
 Anything unparseable fails the build rather than compiling something unintended:
@@ -143,8 +143,19 @@ Pin it to one pose instead:
 make run DEBUG_FORCE_ACTION=move
 ```
 
-Any of `idle`, `sleep`, `move`, `fight`. Omitting it hands control back to the pedometer. `fight` is
-reachable only this way on the ALLY page — the pedometer never classifies it.
+Any of `idle`, `sleep`, `move`, `fight`, `rock`, `paper`, `scissors`. Omitting it hands control back
+to the pedometer. Everything past `move` is reachable only this way on the ALLY page — the pedometer
+never classifies any of them.
+
+The three attacks are hand-drawn per species and most of the roster has none, so pinning one shows
+the ally's name in text for every creature that does not have it. Pair it with `DEBUG_ALLY`:
+
+```bash
+make run DEBUG_ALLY=slime DEBUG_FORCE_ACTION=rock    # the hammer, without rolling for it in a battle
+```
+
+In a real battle the fallback is the fight stance rather than text — `BattleView` asks
+`Sprites.hasAction` first, so a creature without attack art still throws its blow.
 
 Only `Motion.current` consults it. `Motion.classify` stays pure and untouched, so `MotionTests` goes
 on asserting the real `MOVE_ENTER_SPM` / `SLEEP_AFTER_MS` thresholds with the override on — the

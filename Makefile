@@ -22,6 +22,15 @@ TEST_PRG  := GMonsterTest.prg
 IQ        := GMonster.iq
 JUNGLE    := monkey.jungle
 
+# The simulator keeps its whole fake watch filesystem in a per-user temp sandbox, and persists
+# Application.Storage there as APPS/DATA/<APPNAME>.{DAT,IDX,IMT}. Deleting those files is the only
+# way to reset game state — nothing in the app clears it, and the simulator has no menu for it.
+# TMPDIR already ends in a slash on macOS but not everywhere, so normalise it to exactly one.
+SIM_SANDBOX ?= $(shell printf '%s' "$${TMPDIR:-/tmp/}" | sed 's:/*$$:/:')com.garmin.connectiq
+SIM_DATA    := $(SIM_SANDBOX)/GARMIN/APPS/DATA
+# The simulator upper-cases the .prg basename for the storage filenames.
+APP_ID      := $(shell printf '%s' "$(basename $(PRG))" | tr 'a-z' 'A-Z')
+
 # Products the manifest claims, narrowed to those with a simulator device installed — the
 # compiler cannot target a device whose files are absent.
 PRODUCTS   := $(shell sed -n 's/.*<iq:product id="\([^"]*\)".*/\1/p' manifest.xml)
@@ -50,7 +59,7 @@ export DEBUG_ALLY
 DEBUGGEN := python3 tools/debug/gen_debug_config.py
 
 .DEFAULT_GOAL := help
-.PHONY: help build release test run sim package install check clean devices doctor debug-config debug-off debug-status
+.PHONY: help build release test run sim package install check clean devices doctor debug-config debug-off debug-status wipe-state wipe-sim
 
 help:
 	@echo "g-monster — Connect IQ"
@@ -64,6 +73,8 @@ help:
 	@echo "  make package    build the .iq store bundle for all products"
 	@echo "  make install    copy onto a Garmin watch mounted as a USB volume"
 	@echo "  make clean      remove build output"
+	@echo "  make wipe-state erase saved game state in the simulator"
+	@echo "  make wipe-sim   erase the whole simulator sandbox (needs CONFIRM=yes)"
 	@echo "  make doctor     show the resolved toolchain"
 	@echo
 	@echo "  DEVICE=$(DEVICE)   (override: make test DEVICE=fr55)"
@@ -166,6 +177,55 @@ debug-off:
 debug-status:
 	@$(DEBUGGEN) --check --quiet >/dev/null 2>&1 || echo "(source/DebugConfig.mc does not match the current environment)"
 	@sed -n 's/^    const \([A-Z_]*\) = \(.*\);$$/  \1 = \2/p' source/DebugConfig.mc
+
+# Start the next run from a fresh journey and an empty party. Scoped to this app's storage, so
+# other side-loaded apps and the simulator's own settings survive.
+#
+# The simulator holds storage in memory and flushes it on exit, so deleting underneath a running
+# simulator achieves nothing — it would just write the old state back out. Refuse instead of
+# pretending to have worked.
+wipe-state:
+	@if pgrep -f "ConnectIQ.app" >/dev/null 2>&1; then \
+	  echo "Simulator is running — it rewrites storage on exit. Quit it first, then rerun."; \
+	  exit 1; \
+	fi
+	@found=$$(ls "$(SIM_DATA)/$(APP_ID)."* "$(SIM_DATA)/$(APP_ID)TEST."* 2>/dev/null); \
+	if [ -z "$$found" ]; then \
+	  echo "==> no saved state (nothing at $(SIM_DATA)/$(APP_ID).*)"; \
+	else \
+	  echo "$$found" | sed 's/^/  rm /'; \
+	  rm -f "$(SIM_DATA)/$(APP_ID)."* "$(SIM_DATA)/$(APP_ID)TEST."*; \
+	  echo "==> game state wiped"; \
+	fi
+
+# The bigger hammer: every app's storage, the simulator's settings, its logs and its fake GARMIN
+# filesystem. Recreated empty on the next launch. Destructive and not scoped to this app, so it
+# takes an explicit CONFIRM=yes rather than running off a bare target name.
+#
+# One shell block on purpose: each line of a recipe is its own shell, so an early `exit` on the
+# nothing-to-do path would end that line and let the destructive line run anyway.
+wipe-sim:
+	@case "$(SIM_SANDBOX)" in \
+	  */com.garmin.connectiq) ;; \
+	  *) echo "Refusing: $(SIM_SANDBOX) is not a simulator sandbox path"; exit 1;; \
+	esac; \
+	if [ ! -d "$(SIM_SANDBOX)" ]; then \
+	  echo "==> nothing to wipe ($(SIM_SANDBOX) absent)"; \
+	  exit 0; \
+	fi; \
+	if pgrep -f "ConnectIQ.app" >/dev/null 2>&1; then \
+	  echo "Simulator is running — quit it first, then rerun."; \
+	  exit 1; \
+	fi; \
+	if [ "$(CONFIRM)" != "yes" ]; then \
+	  echo "This deletes the entire simulator sandbox:"; \
+	  echo "  $(SIM_SANDBOX)  ($$(du -sh "$(SIM_SANDBOX)" 2>/dev/null | cut -f1))"; \
+	  echo "That is every app's saved data, simulator settings, logs and FIT files. Not undoable."; \
+	  echo "Rerun as:  make wipe-sim CONFIRM=yes"; \
+	  exit 1; \
+	fi; \
+	rm -rf "$(SIM_SANDBOX)"; \
+	echo "==> simulator sandbox wiped — next launch recreates it empty"
 
 clean:
 	@rm -f $(PRG) $(TEST_PRG) $(IQ) *.prg.debug.xml /tmp/check-*.prg /tmp/check-*.log

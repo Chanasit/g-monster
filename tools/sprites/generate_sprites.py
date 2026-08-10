@@ -16,11 +16,18 @@ What a derived pose can be is limited, and the transforms are honest about it:
 these are motion cues built out of one silhouette -- bob, waddle, lunge.
 A sleeping creature here is a squashed creature, not a curled-up one.
 
-Output is 24x24 scaled 3x with nearest-neighbour to 72x72, in exactly two
-colours -- opaque black for ink, fully transparent for everything else. Two
-colours is not an aesthetic choice, it is the app's: Theme keeps the whole UI
-two-tone, so a sprite with anti-aliased edges would be the only soft thing on
-the screen.
+Output is always 72x72 in exactly two colours -- opaque black for ink, fully
+transparent for everything else. Two colours is not an aesthetic choice, it is
+the app's: Theme keeps the whole UI two-tone, so a sprite with anti-aliased
+edges would be the only soft thing on the screen.
+
+A grid may be authored at 24x24, upscaled 3x with nearest-neighbour, or at 72x72
+drawn cell-for-pixel. Both land on the same 72x72 bitmap, so the two sizes cost
+the same and Sprites.mc cannot tell them apart. 24 is the cheap size -- one grid
+per species, edited in a screenful -- and 72 is what a species is promoted to
+when its silhouette needs curves, a highlight or a mouth, none of which survive a
+3x upscale of a 1-cell feature. The size is per block, so a species can move one
+state at a time.
 
 Besides the PNGs this writes the two files that would otherwise have to be kept
 in sync by hand, which is where adding a species used to go wrong: the <bitmap>
@@ -41,9 +48,21 @@ import struct
 import sys
 import zlib
 
-SCALE = 3
-GRID = 24
-SIZE = GRID * SCALE
+#! Rendered size of every bitmap. Fixed, because Sprites.SIZE is fixed: the
+#! watch draws a 72px sprite whatever the ASCII behind it was authored at.
+SIZE = 72
+
+#! The grid sizes a block may be authored at, coarsest first. Both divide SIZE,
+#! so a cell is a whole number of pixels either way -- 3x3 at 24, 1x1 at 72 --
+#! and neither ever needs a resampling filter that could emit a grey pixel.
+#!
+#! 24 stays the default size and the whole roster is drawn at it. A 24 grid is
+#! one screenful, which is why a species costs one grid rather than four, but its
+#! smallest feature is 3px and anything drawn 1 cell wide is a speck. A species
+#! is promoted to 72 when it needs what that forbids: a curve instead of a
+#! staircase, a gloss highlight, a mouth.
+GRIDS = (24, 72)
+GRID = GRIDS[0]
 
 #! Every frame of a variant lives in one bitmap, stacked top to bottom.
 #!
@@ -69,7 +88,21 @@ INDEX_MC = os.path.join(REPO, "source", "ui", "SpriteIndex.mc")
 INK = b"\x00\x00\x00\xff"
 CLEAR = b"\x00\x00\x00\x00"
 
-BLANK = "." * GRID
+
+def blank(n):
+    return "." * n
+
+
+#! One 24-grid cell, measured in cells of the grid actually in hand.
+#!
+#! Every magnitude below -- the idle's one row, the move's two columns, where the
+#! legs start, where a sleeper rests -- was tuned against a 24 grid and is a
+#! fraction of the creature, not a count of cells. Multiplying by this keeps a
+#! promoted species moving exactly as far as it did before, so 72 buys detail
+#! and changes no timing or travel.
+def unit(n):
+    return n // GRID
+
 
 #! Action order is load-bearing: a variant's position here is its slot number in
 #! the species' id array, so the order has to stay in step with ACTION_* in
@@ -104,9 +137,15 @@ VARIANTS = (
     ("scissors_left", "scissors", True, True),
 )
 
-#! The rows that read as legs. Row 23 is excluded because it must stay blank.
-LEGS = frozenset(range(GRID - 7, GRID - 1))
-ALL_ROWS = frozenset(range(GRID))
+#! The rows that read as legs -- the bottom six of a 24 grid, scaled. The blank
+#! rows at the foot of the grid are excluded because they must stay blank.
+def legs(n):
+    u = unit(n)
+    return frozenset(range(n - 7 * u, n - u))
+
+
+def all_rows(n):
+    return frozenset(range(n))
 
 #! How much of a silhouette's ink a transform may push off the canvas edge.
 #!
@@ -119,9 +158,12 @@ CLIP_TOLERANCE = 0.02
 
 #! Sleep compresses the silhouette to this fraction of its height...
 SLEEP_SQUASH = 0.60
-#! ...and rests it here, high enough that the frame B drop still has somewhere
-#! to go.
-SLEEP_FLOOR = GRID - 3
+
+
+#! ...and rests it on this row -- the last row of a 24 grid's row 21, which is
+#! high enough that the frame B drop still has somewhere to go.
+def sleep_floor(n):
+    return n - 2 * unit(n) - 1
 
 
 def parse(path):
@@ -142,19 +184,27 @@ def parse(path):
     def flush():
         if key is None:
             return
-        if len(rows) != GRID:
-            raise ValueError("%s: expected %d rows, got %d" % (key, GRID, len(rows)))
+        # The grid's size is whatever its first row was; every other row has to
+        # agree, which is what catches a block half-converted between sizes.
+        n = len(rows[0]) if rows else 0
+        if n not in GRIDS:
+            raise ValueError("%s: rows must be %s wide, got %d"
+                             % (key, " or ".join(str(g) for g in GRIDS), n))
+        if len(rows) != n:
+            raise ValueError("%s: expected %d rows, got %d" % (key, n, len(rows)))
         for i, r in enumerate(rows):
-            if len(r) != GRID:
+            if len(r) != n:
                 raise ValueError("%s row %d: expected %d cols, got %d"
-                                 % (key, i, GRID, len(r)))
+                                 % (key, i, n, len(r)))
             bad = set(r) - set("#.")
             if bad:
                 raise ValueError("%s row %d: bad characters %s" % (key, i, sorted(bad)))
         # Several actions shift the body down a row, so anything on the last row
-        # would fall off the bottom of the bitmap.
-        if "#" in rows[GRID - 1]:
-            raise ValueError("%s: last row must be blank (frames shift down 1)" % key)
+        # would fall off the bottom of the bitmap. A row here is one 24-grid row,
+        # so a 72 grid owes three blank rows rather than one.
+        if "#" in "".join(rows[n - unit(n):]):
+            raise ValueError("%s: last %d row(s) must be blank (frames shift down)"
+                             % (key, unit(n)))
         if not any("#" in r for r in rows):
             raise ValueError("%s: sprite is empty" % key)
         if action is None:
@@ -165,7 +215,7 @@ def parse(path):
     def is_art(line):
         # Tested before the comment rule on purpose: '#' is also the ink
         # character, so a row that starts on ink looks exactly like a comment.
-        return len(line) == GRID and not (set(line) - set("#."))
+        return len(line) in GRIDS and not (set(line) - set("#."))
 
     with open(SOURCE if path is None else path) as f:
         for line in f:
@@ -210,6 +260,13 @@ def parse(path):
             raise ValueError("%s.%s: frames must be numbered 0..n, got %s" % (k, a, seen))
         if len(seen) < 2:
             raise ValueError("%s.%s: needs at least two frames" % (k, a))
+        # One action is one bitmap with its frames stacked, so its frames have to
+        # be one size. Across actions they need not be: a species is promoted a
+        # state at a time, and the bitmaps are separate resources.
+        sizes = set(len(g) for _n, g in frames)
+        if len(sizes) != 1:
+            raise ValueError("%s.%s: frames must all be one size, got %s"
+                             % (k, a, sorted(sizes)))
         packed[(k, a)] = [g for _n, g in sorted(frames)]
 
     return sprites, packed
@@ -217,29 +274,31 @@ def parse(path):
 
 # --- grid transforms -------------------------------------------------------
 #
-# Every one of these takes and returns a 24-row grid, and any ink pushed past an
-# edge is dropped rather than wrapped. Callers keep that loss inside
-# CLIP_TOLERANCE by way of clamp().
+# Every one of these takes and returns a square grid of whatever size it was
+# handed, and any ink pushed past an edge is dropped rather than wrapped. Callers
+# keep that loss inside CLIP_TOLERANCE by way of clamp(). Magnitudes are in
+# cells, so a caller working in creature-fractions scales them by unit() first.
 
 
 def down(rows, n=1):
     """The whole silhouette drops n rows."""
-    return [BLANK] * n + rows[:GRID - n]
+    return [blank(len(rows))] * n + rows[:len(rows) - n]
 
 
 def up(rows, n=1):
     """The whole silhouette lifts n rows."""
-    return rows[n:] + [BLANK] * n
+    return rows[n:] + [blank(len(rows))] * n
 
 
 def hshift(rows, which, dx):
     """Slide the given row indices sideways; positive dx moves right."""
     if dx == 0:
         return list(rows)
+    width = len(rows)
     out = []
     for i, row in enumerate(rows):
         if i in which:
-            row = ("." * dx + row[:GRID - dx]) if dx > 0 else (row[-dx:] + "." * -dx)
+            row = ("." * dx + row[:width - dx]) if dx > 0 else (row[-dx:] + "." * -dx)
         out.append(row)
     return out
 
@@ -250,19 +309,20 @@ def squash(rows, factor, floor):
     Source rows are OR-ed into their destination rather than sampled, so a limb
     that lands between two output rows thickens instead of disappearing.
     """
+    n = len(rows)
     filled = [i for i, r in enumerate(rows) if "#" in r]
     top, bottom = filled[0], filled[-1]
     span = bottom - top + 1
     height = max(1, int(round(span * factor)))
 
-    packed = [["."] * GRID for _ in range(height)]
+    packed = [["."] * n for _ in range(height)]
     for i in range(top, bottom + 1):
         dest = min(height - 1, (i - top) * height // span)
         for x, ch in enumerate(rows[i]):
             if ch == "#":
                 packed[dest][x] = "#"
 
-    out = [BLANK] * GRID
+    out = [blank(n)] * n
     start = max(0, floor - height + 1)
     for i, row in enumerate(packed[:floor - start + 1]):
         out[start + i] = "".join(row)
@@ -296,10 +356,11 @@ def bob(rows):
 
     A lift if the head allows it, otherwise a squash -- which always fits.
     """
-    lifted = up(rows)
+    n = len(rows)
+    lifted = up(rows, unit(n))
     if ink(rows) - ink(lifted) <= ink(rows) * CLIP_TOLERANCE:
         return lifted
-    return squash(rows, 0.92, GRID - 2)
+    return squash(rows, 0.92, n - unit(n) - 1)
 
 
 def frames_for(rows, action, clamps, override=None):
@@ -312,12 +373,15 @@ def frames_for(rows, action, clamps, override=None):
     if override is not None:
         return [list(g) for g in override]
 
+    n = len(rows)
+    u = unit(n)
+
     if action == "idle":
-        return [list(rows), down(rows)]
+        return [list(rows), down(rows, u)]
 
     if action == "sleep":
-        slumped = squash(rows, SLEEP_SQUASH, SLEEP_FLOOR)
-        return [slumped, down(slumped)]
+        slumped = squash(rows, SLEEP_SQUASH, sleep_floor(n))
+        return [slumped, down(slumped, u)]
 
     if action == "move":
         # Body and legs counter-swing: the torso goes one way, the feet the other.
@@ -328,10 +392,10 @@ def frames_for(rows, action, clamps, override=None):
         # not as walking. At 2x they end up displaced opposite the body, so the two frames differ
         # by a full stride at the feet as well as at the shoulders.
         def build(d):
-            return [hshift(hshift(rows, ALL_ROWS, -d), LEGS, 2 * d),
-                    hshift(hshift(rows, ALL_ROWS, d), LEGS, -2 * d)]
+            return [hshift(hshift(rows, all_rows(n), -d), legs(n), 2 * d),
+                    hshift(hshift(rows, all_rows(n), d), legs(n), -2 * d)]
 
-        d = clamp(rows, build, 2)
+        d = clamp(rows, build, 2 * u)
         if d == 0:
             clamps.append((action, "sideways swing"))
             return [list(rows), bob(rows)]
@@ -341,9 +405,9 @@ def frames_for(rows, action, clamps, override=None):
         # Frame B throws the whole body forward and up: a lunge, snapping back
         # to the neutral frame A.
         def build(f):
-            return [list(rows), up(hshift(rows, ALL_ROWS, f))]
+            return [list(rows), up(hshift(rows, all_rows(n), f), u)]
 
-        f = clamp(rows, build, 2)
+        f = clamp(rows, build, 2 * u)
         if f == 0:
             clamps.append((action, "lunge reach"))
             return [list(rows), bob(rows)]
@@ -409,14 +473,20 @@ def superseded(names, keys, outdir, emitted):
 # --- PNG encode / decode ---------------------------------------------------
 
 
-def pixels(rows):
-    """Flat RGBA bytes for the 3x upscale of a grid of 24-char rows."""
+def pixels(rows, grid):
+    """Flat RGBA bytes for a grid of `grid`-char rows, upscaled to fill SIZE.
+
+    Nearest-neighbour, and the scale is always a whole number -- 3 for a 24 grid,
+    1 for a 72 one -- so ink stays ink and clear stays clear. Anything that
+    resampled would have to invent a third colour, and Theme has no room for one.
+    """
+    scale = SIZE // grid
     out = bytearray()
     for row in rows:
         line = bytearray()
         for ch in row:
-            line += (INK if ch == "#" else CLEAR) * SCALE
-        out += line * SCALE
+            line += (INK if ch == "#" else CLEAR) * scale
+        out += line * scale
     return bytes(out)
 
 
@@ -647,7 +717,7 @@ def main(argv):
             stacked = []
             for grid in frames:
                 stacked += grid
-            want = pixels(stacked)
+            want = pixels(stacked, len(frames[0]))
             have = read_pixels(path, SIZE * len(frames))
 
             if have is not None and normalise(have) == normalise(want):

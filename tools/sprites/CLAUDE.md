@@ -26,21 +26,41 @@ index is Monkey C and a bad species key becomes a compile error, not a runtime o
 
 ## The grid contract
 
-One 24x24 block per species, keyed by the species key in `resources/data/creatures.json`.
-`#` is ink (opaque black), `.` is clear (fully transparent). The parser rejects, loudly:
+One square block per species, keyed by the species key in `resources/data/creatures.json`, drawn
+at **24x24 or 72x72**. `#` is ink (opaque black), `.` is clear (fully transparent). The parser
+rejects, loudly:
 
-- a block that is not exactly 24 rows of exactly 24 columns
+- a block whose rows are not all the same width, or whose width is neither 24 nor 72
+- a block that is not exactly as many rows as it is columns
 - any character other than `#` and `.`
-- ink on row 23 — several transforms shift the body down one row and it would fall off the bitmap
+- ink in the reserved rows at the foot — the last row of a 24 grid, the last three of a 72 one.
+  Several transforms shift the body down and it would fall off the bitmap
 - an all-clear grid, or a duplicate species key
+- frames of one override at mixed sizes: they share a bitmap, so they share a size. Different
+  *actions* may differ, which is what lets a species be promoted one state at a time
 
-A line is art when it is 24 chars of only `#` and `.`; that test runs **before** the comment
+A line is art when it is 24 or 72 chars of only `#` and `.`; that test runs **before** the comment
 test, because `#` is also the ink character and a row starting on ink is indistinguishable from a
-comment. So a comment line must not be 24 characters of ink and dots.
+comment. So a comment line must not be 24 or 72 characters of ink and dots.
 
-Output is 3x nearest-neighbour to 72x72 in exactly two colours. That is not taste, it is
-`Theme`: the whole UI is two-tone, and an anti-aliased sprite would be the only soft thing on the
-screen. Nothing here ever emits a grey pixel.
+Output is always 72x72 in exactly two colours — a 24 grid upscaled 3x, a 72 grid drawn 1:1, both
+nearest-neighbour. Two colours is not taste, it is `Theme`: the whole UI is two-tone, and an
+anti-aliased sprite would be the only soft thing on the screen. Nothing here ever emits a grey
+pixel, which is also why the two sizes are the only ones allowed — both divide 72 exactly, so no
+resampling filter ever has to invent a third colour.
+
+### Which size
+
+24 is the default and the whole roster except `slime` is drawn at it. It is one screenful, it is
+why a species costs one grid rather than four, and its smallest feature is 3px.
+
+Promote a species to 72 when the thing it needs is what 24 forbids: a curve instead of a
+staircase, a highlight, a mouth. A feature drawn one cell wide at 24 arrives as a 3px speck, and a
+2-cell one as a 6px slab — which is why `slime` had no mouth and no gloss until it moved to 72.
+
+A promotion costs nothing but the grid. Same bitmap dimensions, same drawable count, same index,
+no code change: `Sprites.mc` cannot tell the two sizes apart. It costs *authoring* — 72 rows per
+frame, and `slime` is 21 frames of them.
 
 ## Designing a base grid
 
@@ -51,14 +71,21 @@ anything but ink. At 72px on a 240px watch face:
   disappears against a bezel in daylight.
 - Negative space is the only detail channel. Eyes, mouths and joints are holes in ink, so they
   need to be at least 2x2 cells to still be holes after the derived transforms move things.
-- **Keep ink out of columns 0 and 23 if you want the creature animated.** Eight authored grids
+- **Two holes that touch are one hole**, and one big hole in a silhouette this size reads as damage
+  rather than as a face. Keep 3px of ink between features, and 3px between a feature and the
+  outline — a hole that breaks the edge is a bite, not a hole. This bites hardest on 72 grids,
+  where there are enough features close enough together to collide.
+- **Keep ink out of the outermost columns if you want the creature animated.** Eight authored grids
   touch an edge, and the horizontal transforms have nowhere to push them. See *clamping* below.
-- Row 23 stays blank. Row 22 is the floor.
+- The last row (24) or last three rows (72) stay blank; the row above them is the floor.
 
 ## The four action states
 
 Only the base grid is authored. `generate_sprites.py` derives every state from it, so the artist
 maintains 29 grids instead of 116 and a new species costs one grid rather than four.
+
+Magnitudes below are in 24-grid cells. On a 72 grid every one of them is multiplied by 3, so a
+promoted species moves exactly as far as it did before: 72 buys detail, not different motion.
 
 | Slot | Variant | Derivation |
 |---|---|---|
@@ -199,6 +226,25 @@ Per state, what actually reads at this size:
 - **fight** — a single decisive extension with a snap back to neutral. Two frames is enough;
   anticipation is not readable at 500 ms. Drawn side-on — see *Fight stands side-on, facing right*.
 
+### What 72 changes about a pose — the `slime` blocks
+
+`slime` is the worked example at 72, all 21 frames of it: base, four idle, four move, four sleep,
+two fight, and two each of rock, paper and scissors. What the extra resolution actually changed:
+
+1. **Volume is now countable, so conserve it.** Every deformation of the creature — idle, move,
+   sleep body, fight — carries 1830-1843 ink cells against the base grid's 1837. A slime has a fixed
+   volume, so what a pose loses in height it gains in width; draw a squash without conserving area
+   and the thing inflates. The attacks deliberately do not conserve it, and their comments say why.
+2. **Features ride the deformation, and must not collide while doing it.** The eyes sit in body
+   coordinates and move with the squash. The gloss rides too, but pinned above the eyes rather than
+   to the crest: fixed to the crest it lands on the eye in a squashed frame, and the merged hole
+   reads as damage. 3px of clearance is the rule — see *Designing a base grid*.
+3. **A curve costs nothing extra, so nothing is a staircase.** The dome, the smile, the sleeping
+   lids and the wave's barrel are all curves at 1x. The same shapes at 24 were either straight or
+   absent.
+4. **The bottom reserve is three rows, not one**, and the same multiple applies to every derived
+   magnitude. Nothing about the animation timing changes.
+
 ### Fight stands side-on, facing right
 
 `fight` is the one state with a direction in it, and the direction has to be in the *silhouette*,
@@ -220,7 +266,7 @@ lazy eye, not as a head turn. To actually get side-on:
 - **Then** move the eye. It is the last cue, not the first.
 
 The extension in frame 1 is what the profile buys: the lead arm has somewhere to go, and it should
-go there — ink in column 23, the fist carried out with it. The lead foot stays planted on row 22
+go there — ink in the last column, the fist carried out with it. The lead foot stays planted on the floor row
 while the rear foot leaves the ground; that contact is the difference between a lunge and the sprite
 sliding, which is what `move` is for. A frame 1 that only translates vertically is a bob, and the
 derivation already gives a bob for free.
@@ -254,8 +300,9 @@ is fewer variants per species, not more drawables. Do not split stacked frames b
   an unknown key so the text fallback survives, but a grid nothing references is dead weight.
 - Do not import a third-party image library into the generator. Stdlib-only is why this runs
   anywhere.
-- Do not reorder `VARIANTS`, change `GRID`, or change `SCALE` without changing `Sprites.mc` in the
-  same commit.
+- Do not reorder `VARIANTS`, and do not change `GRIDS` or `SIZE` without changing `Sprites.mc` in
+  the same commit. A grid size that does not divide `SIZE` cannot be scaled without a filter, and a
+  filter means grey pixels.
 - Do not ship an override whose comment claims motion the grid does not contain. Nothing checks
   prose against cells — you do. See *Hand-authored motion (overrides)*.
 - Do not hand-author a `fight` that stands front-on. Side-on facing right, or the mirror sends the

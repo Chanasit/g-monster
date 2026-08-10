@@ -77,8 +77,8 @@ or adding a species is a JSON edit, not a code edit. Strings go in `resources/st
 `resources/drawables/<species>/*.png` (one directory per species; `launcher_icon.png` at the top
 level is hand-authored and not one of them), the `<bitmap>` block of
 `resources/drawables/drawables.xml`, and all of `source/ui/SpriteIndex.mc` are **generated** — do not
-hand-edit them. The art lives as 24x24 ASCII in `tools/sprites/sprites.txt` (`#` ink, `.` clear), one
-grid per species key:
+hand-edit them. The art lives as ASCII in `tools/sprites/sprites.txt` (`#` ink, `.` clear), one
+grid per species key, drawn at either 24x24 or 72x72:
 
 ```bash
 python3 tools/sprites/generate_sprites.py           # rewrite the PNGs, the xml and the index
@@ -92,7 +92,13 @@ no grid.
 One grid per species is authored. Everything else is derived from it: four action states (idle,
 sleep, move, fight), two frames each, plus a mirrored lunge for a creature facing left. `move` is
 the one movement state — walking and running both play it. Several transforms shift the body down,
-which is why the last row of every grid must stay blank.
+which is why the row at the foot of every grid must stay blank — one row at 24, three at 72.
+
+Both sizes render to the same 72x72 bitmap (24 upscaled 3x, 72 drawn 1:1), so the size is purely an
+authoring choice and `Sprites.mc` cannot tell them apart. 24 is the default and the whole roster is
+drawn at it except `slime`, which was promoted to 72 for the features 24 cannot hold: a curved
+silhouette, a gloss highlight and a mouth are 1-2 cells at 24 and arrive as specks after the 3x
+upscale. The cost of a promotion is authoring — 72 rows per frame — and nothing else.
 
 The three attacks on the combat wheel — `rock`, `paper`, `scissors`, plus their mirrors — are the
 exception: nothing derives them, so a species has them only where `sprites.txt` hand-draws the

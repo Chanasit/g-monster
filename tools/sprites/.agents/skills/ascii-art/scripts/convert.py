@@ -51,7 +51,7 @@ VIDEO_EXTS = {".mp4", ".webm", ".avi", ".mov", ".mkv"}
 ALL_STYLES = [
     "classic", "braille", "block", "edge",
     "dot-cross", "halftone", "particles",
-    "retro-art", "terminal",
+    "retro-art", "terminal", "sprite",
 ]
 
 # Random mode: curated good combinations
@@ -321,6 +321,13 @@ def convert_text(args) -> None:
     result = render_text(args.input, font=args.font)
     input_name = args.input[:20].replace(" ", "_")
     chars, rows, cols = _figlet_to_grid(result)
+
+    if args.style == "sprite":
+        # FIGlet picks its own glyphs and never consults a ramp, so the two-character
+        # contract has to be applied after the fact: whatever the font inked is `#`,
+        # whitespace is `.`. Rebuild `result` too — stdout prints it, not the grid.
+        chars = [["." if c.isspace() else "#" for c in row] for row in chars]
+        result = "\n".join("".join(row) for row in chars)
 
     if args.export == "clipboard":
         if export_clipboard_text(chars):

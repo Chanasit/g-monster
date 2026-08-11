@@ -15,8 +15,18 @@ HALFTONE_RAMP = "@O0o\u00b7. "  # @O0o·. (space)
 # Particles chars: small symbols scattered by brightness
 PARTICLE_CHARS = ["\u2022", "\u00b7", "\u2027", "*", "\u2219", "+"]  # •·‧*∙+
 
+# Sprite ramp: the two characters the repo's sprites.txt grid contract allows.
+# Dark end is ink, light end is clear — same polarity as `#`/`.` in sprites.txt.
+SPRITE_RAMP = "#."
+
 # Themed preset definitions
 PRESETS = {
+    "sprite": {
+        "ramp": SPRITE_RAMP,
+        "color": "grayscale",
+        "dither": "none",
+        "description": "Two-character output (# ink, . clear) matching the sprites.txt grid contract",
+    },
     "retro-art": {
         "ramp": "\u2588\u2593\u2592\u2591#%=+:. ",
         "color": "amber",

@@ -5,6 +5,21 @@ description: Converts text, images, or video to ASCII art with multiple styles a
 
 # ASCII Art Converter
 
+## Charset rule (always)
+
+**Every run of this skill emits only `#` and `.`** — `#` is ink, `.` is clear, the same contract
+`tools/sprites/sprites.txt` uses. This is not a style the user picks; it is the house charset, and
+it holds for image, video and text input alike.
+
+- Always pass `--style sprite`. Do not offer or accept another style, and do not ask a Style
+  question — drop it from the options prompt and from `--random`.
+- Any art you hand-write in a reply obeys the same two characters. No box-drawing, no shading
+  blocks, no letters used as texture.
+- `sprite` maps the classic ramp down to two levels for image/video, and folds FIGlet's glyphs to
+  `#`/whitespace-to-`.` for text — so a banner comes back in the same charset as a creature.
+
+Overriding this needs an explicit request naming the other style. Silence means `sprite`.
+
 ## Setup
 
 Before first use, run the environment setup (idempotent, <1s after first run):
@@ -31,13 +46,14 @@ bash {{SKILL_DIR}}/scripts/setup.sh
 Parse the user's message for pre-specified options. Then prompt for **unspecified options** using `AskUserQuestion`.
 
 - "defaults" or "just do it" → skip prompting, use all defaults
-- "random" or "surprise me" → skip prompting, use `--random`
+- "random" or "surprise me" → skip prompting, use `--random --style sprite` (random picks colour and
+  dither; the style is fixed by the charset rule)
 - All options specified → skip prompting
 
 Use `questions` array (max 4 per call, 3 options per question). List ALL choices with numbers in the `question` text. Top 3 as selectable options — user can type any number/name in free-text. No "Other" option. Default as option 1.
 
 **Image/video** — ask in two rounds:
-1. **Round 1** (4 questions): Style → Color → Export → Background
+1. **Round 1** (3 questions): Color → Export → Background. No Style question — see *Charset rule*.
 2. **Round 2** (only if export is `interactive` or `tsx`): Mouse Mode → Animation
 
 **Text**: Font → Color → Export → Background (single round).
@@ -46,7 +62,7 @@ Use `questions` array (max 4 per call, 3 options per question). List ALL choices
 
 | Option | Choices | Default |
 |--------|---------|---------|
-| Style | classic, braille, block, edge, dot-cross, halftone, particles, retro-art, terminal | classic |
+| Style | `sprite` — fixed, not a choice. The other styles emit characters the charset rule forbids | sprite |
 | Color | grayscale, original, matrix, amber, custom (hex/named) | grayscale |
 | Ratio | original, 16:9, 4:3, 1:1, 3:4, 9:16 | original |
 | Background | dark, light, transparent | dark |
@@ -71,9 +87,9 @@ Interactive/tsx exports require image or video input — text is not supported.
 
 ### Disambiguation
 
-- "block" as a **style** = Unicode block elements (█▓▒░) for images
-- "block" as a **font** = block-letter FIGlet font for text
-- For block-style text art, use `--font ansi_shadow` or `--font block`
+- "block" only ever means the **font** now — the block *style* emits █▓▒░, which the charset rule
+  forbids. For block-looking text art use `--font ansi_shadow` or `--font block`; it still comes
+  back as `#`/`.` because `sprite` folds FIGlet's glyphs.
 - Custom colors: hex (`#ff6600`) or named (`coral`, `skyblue`). Translate creative descriptions to hex.
 
 ## Running the Conversion
@@ -82,7 +98,7 @@ Interactive/tsx exports require image or video input — text is not supported.
 {{SKILL_DIR}}/scripts/.venv/bin/python {{SKILL_DIR}}/scripts/convert.py \
   --input "<input>" \
   --type <text|image|video> \
-  --style <style> \
+  --style sprite \
   --color <color> \
   --background <background> \
   --export <format> \

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "ascii-art": {
+      "source": "neethanwu/ascii-art",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "e98bbcc4e2f69d622edf5825641acc23c083abdee0c8a77e9d608320f9ee187c"
+    }
+  }
+}

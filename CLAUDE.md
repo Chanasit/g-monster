@@ -97,8 +97,14 @@ which is why the row at the foot of every grid must stay blank — one row at 24
 Both sizes render to the same 72x72 bitmap (24 upscaled 3x, 72 drawn 1:1), so the size is purely an
 authoring choice and `Sprites.mc` cannot tell them apart. 24 is the default and the whole roster is
 drawn at it except `slime`, which was promoted to 72 for the features 24 cannot hold: a curved
-silhouette, a gloss highlight and a mouth are 1-2 cells at 24 and arrive as specks after the 3x
+silhouette and a gloss highlight are 1-2 cells at 24 and arrive as specks after the 3x
 upscale. The cost of a promotion is authoring — 72 rows per frame — and nothing else.
+
+`slime` is also the one species whose grids are struck by code, in `tools/sprites/drawer/`, because
+at 1x its poses are arithmetic — a superellipse, a squash conserving volume, a highlight clearing an
+eye by 3px. Run it with no arguments to check `sprites.txt` against the code, `--write` to rewrite
+the 21 grids, then rerun `generate_sprites.py`. It does not write the prose above each block; that
+stays hand-written and stays yours to keep true.
 
 The three attacks on the combat wheel — `rock`, `paper`, `scissors`, plus their mirrors — are the
 exception: nothing derives them, so a species has them only where `sprites.txt` hand-draws the

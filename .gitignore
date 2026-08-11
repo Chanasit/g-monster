@@ -15,3 +15,7 @@ external-mir/
 .DS_Store
 
 internal-mir/
+
+# Python bytecode from tools/ scripts
+__pycache__/
+*.pyc
